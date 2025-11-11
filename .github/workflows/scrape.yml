@@ -51,7 +51,7 @@ jobs:
           git status --porcelain --untracked-files=all || true
           echo "--- ls -la ---"
           ls -la
-          echo "jobs_latest.csv present?"; test -f jobs_latest.csv && echo "YES" || echo "NO"
+          echo "jobs.csv present?"; test -f jobs.csv && echo "YES" || echo "NO"
 
       - name: Configure Git user
         run: |
@@ -71,12 +71,12 @@ jobs:
             BRANCH=main
           fi
           echo "Attempting to commit and push to branch: $BRANCH"
-          git add jobs_latest.csv || true
+          git add jobs.csv || true
           # Only commit when staged changes exist
           if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
           fi
-          git commit -m "Automated update of jobs_latest.csv from workflow"
+          git commit -m "Automated update of jobs.csv from workflow"
           # push using PAT; this avoids relying on pre-configured GH token perms
           git push "https://x-access-token:${PAT}@github.com/${REPO}.git" HEAD:"${BRANCH}"
