@@ -182,8 +182,9 @@ def main():
         return
     df = pd.DataFrame(all_rows)
     df.drop_duplicates(subset=["Company","Job Link"], inplace=True)
-    df.to_csv("jobs.csv", index=False)
-    print("Wrote jobs.csv:", len(df))
+    df.to_csv("jobs_latest.csv", index=False)
+print("Saved jobs_latest.csv with", len(df), "rows")
+
 
 if __name__=="__main__":
     main()
