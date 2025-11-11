@@ -51,7 +51,7 @@ jobs:
           git status --porcelain --untracked-files=all || true
           echo "--- ls -la ---"
           ls -la
-          echo "2jobs.csv present?"; test -f 2jobs.csv && echo "YES" || echo "NO"
+          echo "jobs_tight.csv present?"; test -f jobs_tight.csv && echo "YES" || echo "NO"
 
       - name: Configure Git user
         run: |
@@ -71,7 +71,7 @@ jobs:
             BRANCH=main
           fi
           echo "Attempting to commit and push to branch: $BRANCH"
-          git add 2jobs.csv || true
+          git add jobs_tight.csv || true
           # Only commit when staged changes exist
           if git diff --cached --quiet; then
             echo "No changes to commit"
