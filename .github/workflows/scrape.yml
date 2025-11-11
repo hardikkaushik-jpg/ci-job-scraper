@@ -1,10 +1,9 @@
-name: Scrape Job Postings
+name: Daily Job Scraper
 
 on:
   schedule:
-    # Runs daily at 7:00 UTC
-    - cron: '0 7 * * *'
-  workflow_dispatch: # allows manual trigger
+    - cron: '0 12 * * *'  # Every day at 12:00 UTC
+  workflow_dispatch:      # Manual trigger option
 
 jobs:
   scrape:
@@ -24,13 +23,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run job scraper
-        run: |
-          python jobs_scraper.py
+      - name: Run scraper
+        run: python jobs_scraper.py
 
-      - name: Commit and push scraped CSV
-        uses: ad-m/github-push-action@v0.11.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
-          force: true
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and push changes
+        run: |
+          git add jobs.csv
+          git diff-index --quiet HEAD || git commit -m "Automated update of jobs.csv"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
