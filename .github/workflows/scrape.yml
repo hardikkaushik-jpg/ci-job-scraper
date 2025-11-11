@@ -1,17 +1,35 @@
 name: Scrape Jobs & Push
 
+# schedule + manual trigger
 on:
   schedule:
-    - cron: '0 12 * * *' # every day at 12:00 UTC
+    - cron: '0 12 * * *'
   workflow_dispatch:
+
+# need write permission to repo contents
+permissions:
+  contents: write
 
 jobs:
   scrape-and-push:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      - name: Show basic debug info
+        run: |
+          echo "== DEBUG INFO =="
+          echo "Repo: $GITHUB_REPOSITORY"
+          echo "Workflow ref name: $GITHUB_REF_NAME"
+          echo "Actor: $GITHUB_ACTOR"
+          git --version
+          uname -a
+          echo "== END DEBUG =="
+      
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -25,14 +43,40 @@ jobs:
       - name: Run scraper
         run: |
           python jobs_scraper.py
+          echo "Script exit code: $?"
 
-      - name: Configure Git
+      - name: Show repo status after scraper
+        run: |
+          echo "--- git status ---"
+          git status --porcelain --untracked-files=all || true
+          echo "--- ls -la ---"
+          ls -la
+          echo "jobs.csv present?"; test -f jobs.csv && echo "YES" || echo "NO"
+
+      - name: Configure Git user
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Commit & push changes
+      - name: Add, commit and push changes (uses PAT)
+        env:
+          PAT: ${{ secrets.PERSONAL_TOKEN }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
         run: |
-          git add jobs.csv
-          git diff --cached --quiet || git commit -m "Automated update of jobs.csv"
-          git push https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }} HEAD:${{ github.ref_name }}
+          set -e
+          # ensure branch variable
+          if [ -z "$BRANCH" ]; then
+            echo "GITHUB_REF_NAME empty — defaulting to main"
+            BRANCH=main
+          fi
+          echo "Attempting to commit and push to branch: $BRANCH"
+          git add jobs.csv || true
+          # Only commit when staged changes exist
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Automated update of jobs.csv from workflow"
+          # push using PAT; this avoids relying on pre-configured GH token perms
+          git push "https://x-access-token:${PAT}@github.com/${REPO}.git" HEAD:"${BRANCH}"
