@@ -1,2 +1,8 @@
-playwright>=1.40.0
+# Core dependencies
+requests
+beautifulsoup4
 pandas
+lxml
+
+# Playwright for browser automation (handles dynamic job pages)
+playwright
