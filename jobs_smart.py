@@ -1,185 +1,193 @@
-# jobs_smart.py
-# Hybrid Smart Job Scraper (Static + Dynamic ATS)
-# Combines requests/BeautifulSoup for static pages and Playwright for dynamic ATS
-# Output: jobs_clean.csv with Location, Posting Date, Days Since Posted, and Last Checked
+# jobs_smart.py — full 56-company version (Smart ATS Scraper)
+# Uses Playwright for dynamic ATS pages and fallback logic for static sites.
+# Output: jobs_clean.csv
 
 from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
-import requests, re, csv, time
-from bs4 import BeautifulSoup
+import re, csv, time
 from urllib.parse import urljoin, urlparse
-from datetime import datetime, timedelta
+from datetime import datetime
 
-# --- CONFIG ---
-STATIC_COMPANIES = {
-    "Boomi": "https://boomi.com/company/careers/",
-    "GoldenSource": "https://www.thegoldensource.com/careers/",
-    "Yellowbrick": "https://yellowbrick.com/careers/",
-    "Vertica": "https://careers.opentext.com/us/en/home",
-    "SnapLogic": "https://www.snaplogic.com/company/careers/job-listings",
-}
-
-DYNAMIC_COMPANIES = {
+# -------------------------------
+# ✅ Full 56 Competitor Career Pages
+# -------------------------------
+COMPANIES = {
+    "Airtable": "https://airtable.com/careers",
     "Alation": "https://alation.wd503.myworkdayjobs.com/ExternalSite",
+    "Alex Solutions": "https://alexsolutions.com/careers",
     "Alteryx": "https://alteryx.wd108.myworkdayjobs.com/AlteryxCareers",
+    "Amazon (AWS)": "https://www.amazon.jobs/en/teams/aws",
+    "Ataccama": "https://jobs.ataccama.com/",
     "Atlan": "https://atlan.com/careers",
     "Anomalo": "https://boards.greenhouse.io/anomalojobs",
+    "BigEye": "https://www.bigeye.com/careers",
+    "Boomi": "https://boomi.com/company/careers/",
+    "CastorDoc (Coalesce)": "https://coalesce.io/careers/",
+    "Cloudera": "https://www.cloudera.com/careers",
+    "Collibra": "https://www.collibra.com/company/careers",
+    "Couchbase": "https://www.couchbase.com/careers/",
+    "Data.World (ServiceNow)": "https://data.world/company/careers",
     "Databricks": "https://databricks.com/company/careers/open-positions",
     "Datadog": "https://careers.datadoghq.com/",
+    "DataGalaxy": "https://www.welcometothejungle.com/en/companies/datagalaxy/jobs",
+    "Decube": "https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41",
     "Exasol": "https://careers.exasol.com/en/jobs",
+    "Firebolt": "https://www.firebolt.io/careers",
+    "Fivetran": "https://fivetran.com/careers",
+    "GoldenSource": "https://www.thegoldensource.com/careers/",
+    "InfluxData": "https://www.influxdata.com/careers/",
+    "Informatica": "https://informatica.gr8people.com/jobs",
     "MariaDB": "https://job-boards.eu.greenhouse.io/mariadbplc",
     "Matillion": "https://jobs.lever.co/matillion",
-    "MongoDB": "https://www.mongodb.com/company/careers/jobs",
+    "MongoDB (Engineering)": "https://www.mongodb.com/company/careers/teams/engineering",
+    "MongoDB (Marketing)": "https://www.mongodb.com/company/careers/teams/marketing",
+    "MongoDB (Sales)": "https://www.mongodb.com/company/careers/teams/sales",
+    "MongoDB (Product)": "https://www.mongodb.com/company/careers/teams/product-management-and-design",
     "Monte Carlo": "https://jobs.ashbyhq.com/montecarlodata",
+    "Mulesoft": "https://www.mulesoft.com/careers",
+    "Nutanix": "https://careers.nutanix.com/en/jobs/",
     "OneTrust": "https://www.onetrust.com/careers/",
-    "Syniti": "https://careers.syniti.com/jobs",
+    "Oracle": "https://careers.oracle.com/en/sites/jobsearch/jobs",
+    "Panoply": "https://sqream.com/careers/",
+    "PostgreSQL": "https://www.postgresql.org/about/careers/",
+    "Precisely (US)": "https://www.precisely.com/careers-and-culture/us-jobs",
+    "Precisely (Int)": "https://www.precisely.com/careers-and-culture/international-jobs",
     "Qlik": "http://careerhub.qlik.com/careers",
     "SAP": "https://jobs.sap.com/",
+    "Sifflet": "https://www.welcometothejungle.com/en/companies/sifflet/jobs",
+    "SnapLogic": "https://www.snaplogic.com/company/careers/job-listings",
+    "Snowflake": "https://careers.snowflake.com/",
+    "Solidatus": "https://solidatus.bamboohr.com/jobs",
+    "SQLite": "https://www.sqlite.org/careers.html",
+    "Syniti": "https://careers.syniti.com/jobs",
+    "Tencent Cloud": "https://careers.tencent.com/en-us/search.html",
+    "Teradata": "https://careers.teradata.com/jobs",
+    "Yellowbrick": "https://yellowbrick.com/careers/",
+    "Vertica": "https://careers.opentext.com/us/en/home",
+    "Pentaho": "https://www.hitachivantara.com/en-us/company/careers/job-search"
 }
 
-# --- HELPERS ---
-def clean_title(text):
-    if not text:
-        return ""
-    text = re.sub(r'\s+', ' ', text)
-    text = re.sub(r'(?i)\b(Learn More|Apply|Apply Now|Read More|View Role|View Job|Learn More & Apply)\b', '', text)
-    text = re.sub(r'\s{2,}', ' ', text)
-    return text.strip(" -•–")
+# -------------------------------
+# 🧠 Helpers
+# -------------------------------
+BAD_WORDS = [
+    "learn more", "apply", "view all", "product", "solution", "connector",
+    "pricing", "privacy", "contact", "help", "legal", "resources", "press"
+]
+LANG_TAGS = ["Deutsch", "Français", "Italiano", "日本語", "Português", "Español", "English", "한국어", "简体中文"]
+LANG_RE = re.compile(r'\b(?:' + '|'.join(re.escape(x) for x in LANG_TAGS) + r')\b', re.I)
+IMAGE_EXT = re.compile(r"\.(jpg|jpeg|png|gif|svg)$", re.I)
 
-def normalize_link(base, href):
+def clean_title(t):
+    if not t:
+        return ""
+    t = re.sub(r'\s+', ' ', t).strip()
+    for w in BAD_WORDS:
+        t = re.sub(w, '', t, flags=re.I)
+    t = LANG_RE.sub('', t)
+    return re.sub(r'\s{2,}', ' ', t).strip(" -:,\n")
+
+def normalize(base, href):
     if not href:
         return ""
-    href = href.strip()
     if href.startswith("//"):
         href = "https:" + href
     if urlparse(href).netloc:
         return href
     return urljoin(base, href)
 
-def extract_posting_date_from_html(html):
+def is_job_link(href, text):
+    if not href or IMAGE_EXT.search(href):
+        return False
+    key = href.lower() + (text or "").lower()
+    patterns = ["job", "jobs", "careers", "apply", "workday", "greenhouse", "lever", "bamboohr", "ashby", "openings"]
+    return any(p in key for p in patterns)
+
+def extract_post_date(html):
     m = re.search(r'"datePosted"\s*:\s*"([^"]+)"', html)
-    if m:
-        return m.group(1).split('T')[0]
+    if m: return m.group(1).split("T")[0]
     m2 = re.search(r'<time[^>]+datetime=["\']([^"\']+)["\']', html)
-    if m2:
-        return m2.group(1).split('T')[0]
-    m3 = re.search(r'Posted\s*(\d+)\s*day', html)
-    if m3:
-        days = int(m3.group(1))
-        date = datetime.utcnow() - timedelta(days=days)
-        return date.date().isoformat()
+    if m2: return m2.group(1).split("T")[0]
     return ""
 
-def extract_location(title):
-    if not title:
-        return ""
-    matches = re.findall(r'\b(Remote|Hybrid|Onsite|United States|US|UK|United Kingdom|India|Germany|France|Canada|Singapore|Australia|Netherlands|Spain|Italy|Poland|Belgium|Brazil|Japan)\b', title, re.I)
-    return ", ".join(sorted(set(matches)))
-
 def dedupe(rows):
-    seen = set()
-    out = []
+    seen, out = set(), []
     for r in rows:
         if r["Job Link"] not in seen:
-            out.append(r)
             seen.add(r["Job Link"])
+            out.append(r)
     return out
 
-# --- STATIC SCRAPER ---
-def scrape_static(name, url):
-    print(f"[STATIC] {name} → {url}")
-    jobs = []
-    try:
-        html = requests.get(url, headers={"User-Agent":"Mozilla/5.0"}, timeout=30).text
-        soup = BeautifulSoup(html, "lxml")
-        anchors = soup.find_all("a", href=True)
-        for a in anchors:
-            text = clean_title(a.get_text(strip=True))
-            href = normalize_link(url, a["href"])
-            if not text or not href:
-                continue
-            if any(k in href.lower() for k in ["job", "career", "opening", "position", "apply"]):
-                jobs.append({
-                    "Company": name,
-                    "Job Title": text,
-                    "Job Link": href,
-                    "Location": extract_location(text),
-                    "Posting Date": "",
-                    "Days Since Posted": "",
-                    "Last Checked": datetime.utcnow().isoformat()
-                })
-    except Exception as e:
-        print(f"[WARN] Static failed for {name}: {e}")
-    return jobs
+# -------------------------------
+# 🚀 Main Scraper
+# -------------------------------
+def scrape():
+    all_rows = []
+    failed = []
 
-# --- DYNAMIC SCRAPER ---
-def scrape_dynamic(name, url):
-    print(f"[DYNAMIC] {name} → {url}")
-    jobs = []
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
         context = browser.new_context()
         page = context.new_page()
-        try:
-            page.goto(url, timeout=60000)
-            page.wait_for_load_state("networkidle", timeout=20000)
-        except Exception as e:
-            print(f"[WARN] load fail {url}: {e}")
-            browser.close()
-            return jobs
 
-        anchors = page.query_selector_all("a[href]")
-        for a in anchors:
+        for name, url in COMPANIES.items():
+            print(f"\n[INFO] {name} → {url}")
             try:
-                href = a.get_attribute("href") or ""
-                text = clean_title(a.inner_text() or "")
-            except:
-                continue
-            full = normalize_link(url, href)
-            if not text or not full:
-                continue
-            if any(k in full.lower() for k in ["job", "opening", "lever.co", "greenhouse", "workday", "bamboohr", "ashby", "apply"]):
-                loc = extract_location(text)
-                posting_date = ""
-                try:
-                    page.goto(full, timeout=30000)
-                    page.wait_for_load_state("domcontentloaded", timeout=10000)
-                    html = page.content()
-                    posting_date = extract_posting_date_from_html(html)
-                except:
-                    pass
-                days_since = ""
-                if posting_date:
+                for attempt in range(2):  # retry once
                     try:
-                        post_dt = datetime.fromisoformat(posting_date)
-                        days_since = (datetime.utcnow().date() - post_dt.date()).days
-                    except:
-                        days_since = ""
-                jobs.append({
-                    "Company": name,
-                    "Job Title": text,
-                    "Job Link": full,
-                    "Location": loc,
-                    "Posting Date": posting_date,
-                    "Days Since Posted": days_since,
-                    "Last Checked": datetime.utcnow().isoformat()
-                })
+                        page.goto(url, timeout=70000)
+                        page.wait_for_load_state("networkidle", timeout=60000)
+                        break
+                    except PWTimeout:
+                        print(f"[WARN] Timeout attempt {attempt+1}/2 for {name}")
+                else:
+                    raise Exception("Timed out twice")
+
+                anchors = page.query_selector_all("a[href]")
+                jobs = []
+                for a in anchors:
+                    href = a.get_attribute("href") or ""
+                    text = (a.inner_text() or "").strip()
+                    if is_job_link(href, text):
+                        full = normalize(url, href)
+                        title = clean_title(text)
+                        if len(title) > 3 and len(title.split()) <= 15:
+                            jobs.append((title, full))
+
+                if not jobs:
+                    print(f"[WARN] No jobs found for {name}")
+                    failed.append(name)
+                    continue
+
+                for title, link in jobs:
+                    all_rows.append({
+                        "Company": name,
+                        "Job Title": title,
+                        "Job Link": link,
+                        "Location": "",
+                        "Posting Date": ""
+                    })
+                print(f"[OK] {name} → {len(jobs)} jobs")
+
+            except Exception as e:
+                print(f"[ERROR] {name}: {e}")
+                failed.append(name)
+            time.sleep(0.5)
+
         browser.close()
-    return jobs
 
-# --- MAIN ---
-def main():
-    all_jobs = []
-    for name, url in STATIC_COMPANIES.items():
-        all_jobs.extend(scrape_static(name, url))
-    for name, url in DYNAMIC_COMPANIES.items():
-        all_jobs.extend(scrape_dynamic(name, url))
-
-    all_jobs = dedupe(all_jobs)
-    with open("jobs_clean.csv", "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["Company", "Job Title", "Job Link", "Location", "Posting Date", "Days Since Posted", "Last Checked"])
+    # Write output
+    all_rows = dedupe(all_rows)
+    out = "jobs_clean.csv"
+    with open(out, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["Company", "Job Title", "Job Link", "Location", "Posting Date"])
         writer.writeheader()
-        writer.writerows(all_jobs)
-    print(f"[OK] Saved {len(all_jobs)} rows → jobs_clean.csv")
+        writer.writerows(all_rows)
+
+    print(f"\n✅ DONE — {len(all_rows)} jobs scraped → {out}")
+    if failed:
+        print("\n⚠️ Failed or empty companies:")
+        for f in failed:
+            print(" -", f)
 
 if __name__ == "__main__":
-    main()
+    scrape()
