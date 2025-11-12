@@ -27,7 +27,7 @@ jobs:
       - name: Run Smart ATS Scraper
         run: python jobs_smart.py
 
-           - name: Commit and push changes manually
+      - name: Commit and push changes manually
         run: |
           git config --global user.email "243287379+hardikkaushik-jpg@users.noreply.github.com"
           git config --global user.name "hardikkaushik-jpg"
