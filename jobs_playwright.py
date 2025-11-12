@@ -1,196 +1,182 @@
-# jobs_playwright.py
-# Playwright-based ATS-focused job scraper -> produces jobs_tighter.csv
-#
-# Requirements:
-#   pip install -r requirements.txt
-#   playwright install
-#
-# Behavior:
-#   - Uses Playwright for JS-heavy pages
-#   - Cleans titles, skips non-job pages, and extracts posting date + location
-#   - Writes jobs_tighter.csv (overwrites each run)
+# jobs_smart.py
+# Hybrid job scraper using direct ATS feeds + Playwright fallback
+# Outputs jobs_clean.csv with proper job postings
 
-from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
-import re, csv, time
-from urllib.parse import urljoin, urlparse
+import requests, csv, re, json, time
 from datetime import datetime
+from urllib.parse import urlparse
+from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
 
-# --- Helper: Safe navigation wrapper for Playwright ---
-def safe_goto(page, url, timeout=60000):
-    """Safely navigate to a URL with retries and error handling."""
-    try:
-        page.on("download", lambda d: print(f"[WARN] download triggered on {url}, skipping"))
-        page.goto(url, timeout=timeout, wait_until="domcontentloaded")
-        return True
-    except Exception as e:
-        print(f"[WARN] failed to load {url} ({e}) — skipping")
-        return False
-
-
-# --- CONFIG: Company career URLs ---
+# ---- CONFIG ----
 COMPANIES = {
-    "Airtable": "https://airtable.com/careers",
-    "Alation": "https://www.alation.com/careers/all-careers/",
-    "Alex Solutions": "https://alexsolutions.com/careers",
-    "Alteryx": "https://alteryx.wd108.myworkdayjobs.com/AlteryxCareers",
-    "Amazon (AWS)": "https://www.amazon.jobs/en/teams/aws",
+    "Alation": "https://alation.wd503.myworkdayjobs.com/ExternalSite",
     "Ataccama": "https://jobs.ataccama.com/",
     "Atlan": "https://atlan.com/careers",
     "Anomalo": "https://www.anomalo.com/careers",
-    "BigEye": "https://www.bigeye.com/careers",
     "Boomi": "https://boomi.com/company/careers/",
-    "CastorDoc (Coalesce)": "https://coalesce.io/careers/",
-    "Cloudera": "https://www.cloudera.com/careers.html",
+    "CastorDoc (Coalesce)": "https://jobs.ashbyhq.com/coalesce",
     "Collibra": "https://www.collibra.com/company/careers",
-    "Couchbase": "https://www.couchbase.com/careers/",
-    "Data.World (ServiceNow)": "https://data.world/company/careers",
-    "Databricks": "https://databricks.com/company/careers/open-positions",
-    "Datadog": "https://careers.datadoghq.com/",
     "DataGalaxy": "https://www.welcometothejungle.com/en/companies/datagalaxy/jobs",
-    "Decube": "https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41",
     "Exasol": "https://careers.exasol.com/",
-    "Firebolt": "https://www.firebolt.io/careers",
-    "Fivetran": "https://fivetran.com/careers",
-    "GoldenSource": "https://www.thegoldensource.com/careers/",
-    "InfluxData": "https://www.influxdata.com/careers/",
-    "Informatica": "https://informatica.gr8people.com/jobs",
-    "MariaDB": "https://mariadb.com/about/careers/",
+    "Firebolt": "https://www.comeet.com/jobs/firebolt",
+    "MariaDB": "https://boards.eu.greenhouse.io/mariadbplc",
     "Matillion": "https://www.matillion.com/careers",
-    "MongoDB (Engineering)": "https://www.mongodb.com/company/careers/teams/engineering",
-    "Monte Carlo": "https://jobs.ashbyhq.com/montecarlodata",
-    "Mulesoft": "https://www.mulesoft.com/careers",
-    "Nutanix": "https://careers.nutanix.com/en/jobs/",
+    "MongoDB": "https://www.mongodb.com/company/careers",
     "OneTrust": "https://www.onetrust.com/careers/",
-    "Oracle": "https://careers.oracle.com/en/sites/jobsearch/jobs",
-    "Panoply": "https://sqream.com/careers/",
-    "PostgreSQL": "https://www.postgresql.org/about/careers/",
-    "Precisely (US)": "https://www.precisely.com/careers-and-culture/us-jobs",
+    "Precisely": "https://www.precisely.com/careers-and-culture/us-jobs",
     "Qlik": "http://careerhub.qlik.com/careers",
-    "SAP": "https://jobs.sap.com/",
-    "Sifflet": "https://www.welcometothejungle.com/en/companies/sifflet/jobs",
+    "Sifflet": "https://jobs.lever.co/sifflet",
     "SnapLogic": "https://www.snaplogic.com/company/careers",
-    "Snowflake": "https://careers.snowflake.com/",
-    "Solidatus": "https://solidatus.bamboohr.com/",
-    "Syniti": "https://careers.syniti.com/",
-    "Tencent Cloud": "https://careers.tencent.com/en-us/search.html",
-    "Teradata": "https://careers.teradata.com/jobs",
-    "Yellowbrick": "https://yellowbrick.com/careers/",
-    "Vertica": "https://careers.opentext.com/us/en",
-    "Pentaho": "https://www.hitachivantara.com/en-us/company/careers/job-search"
+    "Solidatus": "https://solidatus.bamboohr.com/jobs",
+    "Syniti": "https://careers.syniti.com/content/Careers/",
+    "Yellowbrick": "https://yellowbrick.com/careers/"
 }
 
-COMPANIES = {k: v for k, v in COMPANIES.items() if v}
+# ---- ATS DETECTION ----
+def detect_ats(url):
+    u = url.lower()
+    if "greenhouse.io" in u or "boards.greenhouse" in u: return "greenhouse"
+    if "myworkdayjobs" in u or "wd" in u: return "workday"
+    if "lever.co" in u: return "lever"
+    if "ashbyhq" in u: return "ashby"
+    if "bamboohr" in u: return "bamboohr"
+    return None
 
-# --- Cleaning patterns ---
-IMAGE_EXT = re.compile(r"\.(jpg|jpeg|png|gif|svg)$", re.I)
-BAD_TITLE_PATTERNS = [
-    r"learn more", r"apply", r"view all", r"product", r"solution", r"privacy", r"cookie", r"legal",
-    r"contact", r"help", r"docs", r"resources", r"pricing", r"features"
-]
-LANG_TAGS = ["Deutsch", "Français", "Italiano", "日本語", "Português", "Español", "English"]
-LANG_RE = re.compile(r"\b(" + "|".join(LANG_TAGS) + r")\b", re.I)
+# ---- FETCHERS ----
+def fetch_greenhouse(base):
+    api = base.rstrip("/") + "/jobs/feed/json"
+    r = requests.get(api, timeout=20)
+    r.raise_for_status()
+    data = r.json()
+    out = []
+    for j in data:
+        out.append({
+            "Company": urlparse(base).netloc.split(".")[0].capitalize(),
+            "Job Title": j.get("title",""),
+            "Job Link": j.get("absolute_url",""),
+            "Location": (j.get("location","") or {}).get("name","") if isinstance(j.get("location"), dict) else j.get("location",""),
+            "Posting Date": j.get("updated_at","")[:10]
+        })
+    return out
 
-def clean_title(raw):
-    if not raw:
-        return ""
-    t = raw.strip()
-    for pat in BAD_TITLE_PATTERNS:
-        t = re.sub(pat, "", t, flags=re.I)
-    t = LANG_RE.sub("", t)
-    t = re.sub(r"\s{2,}", " ", t)
-    return t.strip(" -:,")
+def fetch_lever(base):
+    api = base.rstrip("/") + "?mode=json"
+    r = requests.get(api, timeout=20)
+    r.raise_for_status()
+    data = r.json()
+    out = []
+    for j in data:
+        out.append({
+            "Company": urlparse(base).netloc.split(".")[0].capitalize(),
+            "Job Title": j.get("text",""),
+            "Job Link": j.get("hostedUrl",""),
+            "Location": j.get("categories",{}).get("location",""),
+            "Posting Date": j.get("createdAt","")[:10]
+        })
+    return out
 
+def fetch_ashby(base):
+    api = base.rstrip("/") + ".json"
+    r = requests.get(api, timeout=20)
+    r.raise_for_status()
+    data = r.json()
+    out = []
+    for j in data.get("jobs", []):
+        out.append({
+            "Company": urlparse(base).netloc.split(".")[0].capitalize(),
+            "Job Title": j.get("title",""),
+            "Job Link": j.get("url",""),
+            "Location": j.get("location",""),
+            "Posting Date": j.get("updatedAt","")[:10]
+        })
+    return out
 
-def is_likely_job_link(href, text):
-    if not href or IMAGE_EXT.search(href):
-        return False
-    low = (text or href).lower()
-    ats_indicators = ["workday", "greenhouse", "lever.co", "bamboohr", "ashby", "myworkdayjobs", "/jobs/", "/apply/"]
-    return any(x in low for x in ats_indicators)
+def fetch_bamboohr(base):
+    api = base.rstrip("/") + "/feed/json"
+    r = requests.get(api, timeout=20)
+    r.raise_for_status()
+    data = r.json()
+    out = []
+    for j in data:
+        out.append({
+            "Company": urlparse(base).netloc.split(".")[0].capitalize(),
+            "Job Title": j.get("jobOpeningName",""),
+            "Job Link": j.get("jobOpeningUrl",""),
+            "Location": j.get("location",""),
+            "Posting Date": j.get("publishedDate","")[:10]
+        })
+    return out
 
+def fetch_workday(base):
+    api = base.rstrip("/") + "/jobs?limit=50"
+    r = requests.get(api, timeout=20)
+    if r.status_code != 200: return []
+    data = r.text
+    out = []
+    for m in re.finditer(r'"title":"([^"]+)".*?"externalPath":"([^"]+)"', data):
+        title, path = m.groups()
+        link = base.rstrip("/") + path
+        out.append({
+            "Company": urlparse(base).netloc.split(".")[0].capitalize(),
+            "Job Title": title,
+            "Job Link": link,
+            "Location": "",
+            "Posting Date": ""
+        })
+    return out
 
-def extract_posting_date_from_html(content):
-    m = re.search(r'"datePosted"\s*:\s*"([^"]+)"', content)
-    if m:
-        return m.group(1).split("T")[0]
-    m2 = re.search(r"<time[^>]+datetime=['\"]([^'\"]+)['\"]", content)
-    if m2:
-        return m2.group(1).split("T")[0]
-    return ""
-
-
-def normalize_link(base, href):
-    if not href:
-        return ""
-    if href.startswith("//"):
-        href = "https:" + href
-    if not urlparse(href).netloc:
-        return urljoin(base, href)
-    return href
-
-
-def scrape():
+# ---- PLAYWRIGHT FALLBACK ----
+def scrape_playwright(url, company):
     rows = []
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
-        page = browser.new_page()
-
-        for company, url in COMPANIES.items():
-            print(f"[INFO] Scraping {company} -> {url}")
-            if not safe_goto(page, url):
-                continue
-
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
+            page = browser.new_page()
+            page.goto(url, timeout=50000)
+            page.wait_for_load_state("networkidle")
             anchors = page.query_selector_all("a[href]")
-            links = []
-
             for a in anchors:
-                href = a.get_attribute("href")
+                href = a.get_attribute("href") or ""
                 text = (a.inner_text() or "").strip()
-                full = normalize_link(url, href)
-                if not full:
-                    continue
-                if is_likely_job_link(full, text):
-                    links.append((full, text))
+                if any(x in href.lower() for x in ["/job", "/careers/", "greenhouse", "workday", "lever", "ashby", "bamboohr"]):
+                    if len(text.split()) < 15 and re.search(r"\b(engineer|manager|analyst|developer|product|sales|consultant)\b", text, re.I):
+                        rows.append({
+                            "Company": company,
+                            "Job Title": text,
+                            "Job Link": href if href.startswith("http") else url.rstrip("/") + "/" + href.lstrip("/"),
+                            "Location": "",
+                            "Posting Date": ""
+                        })
+            browser.close()
+    except Exception as e:
+        print(f"[WARN] Playwright failed for {url}: {e}")
+    return rows
 
-            seen = set()
-            for link, title_text in links:
-                if link in seen:
-                    continue
-                seen.add(link)
+# ---- MAIN ----
+def main():
+    all_jobs = []
+    for company, url in COMPANIES.items():
+        print(f"[INFO] {company} -> {url}")
+        ats = detect_ats(url)
+        try:
+            if ats == "greenhouse": jobs = fetch_greenhouse(url)
+            elif ats == "lever": jobs = fetch_lever(url)
+            elif ats == "ashby": jobs = fetch_ashby(url)
+            elif ats == "bamboohr": jobs = fetch_bamboohr(url)
+            elif ats == "workday": jobs = fetch_workday(url)
+            else: jobs = scrape_playwright(url, company)
+        except Exception as e:
+            print(f"[WARN] failed {company}: {e}")
+            jobs = scrape_playwright(url, company)
+        all_jobs.extend(jobs)
+        time.sleep(0.5)
 
-                if not safe_goto(page, link):
-                    continue
-
-                html = page.content()
-                cleaned_title = clean_title(title_text)
-                posted = extract_posting_date_from_html(html)
-
-                loc = ""
-                try:
-                    el = page.query_selector(".location, .job-location, span.location")
-                    if el:
-                        loc = el.inner_text().strip()
-                except:
-                    pass
-
-                rows.append({
-                    "Company": company,
-                    "Job Title": cleaned_title or title_text,
-                    "Job Link": link,
-                    "Location": loc,
-                    "Posting Date": posted
-                })
-                time.sleep(0.25)
-
-        browser.close()
-
-    with open("jobs_tighter.csv", "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["Company", "Job Title", "Job Link", "Location", "Posting Date"])
+    # write CSV
+    with open("jobs_clean.csv","w",newline="",encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["Company","Job Title","Job Link","Location","Posting Date"])
         writer.writeheader()
-        writer.writerows(rows)
-
-    print(f"[OK] Wrote {len(rows)} rows to jobs_tighter.csv")
-
+        writer.writerows(all_jobs)
+    print(f"[OK] wrote {len(all_jobs)} real jobs to jobs_clean.csv")
 
 if __name__ == "__main__":
-    scrape()
+    main()
