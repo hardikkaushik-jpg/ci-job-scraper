@@ -1,331 +1,306 @@
-#!/usr/bin/env python3
-"""
-jobs_scraper.py -> writes jobs_tighter.csv
+# jobs_playwright.py
+# Playwright-based ATS-focused job scraper -> produces jobs_tighter.csv
+#
+# Requirements:
+#   pip install -r requirements.txt
+#   playwright install  (or workflow will run it)
+#
+# Behavior:
+#   - Renders pages with Playwright (good for JS-heavy career pages)
+#   - Filters anchors and job-cards to pick only real job postings
+#   - Sanitizes titles (removes language labels, "Learn more", location noise)
+#   - Attempts to extract posting date from JSON-LD or common selectors
+#   - Writes jobs_tighter.csv (overwrites each run)
 
-Designed to:
- - Prefer ATS job feeds (Greenhouse/Lever/Workday/Ashby/BambooHR/SmartRecruiters/Comeet/BrioHR)
- - Use JSON-LD JobPosting when present
- - Avoid product/solutions/resource pages (so Boomi/Databricks/Collibra should give real job posts)
- - Best-effort extraction of posting date (JSON-LD -> detail page date parsing)
-"""
-
-import requests, re, json, time, csv, os
-from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
+import re, csv, time, sys
 from urllib.parse import urljoin, urlparse
 from datetime import datetime
 
-# ---------- CONFIG ----------
-OUT_FILE = "jobs_tighter.csv"
-HEADERS = {"User-Agent": "Mozilla/5.0 (job-scraper; +mailto:you@example.com)"}
-TIMEOUT = 15
-POLITENESS = 0.7
-
-# ---------- Full Companies list (from your provided list) ----------
+# --- CONFIG: paste your 56+ career URLs below (company: url) ---
 COMPANIES = {
-    "Airtable":"https://airtable.com/careers",
-    "Alation":"https://www.alation.com/careers/all-careers/",
-    "Alex Solutions":"https://alexsolutions.com/careers",
-    "Alteryx":"https://alteryx.wd108.myworkdayjobs.com/AlteryxCareers",
-    "Amazon (AWS)":"https://www.amazon.jobs/en/teams/aws",
-    "Ataccama":"https://jobs.ataccama.com/",
-    "Atlan":"https://atlan.com/careers",
-    "Anomalo":"https://www.anomalo.com/careers",
-    "BigEye":"https://www.bigeye.com/careers",
-    "Boomi":"https://boomi.com/company/careers/",
-    "CastorDoc (Coalesce)":"https://coalesce.io/company/careers",
-    "Cloudera":"https://www.cloudera.com/careers",
-    "Collibra":"https://www.collibra.com/company/careers",
-    "Couchbase":"https://www.couchbase.com/careers/",
-    "Data.World (ServiceNow)":"https://data.world/company/careers",
-    "Databricks":"https://databricks.com/company/careers/open-positions",
-    "Datadog":"https://www.datadoghq.com/careers/open-roles/",
-    "DataGalaxy":"https://www.welcometothejungle.com/en/companies/datagalaxy/jobs",
-    "Decube":"https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41",
-    "Exasol":"https://careers.exasol.com/",
-    "Firebolt":"https://www.firebolt.io/careers",
-    "Fivetran":"https://fivetran.com/careers",
-    "GoldenSource":"https://www.thegoldensource.com/careers/",
-    "Google (General)":"https://careers.google.com/jobs/results/",
-    "IBM":"https://www.ibm.com/careers/us-en/search/",
-    "InfluxData":"https://www.influxdata.com/careers/",
-    "Informatica":"https://informatica.gr8people.com/jobs?utm_medium=Direct",
-    "MariaDB":"https://mariadb.com/about/careers/",
-    "Matillion":"https://www.matillion.com/careers",
-    "Microsoft":"https://careers.microsoft.com/us/en/search-results",
-    "MongoDB (Engineering)":"https://www.mongodb.com/company/careers/teams/engineering",
-    "MongoDB (Marketing)":"https://www.mongodb.com/company/careers/teams/marketing",
-    "MongoDB (Sales)":"https://www.mongodb.com/company/careers/teams/sales",
-    "MongoDB (Product)":"https://www.mongodb.com/company/careers/teams/product-management-and-design",
-    "Monte Carlo":"https://jobs.ashbyhq.com/montecarlodata",
-    "Mulesoft":"https://www.mulesoft.com/careers",
-    "Nutanix":"https://careers.nutanix.com/en/jobs/",
-    "OneTrust":"https://www.onetrust.com/careers/",
-    "Oracle":"https://careers.oracle.com/en/sites/jobsearch/jobs?mode=location",
-    "Panoply":"https://sqream.com/careers/",
-    "PostgreSQL":"https://www.postgresql.org/about/careers/",
-    "Precisely (US)":"https://www.precisely.com/careers-and-culture/us-jobs",
-    "Precisely (Int)":"https://www.precisely.com/careers-and-culture/international-jobs",
-    "Qlik":"https://careerhub.qlik.com/careers?start=0&pid=1133909999056&sort_by=hot",
-    "SAP":"https://www.sap.com/about/careers.html",
-    "Sifflet":"https://www.welcometothejungle.com/en/companies/sifflet/jobs",
-    "SnapLogic":"https://www.snaplogic.com/company/careers",
-    "Snowflake":"https://careers.snowflake.com/",
-    "Solidatus":"https://www.solidatus.com/careers/",
-    "SQLite":"https://www.sqlite.org/careers.html",
-    "Syniti":"https://careers.syniti.com/",
-    "Tencent Cloud":"https://careers.tencent.com/en-us/search.html",
-    "Teradata":"https://careers.teradata.com/jobs",
-    "Yellowbrick":"https://yellowbrick.com/careers/#positions",
-    "Vertica":"https://careers.opentext.com/us/en",
-    "Pentaho":"https://www.hitachivantara.com/en-us/company/careers/job-search",
+    "Airtable": "https://airtable.com/careers",
+    "Alation": "https://www.alation.com/careers/all-careers/",
+    "Alex Solutions": "https://alexsolutions.com/careers",
+    "Alteryx": "https://alteryx.wd108.myworkdayjobs.com/AlteryxCareers",
+    "Amazon (AWS)": "https://www.amazon.jobs/en/teams/aws",
+    "Ataccama": "https://jobs.ataccama.com/",
+    "Atlan": "https://atlan.com/careers",
+    "Anomalo": "https://www.anomalo.com/careers",
+    "BigEye": "https://www.bigeye.com/careers",
+    "Boomi": "https://boomi.com/company/careers/",
+    "CastorDoc (Coalesce)": "https://coalesce.io/careers/",
+    "Cloudera": "https://www.cloudera.com/careers.html",
+    "Collibra": "https://www.collibra.com/company/careers",
+    "Couchbase": "https://www.couchbase.com/careers/",
+    "Data.World (ServiceNow)": "https://data.world/company/careers",
+    "Databricks": "https://databricks.com/company/careers/open-positions",
+    "Datadog": "https://careers.datadoghq.com/",
+    "DataGalaxy": "https://www.welcometothejungle.com/en/companies/datagalaxy/jobs",
+    "Decube": "https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41",
+    "Exasol": "https://careers.exasol.com/",
+    "Firebolt": "https://www.firebolt.io/careers",
+    "Fivetran": "https://fivetran.com/careers",
+    "GoldenSource": "https://www.thegoldensource.com/careers/",
+    "Google (General)": None,  # removed by request
+    "IBM": None,               # removed by request
+    "InfluxData": "https://www.influxdata.com/careers/",
+    "Informatica": "https://informatica.gr8people.com/jobs",
+    "MariaDB": "https://mariadb.com/about/careers/",
+    "Matillion": "https://www.matillion.com/careers",
+    "Microsoft": None,         # removed by request
+    "MongoDB (Engineering)": "https://www.mongodb.com/company/careers/teams/engineering",
+    "Monte Carlo": "https://jobs.ashbyhq.com/montecarlodata",
+    "Mulesoft": "https://www.mulesoft.com/careers",
+    "Nutanix": "https://careers.nutanix.com/en/jobs/",
+    "OneTrust": "https://www.onetrust.com/careers/",
+    "Oracle": "https://careers.oracle.com/en/sites/jobsearch/jobs",
+    "Panoply": "https://sqream.com/careers/",
+    "PostgreSQL": "https://www.postgresql.org/about/careers/",
+    "Precisely (US)": "https://www.precisely.com/careers-and-culture/us-jobs",
+    "Qlik": "http://careerhub.qlik.com/careers",
+    "SAP": "https://jobs.sap.com/",
+    "Sifflet": "https://www.welcometothejungle.com/en/companies/sifflet/jobs",
+    "SnapLogic": "https://www.snaplogic.com/company/careers",
+    "Snowflake": "https://careers.snowflake.com/",
+    "Solidatus": "https://solidatus.bamboohr.com/",
+    "SQLite": "https://www.sqlite.org/careers.html",
+    "Syniti": "https://careers.syniti.com/",
+    "Tencent Cloud": "https://careers.tencent.com/en-us/search.html",
+    "Teradata": "https://careers.teradata.com/jobs",
+    "Yellowbrick": "https://yellowbrick.com/careers/",
+    "Vertica": "https://careers.opentext.com/us/en",
+    "Pentaho": "https://www.hitachivantara.com/en-us/company/careers/job-search"
 }
 
-# ---------- ATS host tokens to look for on pages ----------
-ATS_HOST_TOKENS = [
-    "boards.greenhouse.io", "jobs.lever.co", "myworkdayjobs.com", "workday.com",
-    "jobs.ashbyhq.com", "bamboohr.com", "smartrecruiters.com", "comeet.co", "boards.briohr.com",
+# sanitize companies dict: remove None entries (explicitly excluded)
+COMPANIES = {k: v for k, v in COMPANIES.items() if v}
+
+# --- helper regex / lists ---
+IMAGE_EXT = re.compile(r"\.(jpg|jpeg|png|gif|svg)$", re.I)
+BAD_TITLE_PATTERNS = [
+    r'learn more', r'apply', r'view all', r'product', r'solutions?', r'connectors?',
+    r'platform', r'privacy', r'cookie', r'legal', r'contact', r'help', r'docs',
+    r'enterprise', r'features', r'pricing', r'resources', r'news', r'events'
 ]
+LANG_TAGS = ["Deutsch", "Français", "Italiano", "日本語", "Português", "Español",
+             "English", "한국어", "简体中文", "Deutsch (Deutschland)", "Português"]
+LANG_RE = re.compile(r'\b(?:' + '|'.join(re.escape(x) for x in LANG_TAGS) + r')\b', re.I)
+LOCATION_IN_TITLE_RE = re.compile(r'\b(USA|United States|United Kingdom|UK|Remote|Hybrid|Worldwide|India|Germany|France|Canada|London|NY|New York|Singapore|Bengaluru|Chennai|Paris|Berlin)\b', re.I)
+APPLY_IN_RE = re.compile(r'apply\s+in', re.I)
+EXTRA_CLEAN_RE = re.compile(r'[\u00A0\u200B]+')  # weird spaces
 
-# ---------- regex / helpers ----------
-JOB_URL_RE = re.compile(r'(/job/|/jobs/|jobs\.|/careers/jobs/|/careers/positions/|/open-roles|/open-positions|/careers/|/careers\?)', re.I)
-ROLE_KW_RE = re.compile(r'\b(engineer|developer|data|analyst|manager|architect|devops|sre|qa|quality|product|designer|ux|ui|sales|solutions engineer|account executive|consultant|scientist|director|lead|researcher)\b', re.I)
-DATE_PATTERNS = [
-    re.compile(r'(\d{4}-\d{2}-\d{2})'),
-    re.compile(r'([A-Za-z]{3,9}\s+\d{1,2},\s*\d{4})'),
-    re.compile(r'(\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4})'),
-]
-
-DENY_PATH_TOKENS = ["/product", "/products", "/solutions", "/resources", "/blog", "/docs", "/documentation", "/webinar", "/events", "/pricing", "/case-study", "/case-studies"]
-
-def fetch_html(url):
-    try:
-        r = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
-        r.raise_for_status()
-        return r.text
-    except Exception as e:
-        print(f"[WARN] fetch_html failed for {url}: {e}")
+def clean_title(raw):
+    if not raw:
         return ""
+    t = raw.strip()
+    # remove "Learn more & Apply" and similar phrases
+    t = re.sub(r'learn more.*$', '', t, flags=re.I)
+    t = re.sub(r'learn more\s*&?\s*apply.*$', '', t, flags=re.I)
+    t = re.sub(r'view all.*$', '', t, flags=re.I)
+    t = re.sub(r'\b(apply|apply now|learn more|learn more & apply)\b', '', t, flags=re.I)
+    # remove language labels, "English", "Deutsch", etc.
+    t = LANG_RE.sub('', t)
+    # remove obvious product/marketing words
+    for p in BAD_TITLE_PATTERNS:
+        t = re.sub(p, '', t, flags=re.I)
+    # remove duplicated location tokens inside title
+    t = LOCATION_IN_TITLE_RE.sub('', t)
+    t = APPLY_IN_RE.sub('', t)
+    t = EXTRA_CLEAN_RE.sub(' ', t)
+    # collapse whitespace
+    t = re.sub(r'\s{2,}', ' ', t).strip(" -:,.")
+    return t
 
-def normalize_link(link, base=None):
-    if not link:
-        return ""
-    link = link.strip()
-    if link.startswith("//"):
-        link = "https:" + link
-    parsed = urlparse(link)
-    if not parsed.scheme:
-        if base:
-            return urljoin(base, link)
-        else:
-            return "https://" + link
-    # remove query & fragment
-    return f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
+def is_likely_job_link(href, text):
+    if not href or IMAGE_EXT.search(href):
+        return False
+    low = (text or href).lower()
+    # positive heuristics: common ATS path fragments
+    positives = ['/jobs/', '/job/', '/careers/', '/careers/', '/positions/', '/open-positions', '/openings', '/apply/','boards.greenhouse','lever.co','workday','bamboohr','ashby','comeet','gr8people','jobs.','myworkdayjobs','job-boards']
+    if any(p in href.lower() for p in positives) or any(p in low for p in positives):
+        return True
+    # also accept anchors that look like job titles (short, capitalized, has role-like words)
+    if 3 <= len(text.split()) <= 7 and re.search(r'\b(engineer|manager|analyst|developer|scientist|architect|director|product|sales|success|consultant|designer|qa|sre)\b', text, re.I):
+        return True
+    return False
 
-def find_ats_links(html, base_url):
-    """Scan anchors for known ATS host links and return them (unique)."""
-    out = []
-    soup = BeautifulSoup(html, "lxml")
-    for a in soup.find_all("a", href=True):
-        href = a["href"].strip()
-        full = normalize_link(href, base_url)
-        for token in ATS_HOST_TOKENS:
-            if token in full:
-                if full not in out:
-                    out.append(full)
-    return out
-
-def parse_jsonld_jobposting(html, base_url):
-    """Return list of job dicts from JSON-LD JobPosting"""
-    out = []
-    try:
-        soup = BeautifulSoup(html, "lxml")
-        scripts = soup.find_all("script", {"type":"application/ld+json"})
-        for s in scripts:
-            raw = s.string
-            if not raw:
-                continue
-            try:
-                data = json.loads(raw)
-            except:
-                # skip broken JSON-LD
-                continue
-            items = data if isinstance(data, list) else [data]
-            for item in items:
-                # handle @graph
-                if isinstance(item, dict) and "@graph" in item and isinstance(item["@graph"], list):
-                    items2 = item["@graph"]
-                else:
-                    items2 = [item]
-                for it in items2:
-                    if isinstance(it, dict):
-                        typ = it.get("@type") or it.get("type") or ""
-                        if isinstance(typ, list):
-                            typ = ",".join(typ)
-                        if "JobPosting" in str(typ):
-                            title = it.get("title") or it.get("name") or ""
-                            link = it.get("url") or base_url
-                            datep = it.get("datePosted") or ""
-                            loc = ""
-                            jl = it.get("jobLocation")
-                            if isinstance(jl, dict):
-                                addr = jl.get("address", {})
-                                loc = addr.get("addressLocality","") or addr.get("addressRegion","") or ""
-                            out.append({"title": title.strip(), "link": link.strip(), "location": loc, "datePosted": datep})
-    except Exception as e:
-        print(f"[WARN] parse_jsonld_jobposting error: {e}")
-    return out
-
-def find_job_anchors_conservative(html, base_url):
-    """Conservative anchor scanning: only anchors that look like jobs and are not product pages"""
-    out = []
-    soup = BeautifulSoup(html, "lxml")
-    for a in soup.find_all("a", href=True):
-        href = a["href"].strip()
-        text = a.get_text(" ", strip=True) or ""
-        full = normalize_link(href, base_url)
-        if not full:
-            continue
-        path = urlparse(full).path.lower()
-        if any(tok in path for tok in DENY_PATH_TOKENS):
-            continue
-        if JOB_URL_RE.search(full) or ROLE_KW_RE.search(text):
-            out.append({"title": text.strip(), "link": full})
-    # dedupe by link
-    uniq = []
-    seen = set()
-    for c in out:
-        if c["link"] not in seen:
-            seen.add(c["link"])
-            uniq.append(c)
-    return uniq
-
-def guess_date_from_detail(detail_html):
-    if not detail_html:
-        return ""
-    text = BeautifulSoup(detail_html, "lxml").get_text(" ", strip=True)
-    for pat in DATE_PATTERNS:
-        m = pat.search(text)
-        if m:
-            ds = m.group(1)
-            for fmt in ("%Y-%m-%d","%B %d, %Y","%b %d, %Y","%d %B %Y"):
-                try:
-                    dt = datetime.strptime(ds, fmt)
-                    return dt.date().isoformat()
-                except:
-                    pass
-            return ds
+def extract_posting_date_from_html(page_content):
+    # try to find JSON-LD datePosted, or meta[property="article:published_time"], or <time datetime=...>
+    m = re.search(r'"datePosted"\s*:\s*"([^"]+)"', page_content)
+    if m:
+        return m.group(1).split('T')[0]
+    m2 = re.search(r'<meta[^>]+property=["\']article:published_time["\'][^>]+content=["\']([^"\']+)["\']', page_content, re.I)
+    if m2:
+        try:
+            return datetime.fromisoformat(m2.group(1)).date().isoformat()
+        except:
+            return m2.group(1)
+    m3 = re.search(r'<time[^>]+datetime=["\']([^"\']+)["\']', page_content, re.I)
+    if m3:
+        return m3.group(1).split('T')[0]
     return ""
 
-def follow_and_extract(company, careers_url):
-    """
-    Strategy:
-     1) fetch careers page
-     2) try JSON-LD on that page
-     3) find ATS links on that page and follow them (prefer first)
-     4) else conservative anchor extraction
-    """
+def normalize_link(base, href):
+    if not href:
+        return ""
+    href = href.strip()
+    if href.startswith("//"):
+        href = "https:" + href
+    if urlparse(href).netloc:
+        return href
+    return urljoin(base, href)
+
+def dedupe_keep_latest(rows):
+    # simple dedupe by Job Link, keep first occurrence
+    seen = set()
     out = []
-    careers_html = fetch_html(careers_url)
-    if not careers_html:
-        return out
-
-    # 1) JSON-LD on careers page
-    jl = parse_jsonld_jobposting(careers_html, careers_url)
-    if jl:
-        for j in jl:
-            title = j.get("title") or ""
-            link = normalize_link(j.get("link") or careers_url, careers_url)
-            datep = j.get("datePosted") or ""
-            loc = j.get("location") or ""
-            # final acceptance test
-            if ROLE_KW_RE.search(title) or JOB_URL_RE.search(link):
-                # try to fill date if missing
-                if not datep:
-                    detail_html = fetch_html(link)
-                    datep = guess_date_from_detail(detail_html)
-                out.append({"Company": company, "Job Title": title, "Job Link": link, "Location": loc, "Posting Date": datep})
-        if out:
-            return out
-
-    # 2) find ATS links embedded and follow them (strong preference)
-    ats_links = find_ats_links(careers_html, careers_url)
-    for ats in ats_links:
-        # fetch ATS page (list) and try JSON-LD or anchors there
-        ats_html = fetch_html(ats)
-        if not ats_html:
+    for r in rows:
+        link = r.get("Job Link","")
+        if link in seen:
             continue
-        # JSON-LD on ATS page
-        jl2 = parse_jsonld_jobposting(ats_html, ats)
-        if jl2:
-            for j in jl2:
-                title = j.get("title") or ""
-                link = normalize_link(j.get("link") or ats, ats)
-                datep = j.get("datePosted") or ""
-                loc = j.get("location") or ""
-                if not datep:
-                    detail_html = fetch_html(link)
-                    datep = guess_date_from_detail(detail_html)
-                if ROLE_KW_RE.search(title) or JOB_URL_RE.search(link):
-                    out.append({"Company": company, "Job Title": title, "Job Link": link, "Location": loc, "Posting Date": datep})
-        # fallback: conservative anchors on ATS page
-        candidates = find_job_anchors_conservative(ats_html, ats)
-        for c in candidates:
-            title = c.get("title") or ""
-            link = normalize_link(c.get("link") or ats, ats)
-            detail_html = fetch_html(link)
-            datep = guess_date_from_detail(detail_html)
-            if ROLE_KW_RE.search(title) or JOB_URL_RE.search(link):
-                out.append({"Company": company, "Job Title": title, "Job Link": link, "Location": "", "Posting Date": datep})
-        if out:
-            return out
-
-    # 3) fallback: conservative anchors on careers page itself
-    candidates = find_job_anchors_conservative(careers_html, careers_url)
-    for c in candidates:
-        title = c.get("title") or ""
-        link = normalize_link(c.get("link") or careers_url, careers_url)
-        detail_html = fetch_html(link)
-        datep = guess_date_from_detail(detail_html)
-        if ROLE_KW_RE.search(title) or JOB_URL_RE.search(link):
-            out.append({"Company": company, "Job Title": title, "Job Link": link, "Location": "", "Posting Date": datep})
-
+        seen.add(link)
+        out.append(r)
     return out
 
-def run_all():
-    all_rows = []
-    for name, url in COMPANIES.items():
-        try:
-            rows = follow_and_extract(name, url)
-            # small delay
-            time.sleep(POLITENESS)
-            # dedupe inside company by link
+def scrape():
+    rows = []
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
+        context = browser.new_context()
+        page = context.new_page()
+        for company, url in COMPANIES.items():
+            print(f"[INFO] scraping {company} -> {url}")
+            try:
+                page.goto(url, timeout=40000)
+                page.wait_for_load_state("networkidle", timeout=20000)
+            except PWTimeout:
+                print(f"[WARN] timeout loading {url} (continuing)")
+
+            # collect candidate anchors and job-card elements
+            anchors = page.query_selector_all("a[href]")
+            candidate_links = []
+            for a in anchors:
+                href = a.get_attribute("href") or ""
+                text = (a.inner_text() or "").strip()
+                full = normalize_link(url, href)
+                if not full:
+                    continue
+                if is_likely_job_link(full, text):
+                    # avoid marketing pages or repeated nav anchors
+                    if re.search(r'\b(privacy|cookie|terms|contact|docs|help|legal|resources|product|features|pricing)\b', text, re.I):
+                        continue
+                    candidate_links.append((full, text))
+
+            # also try to capture job-card anchors (some sites use <div role="link"> or buttons)
+            # find elements that look like job cards
+            job_cards = page.query_selector_all("a,button,[role='link']")
+            for jc in job_cards:
+                try:
+                    href = jc.get_attribute("href") or ""
+                except:
+                    href = ""
+                text = (jc.inner_text() or "").strip()
+                full = normalize_link(url, href) if href else ""
+                if full and is_likely_job_link(full, text):
+                    candidate_links.append((full, text))
+
+            # make unique while preserving order
             seen = set()
-            for r in rows:
-                lk = r.get("Job Link","")
-                if not lk: continue
-                if lk in seen: continue
-                seen.add(lk)
-                all_rows.append(r)
-            print(f"[INFO] {name} -> extracted {len(seen)} jobs")
-        except Exception as e:
-            print(f"[ERROR] {name} failed: {e}")
+            filtered = []
+            for link, text in candidate_links:
+                if link in seen:
+                    continue
+                seen.add(link)
+                filtered.append((link, text))
 
-    # final dedupe overall
-    uniq = {}
-    for r in all_rows:
-        key = (r.get("Company",""), r.get("Job Link",""))
-        if key not in uniq:
-            uniq[key] = r
+            # If nothing found using anchor heuristics, try to detect job-list items (fallback)
+            if not filtered:
+                # common job-list selectors used by ATS templates
+                hit = page.query_selector_all("li.jb, li.job, div.job, div.opening, .job-listing, .position, .job-card, .open-role")
+                for el in hit:
+                    try:
+                        a = el.query_selector("a[href]")
+                        if a:
+                            href = a.get_attribute("href") or ""
+                            text = (a.inner_text() or el.inner_text() or "").strip()
+                            full = normalize_link(url, href)
+                            if full and is_likely_job_link(full, text):
+                                if full not in seen:
+                                    filtered.append((full, text))
+                                    seen.add(full)
+                    except:
+                        pass
 
-    out = list(uniq.values())
-    # write CSV
-    fieldnames = ["Company","Job Title","Job Link","Location","Posting Date"]
-    with open(OUT_FILE, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+            # final cleaning: remove obvious non-job pages
+            final_links = []
+            for link, text in filtered:
+                if IMAGE_EXT.search(link):
+                    continue
+                # exclude links that are the same as the careers landing / homepage
+                if link.rstrip('/') == url.rstrip('/'):
+                    continue
+                # ignore obvious product pages
+                if re.search(r'/product|/features|/pricing|/solutions|/docs|/resources|/legal|/contact', link, re.I):
+                    # still accept if the anchor text is clearly a job title
+                    if not re.search(r'\b(engineer|manager|analyst|developer|scientist|architect|director|product|sales|success|consultant|designer|qa|sre)\b', text, re.I):
+                        continue
+                final_links.append((link, text))
+
+            # fetch each job detail page to get cleaned title and posting date (if possible)
+            for link, title_text in final_links:
+                try:
+                    # load detail page
+                    page.goto(link, timeout=30000)
+                    page.wait_for_load_state("networkidle", timeout=20000)
+                    html = page.content()
+                except PWTimeout:
+                    html = ""
+                cleaned_title = clean_title(title_text)
+                # fallback: if cleaned_title is empty or looks like nav, try to extract h1/h2 from detail page
+                if (not cleaned_title) and html:
+                    try:
+                        h1 = page.query_selector("h1")
+                        if h1 and h1.inner_text().strip():
+                            cleaned_title = clean_title(h1.inner_text().strip())
+                    except:
+                        pass
+                # posting date
+                posted = extract_posting_date_from_html(html or "")
+                # location attempt: find patterns on job detail page
+                loc = ""
+                try:
+                    # try common selectors
+                    cand = page.query_selector("span.location, .job-location, .location, [data-test='job-location']")
+                    if cand:
+                        loc = cand.inner_text().strip()
+                    else:
+                        # try JSON-LD location or meta
+                        m = re.search(r'"hiringOrganization".*', html or "")
+                        # fallback blank
+                except:
+                    loc = ""
+                rows.append({
+                    "Company": company,
+                    "Job Title": cleaned_title or title_text,
+                    "Job Link": link,
+                    "Location": loc,
+                    "Posting Date": posted
+                })
+                # be polite to sites
+                time.sleep(0.25)
+
+        browser.close()
+
+    # dedupe and write CSV
+    rows = dedupe_keep_latest(rows)
+    out = "jobs_tighter.csv"
+    with open(out, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["Company","Job Title","Job Link","Location","Posting Date"])
         writer.writeheader()
-        for r in out:
-            writer.writerow({k: r.get(k,"") for k in fieldnames})
-    print(f"[OK] Wrote {len(out)} rows to {OUT_FILE}")
+        for r in rows:
+            writer.writerow(r)
+    print(f"[OK] wrote {len(rows)} rows -> {out}")
 
 if __name__ == "__main__":
-    run_all()
+    scrape()
