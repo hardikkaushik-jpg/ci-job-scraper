@@ -3,15 +3,19 @@ name: Scrape and Push Jobs (Smart ATS)
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 6 * * *"  # runs daily at 6 AM UTC
+    - cron: "0 6 * * *"
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repo with personal token
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -27,7 +31,7 @@ jobs:
       - name: Run Smart ATS Scraper
         run: python jobs_smart.py
 
-      - name: Commit and push changes manually
+      - name: Commit and push changes
         env:
           TOKEN: ${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}
         run: |
@@ -35,5 +39,4 @@ jobs:
           git config --global user.name "hardikkaushik-jpg"
           git add jobs_clean.csv
           git commit -m "Automated Smart ATS scrape" || echo "No changes to commit"
-          git remote set-url origin https://x-access-token:${TOKEN}@github.com/hardikkaushik-jpg/ci-job-scraper.git
-          git push origin main --force
+          git push https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git HEAD:main --force
