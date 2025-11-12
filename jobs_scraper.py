@@ -68,7 +68,7 @@ COMPANIES = {
 # -------------------- SETTINGS --------------------
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; job-scraper/1.0; +mailto:you@example.com)"}
 TIMEOUT = 15
-OUT_FILE = "jobs_tight.csv"   # output file name (change if you want)
+OUT_FILE = "jobs_tighter.csv"   # output file name (change if you want)
 # ------------------------------------------------------------------------
 
 # Regex patterns used for heuristics
