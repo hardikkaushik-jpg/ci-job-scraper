@@ -27,15 +27,10 @@ jobs:
       - name: Run Smart ATS Scraper
         run: python jobs_smart.py
 
-      - name: Commit and push changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Automated Smart ATS scrape"
-          file_pattern: jobs_clean.csv
-          branch: main
-          push_options: '--force'
-          repository: .
-          commit_user_name: hardikkaushik-jpg
-          commit_user_email: 243287379+hardikkaushik-jpg@users.noreply.github.com
-        env:
-          GITHUB_TOKEN: ${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}
+           - name: Commit and push changes manually
+        run: |
+          git config --global user.email "243287379+hardikkaushik-jpg@users.noreply.github.com"
+          git config --global user.name "hardikkaushik-jpg"
+          git add jobs_clean.csv
+          git commit -m "Automated Smart ATS scrape" || echo "No changes to commit"
+          git push https://hardikkaushik-jpg:${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}@github.com/hardikkaushik-jpg/ci-job-scraper.git main --force
