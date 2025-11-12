@@ -1,45 +1,38 @@
-name: Scrape and Push Jobs (Playwright)
+name: Scrape and Push Jobs (Smart ATS)
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: "0 6 * * *"  # runs every day at 6:00 AM UTC
-  workflow_dispatch:      # allows manual trigger
+    - cron: "0 6 * * *"  # runs daily at 6 AM UTC
 
 jobs:
-  scrape-and-push:
+  scrape:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      id-token: write
 
     steps:
-      # Checkout repository
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      # Install dependencies and Playwright browsers
       - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
-          playwright install --with-deps
+          python -m playwright install chromium
 
-      # Run the Playwright job scraper
-      - name: Run job scraper
-        run: python jobs_playwright.py
+      - name: Run Smart ATS Scraper
+        run: python jobs_smart.py
 
-      # Commit and push updated jobs_tighter.csv file
-      - name: Commit and push CSV
-        run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "github-actions[bot]"
-          git add jobs_tighter.csv || echo "No CSV to add"
-          git commit -m "Automated update of jobs_tighter.csv" || echo "No changes to commit"
-          git push
+      - name: Commit and push results
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Automated Smart ATS scrape"
+          file_pattern: jobs_clean.csv
+          branch: main
+          push_options: '--force'
         env:
           GITHUB_TOKEN: ${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}
