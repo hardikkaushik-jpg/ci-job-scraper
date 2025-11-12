@@ -1,4 +1,2 @@
-requests
-beautifulsoup4
+playwright>=1.40.0
 pandas
-lxml
