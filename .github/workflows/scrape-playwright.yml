@@ -3,36 +3,44 @@ name: Scrape and Push Jobs (Smart ATS)
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 6 * * *"
+    - cron: "0 6 * * *"  # daily 06:00 UTC
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
+          # install playwright browsers
           python -m playwright install chromium
 
-      - name: Run Smart Scraper
+      - name: Run Smart ATS Scraper
         run: python jobs_smart.py
 
-      - name: Commit results
+      - name: Commit and push jobs_final_hard.csv
+        env:
+          PUSH_TOKEN: ${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add job_final_hard.csv
-          git commit -m "Update job_final_hard.csv" || echo "No changes"
-          git push https://hardikkaushik-jpg:${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}@github.com/hardikkaushik-jpg/ci-job-scraper.git HEAD:main
+          # Configure git identity
+          git config --global user.email "243287379+${{ github.actor }}@users.noreply.github.com"
+          git config --global user.name "${{ github.actor }}"
+          git add jobs_final_hard.csv || true
+          # commit only if changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Automated Smart ATS scrape: update jobs_final_hard.csv" || true
+            # use token to push
+            git push "https://x-access-token:${PUSH_TOKEN}@github.com/${{ github.repository }}" HEAD:main --force
+          fi
