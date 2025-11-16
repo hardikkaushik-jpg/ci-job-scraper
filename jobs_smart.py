@@ -42,7 +42,7 @@ from datetime import datetime, timezone, date
         "https://www.mongodb.com/company/careers/teams/engineering",
         "https://www.mongodb.com/company/careers/teams/marketing",
         "https://www.mongodb.com/company/careers/teams/sales",
-        "https://www.mongodb.com/company/careers/teams/product-management-and-design",
+        "https://www.mongodb.com/company/careers/teams/product-management-and-design"
     ],
     "Monte Carlo": ["https://jobs.ashbyhq.com/montecarlodata"],
     "Mulesoft": ["https://www.mulesoft.com/careers"],
@@ -52,22 +52,21 @@ from datetime import datetime, timezone, date
     "Panoply (Sqream)": ["https://sqream.com/careers/"],
     "Precisely": [
         "https://www.precisely.com/careers-and-culture/us-jobs",
-        "https://www.precisely.com/careers-and-culture/international-jobs",
+        "https://www.precisely.com/careers-and-culture/international-jobs"
     ],
     "Qlik": ["http://careerhub.qlik.com/careers"],
     "Sifflet": ["https://www.welcometothejungle.com/en/companies/sifflet/jobs"],
     "SnapLogic": ["https://www.snaplogic.com/company/careers/job-listings"],
-    "Snowflake": ["https://careers.snowflake.com/us/en/search-results"],
+    "Snowflake": ["https://careers.snowflake.com/global/en/search-results"],
     "Solidatus": ["https://solidatus.bamboohr.com/jobs"],
     "Syniti": ["https://careers.syniti.com/go/Explore-Our-Roles/8777900/"],
     "Tencent Cloud": ["https://careers.tencent.com/en-us/search.html"],
     "Teradata": ["https://careers.teradata.com/jobs"],
     "Yellowbrick": ["https://yellowbrick.com/careers/#positions"],
     "Vertica": ["https://careers.opentext.com/us/en/home"],
-    "Pentaho": ["https://www.hitachivantara.com/en-us/company/careers/job-search"],
+    "Pentaho": ["https://www.hitachivantara.com/en-us/company/careers/job-search"]
 }
 # ---------------------------------------------------------------------------------
-
 # throttles
 PAGE_NAV_TIMEOUT = 45000
 PAGE_IDLE_TIMEOUT = 30000
