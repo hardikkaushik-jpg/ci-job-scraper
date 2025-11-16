@@ -1,5 +1,5 @@
-playwright
-beautifulsoup4
-requests
-pandas
-lxml
+playwright==1.43.0
+beautifulsoup4==4.12.2
+pandas==2.1.0
+lxml==4.9.3
+requests==2.31.0
