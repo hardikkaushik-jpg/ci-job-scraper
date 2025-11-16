@@ -3,7 +3,7 @@ name: Scrape and Push Jobs (Smart ATS)
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 6 * * *"  # daily at 06:00 UTC (adjust if needed)
+    - cron: "0 6 * * *"  # daily at 06:00 UTC
 
 jobs:
   scrape:
@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -26,20 +24,17 @@ jobs:
           python -m playwright install chromium
 
       - name: Run Smart ATS Scraper
-        run: |
-          python jobs_smart.py
+        run: python jobs_smart.py
+        # if your script is named differently locally, change the above
 
-      - name: Commit and push CSV (using PAT)
-        env:
-          GITHUB_TOKEN_PUSH: ${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}
+      - name: Commit & push CSV (using personal token)
         run: |
           git config --global user.email "243287379+hardikkaushik-jpg@users.noreply.github.com"
           git config --global user.name "hardikkaushik-jpg"
           git add jobs_final_hard.csv || true
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Automated Smart ATS scrape"
-            # push using the PAT stored in the repo secret
-            git push https://x-access-token:${GITHUB_TOKEN_PUSH}@github.com/${{ github.repository }} HEAD:main --force
-          fi
+          git commit -m "Automated Smart ATS scrape" --author="hardikkaushik-jpg <243287379+hardikkaushik-jpg@users.noreply.github.com>" || echo "No changes to commit"
+          # push using token stored in secrets (use the exact secret name you created)
+          git push https://hardikkaushik-jpg:${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}@github.com/hardikkaushik-jpg/ci-job-scraper.git HEAD:main --force
+        env:
+          # ensure you added this secret in repo Settings -> Secrets -> Actions
+          CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN: ${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}
