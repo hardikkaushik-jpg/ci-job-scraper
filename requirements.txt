@@ -1,5 +1,5 @@
-requests
-beautifulsoup4
-lxml
-pandas
 playwright
+beautifulsoup4
+requests
+pandas
+lxml
