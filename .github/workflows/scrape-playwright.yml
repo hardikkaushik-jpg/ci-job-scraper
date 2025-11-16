@@ -3,7 +3,7 @@ name: Scrape and Push Jobs (Smart ATS)
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 6 * * *"  # daily at 06:00 UTC
+    - cron: "0 6 * * *"  # daily 06:00 UTC
 
 jobs:
   scrape:
@@ -15,7 +15,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |
@@ -25,16 +25,15 @@ jobs:
 
       - name: Run Smart ATS Scraper
         run: python jobs_smart.py
-        # if your script is named differently locally, change the above
+        timeout-minutes: 20
 
-      - name: Commit & push CSV (using personal token)
+      - name: Commit & push results using token
+        env:
+          GH_PUSH_TOKEN: ${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}
         run: |
           git config --global user.email "243287379+hardikkaushik-jpg@users.noreply.github.com"
           git config --global user.name "hardikkaushik-jpg"
           git add jobs_final_hard.csv || true
-          git commit -m "Automated Smart ATS scrape" --author="hardikkaushik-jpg <243287379+hardikkaushik-jpg@users.noreply.github.com>" || echo "No changes to commit"
-          # push using token stored in secrets (use the exact secret name you created)
-          git push https://hardikkaushik-jpg:${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}@github.com/hardikkaushik-jpg/ci-job-scraper.git HEAD:main --force
-        env:
-          # ensure you added this secret in repo Settings -> Secrets -> Actions
-          CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN: ${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}
+          git commit -m "Automated Smart ATS scrape" || echo "No changes to commit"
+          # use HTTPS push with token (force if you want)
+          git push https://hardikkaushik-jpg:${GH_PUSH_TOKEN}@github.com/hardikkaushik-jpg/ci-job-scraper.git HEAD:main --force
