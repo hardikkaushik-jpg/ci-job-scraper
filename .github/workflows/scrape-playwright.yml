@@ -8,14 +8,18 @@ on:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
@@ -23,17 +27,16 @@ jobs:
           pip install -r requirements.txt
           python -m playwright install chromium
 
-      - name: Run Smart ATS Scraper
-        run: python jobs_smart.py
-        timeout-minutes: 20
+      - name: Run Smart ATS Scraper (hybrid)
+        run: python jobs_smart_hybrid.py
 
-      - name: Commit & push results using token
+      - name: Commit and push jobs_final_hard.csv
         env:
-          GH_PUSH_TOKEN: ${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}
         run: |
           git config --global user.email "243287379+hardikkaushik-jpg@users.noreply.github.com"
           git config --global user.name "hardikkaushik-jpg"
           git add jobs_final_hard.csv || true
-          git commit -m "Automated Smart ATS scrape" || echo "No changes to commit"
-          # use HTTPS push with token (force if you want)
-          git push https://hardikkaushik-jpg:${GH_PUSH_TOKEN}@github.com/hardikkaushik-jpg/ci-job-scraper.git HEAD:main --force
+          git commit -m "Automated Smart ATS scrape (hybrid)" || echo "No changes to commit"
+          # push using token
+          git push https://x-access-token:${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}@github.com/${{ github.repository }} HEAD:main --force
