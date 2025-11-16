@@ -3,17 +3,18 @@ name: Scrape and Push Jobs (Smart ATS)
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 6 * * *"  # daily 06:00 UTC
+    - cron: "0 6 * * *"  # daily at 06:00 UTC (adjust if needed)
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Set up Python 3.10
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
@@ -22,25 +23,23 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          # install playwright browsers
           python -m playwright install chromium
 
       - name: Run Smart ATS Scraper
-        run: python jobs_smart.py
-
-      - name: Commit and push jobs_final_hard.csv
-        env:
-          PUSH_TOKEN: ${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}
         run: |
-          # Configure git identity
-          git config --global user.email "243287379+${{ github.actor }}@users.noreply.github.com"
-          git config --global user.name "${{ github.actor }}"
+          python jobs_smart.py
+
+      - name: Commit and push CSV (using PAT)
+        env:
+          GITHUB_TOKEN_PUSH: ${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}
+        run: |
+          git config --global user.email "243287379+hardikkaushik-jpg@users.noreply.github.com"
+          git config --global user.name "hardikkaushik-jpg"
           git add jobs_final_hard.csv || true
-          # commit only if changes
-          if git diff --staged --quiet; then
+          if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Automated Smart ATS scrape: update jobs_final_hard.csv" || true
-            # use token to push
-            git push "https://x-access-token:${PUSH_TOKEN}@github.com/${{ github.repository }}" HEAD:main --force
+            git commit -m "Automated Smart ATS scrape"
+            # push using the PAT stored in the repo secret
+            git push https://x-access-token:${GITHUB_TOKEN_PUSH}@github.com/${{ github.repository }} HEAD:main --force
           fi
