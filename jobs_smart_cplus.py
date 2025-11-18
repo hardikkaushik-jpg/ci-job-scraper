@@ -518,59 +518,134 @@ def scrape():
                                             posting_date = _iso_only_date(item.get("datePosted"))
                                             print(f"[DETAIL_DATE] found -> {posting_date}")
                                             
-                                # --- UNIVERSAL DEEP DATE EXTRACTOR ---
-                                if not posting_date:
-                                    try:
-                                        # 1) Search ANY ISO date inside any script tag
-                                        for script in s.find_all("script"):
-                                            t = script.string or script.text or ""
-                                            if not t:
-                                                continue
+                               # --- EXTENDED ATS-SPECIFIC DATE PARSERS ---
+if not posting_date:
+    try:
+        text_blob = detail_html
 
-                                            # ISO formats: 2024-11-20 / 2024-11-20T10:30:00Z
-                                            m = re.search(r'(\d{4}-\d{2}-\d{2})(?:[T ][\d:Z+-]*)?', t)
-                                            if m:
-                                                posting_date = _iso_only_date(m.group(1))
-                                                print(f"[DETAIL_DEEP_DATE] ISO found -> {posting_date}")
-                                                break
+        # 1) Workday: sometimes embedded in "window.__WD_DATA__" or "workday" JSON blobs
+        m = re.search(r'window\.__WD_DATA__\s*=\s*({.+?});', text_blob, re.S)
+        if m:
+            try:
+                wd = json.loads(m.group(1))
+                # deep search for date-like keys
+                def wd_find_date(obj):
+                    if isinstance(obj, dict):
+                        for k,v in obj.items():
+                            if isinstance(v, str) and re.match(r'\d{4}-\d{2}-\d{2}', v):
+                                return v
+                            res = wd_find_date(v)
+                            if res: return res
+                    if isinstance(obj, list):
+                        for it in obj:
+                            res = wd_find_date(it)
+                            if res: return res
+                    return None
+                res = wd_find_date(wd)
+                if res:
+                    posting_date = _iso_only_date(res)
+                    print(f"[DETAIL_AUX_DATE] Workday -> {posting_date}")
+            except Exception:
+                pass
 
-                                            # 2) Workday-style
-                                            m2 = re.search(r'"posted(Date|On)"\s*:\s*"([^"]+)"', t, re.I)
-                                            if m2:
-                                                posting_date = _iso_only_date(m2.group(2))
-                                                print(f"[DETAIL_DEEP_DATE] Workday -> {posting_date}")
-                                                break
+        # 2) Greenhouse: often in window.__INITIAL_STATE__ or "job" objects
+        if not posting_date:
+            m2 = re.search(r'window\.__INITIAL_STATE__\s*=\s*({.+?});', text_blob, re.S)
+            if m2:
+                try:
+                    st = json.loads(m2.group(1))
+                    # try common paths
+                    for key in ("job","jobPosting","job_posting"):
+                        node = st.get(key) if isinstance(st, dict) else None
+                        if isinstance(node, dict):
+                            for k in ("posted_at","updated_at","created_at","date_posted","date"):
+                                if node.get(k):
+                                    posting_date = _iso_only_date(str(node.get(k)))
+                                    print(f"[DETAIL_AUX_DATE] Greenhouse->{k} -> {posting_date}")
+                                    break
+                            if posting_date:
+                                break
+                except Exception:
+                    pass
 
-                                            # 3) Lever createdAt
-                                            m3 = re.search(r'"createdAt"\s*:\s*"([^"]+)"', t)
-                                            if m3:
-                                                posting_date = _iso_only_date(m3.group(1))
-                                                print(f"[DETAIL_DEEP_DATE] Lever createdAt -> {posting_date}")
-                                                break
+        # 3) Lever: createdAt / postingDate often in inline JSON
+        if not posting_date:
+            m3 = re.search(r'window\.__INITIAL_STATE__\s*=\s*({.+?});', text_blob, re.S) or re.search(r'({"jobPosting".+?})', text_blob, re.S)
+            if m3:
+                try:
+                    payload = json.loads(m3.group(1))
+                    def find_lever_date(o):
+                        if isinstance(o, dict):
+                            for k,v in o.items():
+                                if k.lower() in ("createdat","created_at","postingdate","postedat","post_date") and isinstance(v,str):
+                                    return v
+                                res = find_lever_date(v)
+                                if res: return res
+                        if isinstance(o, list):
+                            for it in o:
+                                res = find_lever_date(it)
+                                if res: return res
+                        return None
+                    res = find_lever_date(payload)
+                    if res:
+                        posting_date = _iso_only_date(res)
+                        print(f"[DETAIL_AUX_DATE] Lever -> {posting_date}")
+                except Exception:
+                    pass
 
-                                            # 4) Greenhouse updated_at
-                                            m4 = re.search(r'"updated_at"\s*:\s*"([^"]+)"', t)
-                                            if m4:
-                                                posting_date = _iso_only_date(m4.group(1))
-                                                print(f"[DETAIL_DEEP_DATE] Greenhouse updated_at -> {posting_date}")
-                                                break
+        # 4) Ashby / NextJS: __NEXT_DATA__ JSON blob
+        if not posting_date:
+            m4 = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.+?)</script>', text_blob, re.S)
+            if m4:
+                try:
+                    nd = json.loads(m4.group(1))
+                    # Deep walk for date-like strings
+                    def nd_find_date(obj):
+                        if isinstance(obj, dict):
+                            for v in obj.values():
+                                if isinstance(v, str) and re.match(r'\d{4}-\d{2}-\d{2}', v):
+                                    return v
+                                res = nd_find_date(v)
+                                if res: return res
+                        if isinstance(obj, list):
+                            for it in obj:
+                                res = nd_find_date(it)
+                                if res: return res
+                        return None
+                    res = nd_find_date(nd)
+                    if res:
+                        posting_date = _iso_only_date(res)
+                        print(f"[DETAIL_AUX_DATE] NextJS -> {posting_date}")
+                except Exception:
+                    pass
 
-                                            # 5) ATS generic posted keys
-                                            m5 = re.search(r'"(posted|postingDate|date_created)"\s*:\s*"([^"]+)"', t, re.I)
-                                            if m5:
-                                                posting_date = _iso_only_date(m5.group(2))
-                                                print(f"[DETAIL_DEEP_DATE] ATS generic -> {posting_date}")
-                                                break
+        # 5) BambooHR / other ATS: search for common keys in any script tags
+        if not posting_date:
+            for script in s.find_all("script"):
+                t = script.string or script.text or ""
+                if not t:
+                    continue
+                # common candidates
+                for key in ("posted_at","post_date","date_posted","datePosted","date_published","created_at","createdAt"):
+                    mkey = re.search(rf'"{key}"\s*:\s*"([^"]+)"', t, re.I)
+                    if mkey:
+                        posting_date = _iso_only_date(mkey.group(1))
+                        print(f"[DETAIL_AUX_DATE] script-key {key} -> {posting_date}")
+                        break
+                if posting_date:
+                    break
 
-                                        # FINAL HTML SCAN
-                                        if not posting_date:
-                                            m6 = re.findall(r'\d{4}-\d{2}-\d{2}', detail_html)
-                                            if m6:
-                                                posting_date = m6[0]
-                                                print(f"[DETAIL_DEEP_DATE] HTML fallback -> {posting_date}")
+        # 6) last resort: first ISO anywhere inside full HTML (already done earlier, keep as last)
+        if not posting_date:
+            mm = re.search(r'(\d{4}-\d{2}-\d{2})', detail_html)
+            if mm:
+                posting_date = _iso_only_date(mm.group(1))
+                print(f"[DETAIL_AUX_DATE] ISO fallback -> {posting_date}")
 
-                                    except Exception as e:
-                                        print(f"[WARN] deep date extractor failed: {e}")
+    except Exception as e:
+        print(f"[WARN] extended-ats-date extractor failed: {e}")
+# --- END EXTENDED ATS-SPECIFIC DATE PARSERS ---
+
                                         
                                 # fallback: extract date via regex from entire HTML if still missing
                                 if not posting_date:
