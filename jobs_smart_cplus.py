@@ -715,81 +715,37 @@ def scrape():
                                     except Exception as e:
                                         print(f"[WARN] extended-ats-date extractor failed: {e}")
 
-                                # --- UNIVERSAL DEEP DATE EXTRACTOR (correct placement) ---
-                                if not posting_date:
-                                    try:
-                                        # 1) ISO dates in ANY script (very common)
-                                        for script in s.find_all("script"):
-                                            t = script.string or script.text or ""
-                                            if not t:
-                                                continue
+                               # --- DATE NEAR TITLE PARSER (ultra-precise) ---
+if not posting_date:
+    try:
+        # Get h1 and nearby siblings
+        h1 = s.find("h1")
+        if h1:
+            # Look for patterns like:
+            # Posted: 2024-05-11
+            # Posted 3 days ago
+            # Posting Date: 2024-10-03
+            h1_block = h1.get_text(" ", strip=True)
+            parent_block = h1.parent.get_text(" ", strip=True) if h1.parent else ""
 
-                                            # ISO 8601
-                                            m = re.search(r'(\d{4}-\d{2}-\d{2})(?:[T ][\d:Z+-]*)?', t)
-                                            if m:
-                                                posting_date = _iso_only_date(m.group(1))
-                                                print(f"[DEEP_DATE] ISO -> {posting_date}")
-                                                break
+            combined = h1_block + " " + parent_block
 
-                                            # generic ATS keys
-                                            for key in ("created_at","createdAt","updated_at","posted_at","post_date","postingDate","datePublished"):
-                                                m2 = re.search(rf'"{key}"\s*:\s*"([^"]+)"', t, re.I)
-                                                if m2:
-                                                    posting_date = _iso_only_date(m2.group(1))
-                                                    print(f"[DEEP_DATE] {key} -> {posting_date}")
-                                                    break
-                                            if posting_date:
-                                                break
+            # ISO date
+            m_iso = re.search(r'(\d{4}-\d{2}-\d{2})', combined)
+            if m_iso:
+                posting_date = _iso_only_date(m_iso.group(1))
+                print(f"[TITLE_DATE] ISO near title -> {posting_date}")
 
-                                        # 2) Workday WD_DATA blob deep search
-                                        if not posting_date:
-                                            m = re.search(r'window\.__WD_DATA__\s*=\s*({.+?});', detail_html, re.S)
-                                            if m:
-                                                try:
-                                                    data = json.loads(m.group(1))
-                                                    def find_date(obj):
-                                                        if isinstance(obj, dict):
-                                                            for v in obj.values():
-                                                                if isinstance(v,str) and re.match(r'\d{4}-\d{2}-\d{2}',v):
-                                                                    return v
-                                                                sub=find_date(v)
-                                                                if sub: return sub
-                                                        if isinstance(obj,list):
-                                                            for v in obj:
-                                                                sub=find_date(v)
-                                                                if sub: return sub
-                                                        return None
-                                                    found=find_date(data)
-                                                    if found:
-                                                        posting_date=_iso_only_date(found)
-                                                        print(f"[DEEP_DATE] Workday -> {posting_date}")
-                                                except:
-                                                    pass
+            # e.g., “Posted X days ago”
+            if not posting_date:
+                m_days = re.search(r'posted\s+(\d+)\s+days?\s+ago', combined, re.I)
+                if m_days:
+                    d = date.today() - timedelta(days=int(m_days.group(1)))
+                    posting_date = d.isoformat()
+                    print(f"[TITLE_DATE] days-ago near title -> {posting_date}")
 
-                                        # 3) Greenhouse initial state quick check
-                                        if not posting_date:
-                                            m = re.search(r'window\.__INITIAL_STATE__\s*=\s*({.+?});', detail_html, re.S)
-                                            if m:
-                                                try:
-                                                    st=json.loads(m.group(1))
-                                                    if isinstance(st, dict) and st.get("job"):
-                                                        for k in ("posted_at","updated_at","created_at","date_posted","date"):
-                                                            if st["job"].get(k):
-                                                                posting_date=_iso_only_date(str(st["job"][k]))
-                                                                print(f"[DEEP_DATE] Greenhouse->{k} -> {posting_date}")
-                                                                break
-                                                except:
-                                                    pass
-
-                                        # 4) Fallback ISO anywhere in HTML
-                                        if not posting_date:
-                                            m = re.search(r'(\d{4}-\d{2}-\d{2})', detail_html)
-                                            if m:
-                                                posting_date=_iso_only_date(m.group(1))
-                                                print(f"[DEEP_DATE] HTML fallback -> {posting_date}")
-
-                                    except Exception as e:
-                                        print(f"[WARN] deep extractor error: {e}")
+    except Exception as e:
+        print(f"[WARN] title-date-extractor error: {e}")
 
                                 # final fallback using existing helper
                                 if not posting_date:
