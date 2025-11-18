@@ -1,18 +1,19 @@
-name: Scrape and Push Jobs (Smart ATS)
+name: Scrape + Clean + Push Jobs (Automated)
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 6 * * *"  # daily at 06:00 UTC
+    - cron: "0 6 * * *"    # daily at 06:00 UTC
 
 jobs:
-  scrape:
+  scrape_clean_push:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          persist-credentials: false  # we will use our token for push
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -25,22 +26,22 @@ jobs:
           pip install -r requirements.txt
           python -m playwright install chromium
 
-      - name: Run Smart ATS Scraper
+      - name: Run scraper
         run: |
           python jobs_smart.py
-        # no timeout override - keep default job timeout (longer than scraping)
 
-      - name: Commit & push CSV (manual token)
+      - name: Clean + Enrich data
+        run: |
+          python clean_jobs.py
+
+      - name: Commit & Push Output
         env:
           PUSH_TOKEN: ${{ secrets.CI_JOB_SCRAPER_GITHUB_ACTION_TOKEN }}
         run: |
           git config --global user.email "243287379+hardikkaushik-jpg@users.noreply.github.com"
           git config --global user.name "hardikkaushik-jpg"
-          git add jobs_final_hard.csv || true
-          git commit -m "Automated Smart ATS scrape" || echo "No changes to commit"
-          # Use token for push
-          if git rev-parse --verify origin/main >/dev/null 2>&1; then
-            git push "https://x-access-token:${PUSH_TOKEN}@github.com/${{ github.repository }}" main --force
-          else
-            git push --set-upstream "https://x-access-token:${PUSH_TOKEN}@github.com/${{ github.repository }}" main --force
-          fi
+
+          git add jobs_cleaned_final_enriched.csv || true
+          git commit -m "Automated scrape & clean" || echo "No changes"
+          
+          git push "https://x-access-token:${PUSH_TOKEN}@github.com/${{ github.repository }}" main --force
