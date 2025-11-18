@@ -1,17 +1,3 @@
-I've fixed the indentation issues, primarily where a block of code intended to be inside an `if` or `try` block was improperly placed outside or at the wrong level.
-
-The most critical fixes were applied to the **UNIVERSAL DEEP DATE EXTRACTOR** block and the subsequent code flow which was broken due to incorrect indentation after the line:
-
-```python
-if must_detail:
-    print(f"[DETAIL_DECISION] company={company} link={link} reasons={','.join(must_reasons)} detail_count={detail_count}")
-```
-
-and within the `if detail_html:` block.
-
-Here is the fully fixed and correctly indented Python script:
-
-```python
 # jobs_smart_cplus_fixed.py (REPAIRED)
 # Playwright + BeautifulSoup hybrid scraper, ATS-aware, safe detail quota.
 # Run with: python3 jobs_smart_cplus_fixed.py
@@ -661,4 +647,3 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("Interrupted")
         sys.exit(1)
-```
