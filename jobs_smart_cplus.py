@@ -1,4 +1,4 @@
-# jobs_smart_cplus.py  (ENTERPRISE C+)
+# jobs_smart_cplus.py  (FULL FIXED — paste / replace existing)
 # Playwright + BeautifulSoup hybrid scraper, ATS-aware, safe detail quota.
 from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
 from bs4 import BeautifulSoup
@@ -62,17 +62,17 @@ COMPANIES = {
     "Pentaho": ["https://www.hitachivantara.com/en-us/company/careers/job-search"]
 }
 # Timeouts (ms)
-PAGE_NAV_TIMEOUT = 60000
-PAGE_DOM_TIMEOUT = 9000       # shorter detail DOM timeout
+PAGE_NAV_TIMEOUT = 40000
+PAGE_DOM_TIMEOUT = 8000       # shorter detail DOM timeout
 SLEEP_BETWEEN_REQUESTS = 0.18
-MAX_DETAIL_PAGES = 80        # don't exceed this many detail fetches per run
+MAX_DETAIL_PAGES = 250        # increased quota to capture needed details
 
 # Patterns
 IMAGE_EXT = re.compile(r"\.(jpg|jpeg|png|gif|svg|webp)$", re.I)
 FORBIDDEN_WORDS = [
     "privacy","privacy policy","about","legal","terms","cookie","cookies",
     "press","blog","partners","pricing","docs","documentation","support",
-    "events","resources","login","signin","register","apply now","careers home","Our Opportunity","read more","Case study","What is data governance?","Skip to main content","integrations Simplify your data workflows seamlessly"
+    "events","resources","login","signin","register","apply now","careers home"
 ]
 FORBIDDEN_RE = re.compile(r'\b(?:' + '|'.join(re.escape(x) for x in FORBIDDEN_WORDS) + r')\b', re.I)
 
@@ -91,6 +91,8 @@ COMPANY_SKIP_RULES = {
     "Fivetran": [r'launchers', r'product', r'developers'],
     "Datadog": [r'resources', r'events', r'product'],
 }
+
+CRITICAL_COMPANIES = ["fivetran","ataccama","datadog","snowflake","matillion","oracle"]
 
 # ---------- HELPERS ----------
 def normalize_link(base, href):
@@ -154,7 +156,7 @@ def extract_date_from_html(html_text):
     m2 = re.search(r'"postedOn"\s*:\s*"([^"]+)"', html_text)
     if m2:
         return _iso_only_date(m2.group(1))
-    # meta property
+    # meta property article:published_time
     m3 = re.search(r'<meta[^>]+property=["\']article:published_time["\'][^>]+content=["\']([^"\']+)["\']', html_text, re.I)
     if m3:
         return _iso_only_date(m3.group(1))
@@ -162,7 +164,7 @@ def extract_date_from_html(html_text):
     m4 = re.search(r'<time[^>]+datetime=["\']([^"\']+)["\']', html_text, re.I)
     if m4:
         return _iso_only_date(m4.group(1))
-    # textual posted X days ago
+    # textual "posted X days ago"
     mm = re.search(r'posted\s+(\d+)\s+days?\s+ago', html_text, re.I)
     if mm:
         days = int(mm.group(1)); return (date.today() - timedelta(days=days)).isoformat()
@@ -187,7 +189,7 @@ def is_likely_job_anchor(href, text):
         return True
     if any(p in low for p in positives):
         return True
-    if text and ROLE_WORDS_RE.search(text) and len(text) < 140:
+    if text and ROLE_WORDS_RE.search(text) and len(text) < 200:
         return True
     return False
 
@@ -195,7 +197,7 @@ def extract_location_from_text(txt):
     if not txt:
         return "", ""
     s = txt.replace("\r", " ").replace("\n", " ").strip()
-    # parenthesis at end -> often location
+    # parentheses at end -> often location
     paren = re.search(r'\(([^)]+)\)\s*$', s)
     if paren:
         loc = paren.group(1); title = s[:paren.start()].strip(" -:,"); return title, normalize_location(loc)
@@ -213,7 +215,6 @@ def extract_location_from_text(txt):
         title = s.replace(candidate, '').strip(" -:,"); return title, normalize_location(candidate)
     return s, ""
 
-# card-based location extraction
 def try_extract_location_from_card(el):
     if not el: return ""
     search_selectors = [
@@ -237,7 +238,6 @@ def try_extract_location_from_card(el):
                 return normalize_location(found.get_text(" ", strip=True))
     return ""
 
-# fetch but use DOMContentLoaded to avoid networkidle stalls
 def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=PAGE_DOM_TIMEOUT):
     try:
         page.goto(url, timeout=nav_timeout, wait_until="domcontentloaded")
@@ -273,15 +273,17 @@ def scrape():
                 # parse listing anchors & job-cards
                 soup = BeautifulSoup(listing_html, "lxml")
                 candidates = []
+                # standard anchors
                 for a in soup.find_all("a", href=True):
                     href = a.get("href"); text = (a.get_text(" ", strip=True) or "")
                     href_abs = normalize_link(main_url, href)
                     if is_likely_job_anchor(href_abs, text):
                         candidates.append((href_abs, text, a))
 
-                # try job-card containers too
+                # job-card containers
                 for el in soup.select("[data-job], .job, .job-listing, .job-card, .opening, .position, .posting, .role, .job-row"):
-                    a = el.find("a", href=True); text = (a.get_text(" ", strip=True) if a else el.get_text(" ", strip=True))
+                    a = el.find("a", href=True)
+                    text = (a.get_text(" ", strip=True) if a else el.get_text(" ", strip=True))
                     href = normalize_link(main_url, a.get("href")) if a else ""
                     if is_likely_job_anchor(href, text):
                         candidates.append((href, text, el))
@@ -294,16 +296,21 @@ def scrape():
                             src_full = normalize_link(main_url, src)
                             iframe_html = fetch_page_content(page, src_full)
                             if iframe_html:
-                                candidates += [(x[0], x[1], None) for x in parse_candidates_from_html(src_full, iframe_html)]
+                                # attempt to parse anchors in iframe HTML
+                                f_soup = BeautifulSoup(iframe_html, "lxml")
+                                for a in f_soup.find_all("a", href=True):
+                                    href = a.get("href"); text = (a.get_text(" ", strip=True) or "")
+                                    href_abs = normalize_link(src_full, href)
+                                    if is_likely_job_anchor(href_abs, text):
+                                        candidates.append((href_abs, text, a))
 
-                # dedupe preserve order
+                # dedupe preserve order and apply company specific skip rules
                 seen=set(); filtered=[]
                 for href, text, el in candidates:
                     if not href or href.rstrip("/") == main_url.rstrip("/"):
                         continue
                     if href in seen: continue
                     seen.add(href)
-                    # company-specific skip heuristics
                     skip=False
                     low_text = (text or "").lower()
                     for c, rules in COMPANY_SKIP_RULES.items():
@@ -323,52 +330,49 @@ def scrape():
                     title_clean, location_candidate = extract_location_from_text(title_candidate)
                     if not title_clean:
                         title_clean = clean_title(title_candidate)
-                    # try card location
+
+                    # try card location extraction
                     card_loc = try_extract_location_from_card(el)
                     if card_loc and not location_candidate:
                         location_candidate = card_loc
 
-                    # --- C++ detail page logic ---
-                    posting_date = ""  # ensure defined
-
-                    CRITICAL_COMPANIES = ["fivetran","ataccama","datadog","snowflake","matillion","oracle"]
-
+                    posting_date = ""
+                    # --- C++ detail logic start ---
                     must_detail = False
 
-                    # 1. Critical companies always scrape detail pages
+                    # Critical companies always need detail scraping
                     if company.lower() in CRITICAL_COMPANIES:
                         must_detail = True
 
-                    # 2. Missing important fields → MUST scrape detail
+                    # Missing important fields -> must detail
                     if not location_candidate or not posting_date or len(title_clean.split()) < 2:
                         must_detail = True
 
-                    # 3. Title includes location text → re-extract from detail page
+                    # Title includes location token -> must detail
                     if LOC_RE.search(title_candidate):
                         must_detail = True
 
-                    # 4. Link looks like a detailed ATS job page
-                    if any(x in link.lower() for x in [
+                    # Link looks like ATS detail page -> must detail
+                    if any(x in (link or "").lower() for x in [
                         "/job/", "/jobs/", "greenhouse", "lever.co", "ashbyhq",
                         "bamboohr", "myworkdayjobs", "gr8people",
                         "welcometothejungle", "career"
                     ]):
                         must_detail = True
 
-                    # --- Perform detail scraping if allowed ---
+                    # Perform detail scraping if allowed by quota
                     if must_detail and detail_count < MAX_DETAIL_PAGES:
                         detail_count += 1
                         detail_html = fetch_page_content(page, link)
                         if detail_html:
                             try:
                                 s = BeautifulSoup(detail_html, "lxml")
-
-                                # Extract clean H1 title
+                                # H1/title fallback
                                 header = s.find("h1")
                                 if header:
                                     title_clean = clean_title(header.get_text(" ", strip=True))
 
-                                # Extract location from known selectors
+                                # location selectors
                                 for sel in [
                                     "span.location",".job-location",".location","[data-test='job-location']",
                                     ".posting-location",".job_meta_location",".location--name",
@@ -379,70 +383,48 @@ def scrape():
                                         location_candidate = normalize_location(eloc.get_text(" ", strip=True))
                                         break
 
-                                # JSON-LD date extraction
+                                # JSON-LD / script parsing for date
                                 for script in s.find_all("script", type="application/ld+json"):
                                     try:
                                         payload = json.loads(script.string or "{}")
                                         if isinstance(payload, dict):
                                             if payload.get("datePosted"):
-                                                posting_date = _iso_only_date(payload["datePosted"])
+                                                posting_date = _iso_only_date(payload.get("datePosted"))
                                                 break
                                             if payload.get("datePublished"):
-                                                posting_date = _iso_only_date(payload["datePublished"])
+                                                posting_date = _iso_only_date(payload.get("datePublished"))
                                                 break
-                                    except:
-                                        pass
+                                    except Exception:
+                                        continue
 
-                                # Fallback date parsing from HTML
+                                # fallback text date parse
                                 if not posting_date:
-                                    parsed = extract_date_from_html(detail_html)
-                                    if parsed:
-                                        posting_date = parsed
-
+                                    pd = extract_date_from_html(detail_html)
+                                    if pd:
+                                        posting_date = pd
                             except Exception as e:
                                 print(f"[WARN] detail parse fail {link} -> {e}")
+                    # --- C++ detail logic end ---
 
-                    # Final normalization
+                    # final normalization
                     title_final = clean_title(title_clean) if title_clean else clean_title(anchor_text)
                     location_final = normalize_location(location_candidate)
                     posting_date_final = posting_date or ""
 
-                    # fallback: extract location from link path if plausible
+                    # fallback: try extract location from link path
                     if not location_final:
                         mloc = re.search(r'/(remote|new[-_]york|london|berlin|singapore|bengaluru|chennai|munich|frankfurt)[/\-]?', link, re.I)
                         if mloc:
                             location_final = mloc.group(1).replace('-', ' ').title()
 
-                    # posting date from anchor text
+                    # posting date from anchor text fallback
                     if not posting_date_final:
                         posted_from_anchor = re.search(r'posted\s+(\d+)\s+days?\s+ago', anchor_text or "", re.I)
                         if posted_from_anchor:
                             d = date.today() - timedelta(days=int(posted_from_anchor.group(1)))
                             posting_date_final = d.isoformat()
 
-                    rows.append({
-                        "Company": company,
-                        "Job Title": title_final,
-                        "Job Link": link,
-                        "Location": location_final,
-                        "Posting Date": posting_date_final,
-                        "Days Since Posted": ""
-                    })
-                    # final normalization
-                    title_final = clean_title(title_clean) if title_clean else clean_title(anchor_text)
-                    location_final = normalize_location(location_candidate)
-                    posting_date_final = posting_date or ""
-                    # fallback: extract location from link path if plausible
-                    if not location_final:
-                        mloc = re.search(r'/(remote|new[-_]york|london|berlin|singapore|bengaluru|chennai|munich|frankfurt)[/\-]?', link, re.I)
-                        if mloc: location_final = mloc.group(1).replace('-', ' ').title()
-                    # posting date from anchor text
-                    if not posting_date_final:
-                        posted_from_anchor = re.search(r'posted\s+(\d+)\s+days?\s+ago', anchor_text or "", re.I)
-                        if posted_from_anchor:
-                            d = date.today() - timedelta(days=int(posted_from_anchor.group(1)))
-                            posting_date_final = d.isoformat()
-
+                    # record row
                     rows.append({
                         "Company": company,
                         "Job Title": title_final,
@@ -455,27 +437,32 @@ def scrape():
         browser.close()
 
     # dedupe by Job Link and compute Days Since Posted
-    dedup={}
+    dedup = {}
     for r in rows:
         lk = r.get("Job Link") or ""
-        if lk in dedup: continue
+        if lk in dedup:
+            continue
         pd = r.get("Posting Date") or ""
         if pd:
             try:
-                d = datetime.fromisoformat(pd).date(); r["Days Since Posted"]=str((date.today()-d).days)
+                d = datetime.fromisoformat(pd).date()
+                r["Days Since Posted"] = str((date.today() - d).days)
             except:
-                r["Days Since Posted"]=""
+                r["Days Since Posted"] = ""
         else:
-            r["Days Since Posted"]=""
-        dedup[lk]=r
+            r["Days Since Posted"] = ""
+        dedup[lk] = r
 
     out = list(dedup.values())
     out_sorted = sorted(out, key=lambda x: (x.get("Company","").lower(), x.get("Job Title","").lower()))
+
     outfile = "jobs_final_hard.csv"
     with open(outfile, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["Company","Job Title","Job Link","Location","Posting Date","Days Since Posted"])
         writer.writeheader()
-        for r in out_sorted: writer.writerow(r)
+        for r in out_sorted:
+            writer.writerow(r)
+
     print(f"[OK] wrote {len(out_sorted)} rows -> {outfile}")
 
 if __name__ == "__main__":
