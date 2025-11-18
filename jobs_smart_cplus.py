@@ -359,6 +359,22 @@ def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=PAGE
         print(f"[WARN] fetch failed: {url} -> {e}")
         return ""
 
+# --- SENIORITY CLASSIFIER (Helper moved outside scrape) ---
+def detect_seniority(title):
+    t = title.lower()
+
+    if any(x in t for x in ("senior", "sr ", "sr.", "lead", "staff", "principal")):
+        return "Senior"
+    if any(x in t for x in ("director", "head of", "vp", "vice president")):
+        return "Director+"
+    if any(x in t for x in ("manager", "mgr", "management")):
+        return "Manager"
+    if any(x in t for x in ("intern", "internship", "graduate", "entry")):
+        return "Entry"
+    if any(x in t for x in ("associate", "mid", "middle", "ii", "2")):
+        return "Mid"
+    return "Unknown"
+
 
 # ---------- MAIN SCRAPE ----------
 def scrape():
@@ -498,6 +514,7 @@ def scrape():
 
                     # Perform detail scraping
                     detail_html = ""
+                    s = None
                     if must_detail and detail_count < MAX_DETAIL_PAGES:
                         detail_count += 1
                         print(f"[DETAIL_FETCH] #{detail_count} -> {company} -> {link}")
@@ -715,70 +732,71 @@ def scrape():
                                     except Exception as e:
                                         print(f"[WARN] extended-ats-date extractor failed: {e}")
 
-                               # --- DATE NEAR TITLE PARSER (ultra-precise) ---
-    if not posting_date:
-    try:
-        h1 = s.find("h1")
-        if h1:
-            h1_block = h1.get_text(" ", strip=True)
-            parent_block = h1.parent.get_text(" ", strip=True) if h1.parent else ""
-            combined = h1_block + " " + parent_block
+                                # --- DATE NEAR TITLE PARSER (ultra-precise) ---
+                                if not posting_date and s:
+                                    try:
+                                        h1 = s.find("h1")
+                                        if h1:
+                                            h1_block = h1.get_text(" ", strip=True)
+                                            parent_block = h1.parent.get_text(" ", strip=True) if h1.parent else ""
+                                            combined = h1_block + " " + parent_block
 
-            # ISO near title
-            m_iso = re.search(r'(\d{4}-\d{2}-\d{2})', combined)
-            if m_iso:
-                posting_date = _iso_only_date(m_iso.group(1))
-                print(f"[TITLE_DATE] ISO near title -> {posting_date}")
+                                            # ISO near title
+                                            m_iso = re.search(r'(\d{4}-\d{2}-\d{2})', combined)
+                                            if m_iso:
+                                                posting_date = _iso_only_date(m_iso.group(1))
+                                                print(f"[TITLE_DATE] ISO near title -> {posting_date}")
 
-            # Posted X days ago
-            if not posting_date:
-                m_days = re.search(r'posted\s+(\d+)\s+days?\s+ago', combined, re.I)
-                if m_days:
-                    d = date.today() - timedelta(days=int(m_days.group(1)))
-                    posting_date = d.isoformat()
-                    print(f"[TITLE_DATE] days-ago near title -> {posting_date}")
+                                            # Posted X days ago
+                                            if not posting_date:
+                                                m_days = re.search(r'posted\s+(\d+)\s+days?\s+ago', combined, re.I)
+                                                if m_days:
+                                                    d = date.today() - timedelta(days=int(m_days.group(1)))
+                                                    posting_date = d.isoformat()
+                                                    print(f"[TITLE_DATE] days-ago near title -> {posting_date}")
 
-    except Exception as e:
-        print(f"[WARN] title-date-extractor error: {e}")
-        # --- ULTRA POSTING DATE (ATS DEEP PARSER) ---
-if not posting_date:
-    try:
-        # 1) Workday: "postedOn": "2024-10-05T00:00:00Z"
-        m = re.search(r'"postedOn"\s*:\s*"([^"]+)"', detail_html)
-        if m:
-            posting_date = _iso_only_date(m.group(1))
-            print(f"[ULTRA_DATE] postedOn -> {posting_date}")
+                                    except Exception as e:
+                                        print(f"[WARN] title-date-extractor error: {e}")
 
-        # 2) Workday: "postedDate" / "datePosted"
-        if not posting_date:
-            m = re.search(r'"datePosted"\s*:\s*"([^"]+)"', detail_html)
-            if m:
-                posting_date = _iso_only_date(m.group(1))
-                print(f"[ULTRA_DATE] datePosted -> {posting_date}")
+                                # --- ULTRA POSTING DATE (ATS DEEP PARSER) ---
+                                if not posting_date:
+                                    try:
+                                        # 1) Workday: "postedOn": "2024-10-05T00:00:00Z"
+                                        m = re.search(r'"postedOn"\s*:\s*"([^"]+)"', detail_html)
+                                        if m:
+                                            posting_date = _iso_only_date(m.group(1))
+                                            print(f"[ULTRA_DATE] postedOn -> {posting_date}")
 
-        # 3) Greenhouse: "updated_at"
-        if not posting_date:
-            m = re.search(r'"updated_at"\s*:\s*"([^"]+)"', detail_html)
-            if m:
-                posting_date = _iso_only_date(m.group(1))
-                print(f"[ULTRA_DATE] updated_at -> {posting_date}")
+                                        # 2) Workday: "postedDate" / "datePosted"
+                                        if not posting_date:
+                                            m = re.search(r'"datePosted"\s*:\s*"([^"]+)"', detail_html)
+                                            if m:
+                                                posting_date = _iso_only_date(m.group(1))
+                                                print(f"[ULTRA_DATE] datePosted -> {posting_date}")
 
-        # 4) Lever: "createdAt"
-        if not posting_date:
-            m = re.search(r'"createdAt"\s*:\s*"([^"]+)"', detail_html)
-            if m:
-                posting_date = _iso_only_date(m.group(1))
-                print(f"[ULTRA_DATE] createdAt -> {posting_date}")
+                                        # 3) Greenhouse: "updated_at"
+                                        if not posting_date:
+                                            m = re.search(r'"updated_at"\s*:\s*"([^"]+)"', detail_html)
+                                            if m:
+                                                posting_date = _iso_only_date(m.group(1))
+                                                print(f"[ULTRA_DATE] updated_at -> {posting_date}")
 
-        # 5) ISO anywhere near job header (title block)
-        if not posting_date:
-            m = re.search(r'>\s*(\d{4}-\d{2}-\d{2})\s*<', detail_html)
-            if m:
-                posting_date = _iso_only_date(m.group(1))
-                print(f"[ULTRA_DATE] header-ISO -> {posting_date}")
+                                        # 4) Lever: "createdAt"
+                                        if not posting_date:
+                                            m = re.search(r'"createdAt"\s*:\s*"([^"]+)"', detail_html)
+                                            if m:
+                                                posting_date = _iso_only_date(m.group(1))
+                                                print(f"[ULTRA_DATE] createdAt -> {posting_date}")
 
-    except Exception as e:
-        print(f"[WARN] ultra-date extractor failed: {e}")
+                                        # 5) ISO anywhere near job header (title block)
+                                        if not posting_date:
+                                            m = re.search(r'>\s*(\d{4}-\d{2}-\d{2})\s*<', detail_html)
+                                            if m:
+                                                posting_date = _iso_only_date(m.group(1))
+                                                print(f"[ULTRA_DATE] header-ISO -> {posting_date}")
+
+                                    except Exception as e:
+                                        print(f"[WARN] ultra-date extractor failed: {e}")
 
                                 # final fallback using existing helper
                                 if not posting_date:
@@ -794,62 +812,65 @@ if not posting_date:
                     title_final = clean_title(title_clean) if title_clean else clean_title(anchor_text or "")
                     location_final = normalize_location(location_candidate)
                     posting_date_final = posting_date or ""
-# --- ULTRA LOCATION EXTRACTOR (Workday / Greenhouse / Lever / Ashby) ---
-if not location_candidate:
-    try:
-        # 1) Workday locationDeep (wd:Locations)
-        m = re.search(r'"addressLocality"\s*:\s*"([^"]+)"', detail_html)
-        if m:
-            city = m.group(1)
-            m2 = re.search(r'"addressCountry"\s*:\s*"([^"]+)"', detail_html)
-            country = m2.group(1) if m2 else ""
-            loc = f"{city}, {country}".strip(", ")
-            if loc:
-                location_candidate = normalize_location(loc)
-                print(f"[DEEP_LOC] Workday -> {location_candidate}")
 
-        # 2) Greenhouse additional locations array
-        if not location_candidate:
-            m = re.search(r'"additionalLocations"\s*:\s*\[(.+?)\]', detail_html, re.S)
-            if m:
-                locs_raw = m.group(1)
-                locs = re.findall(r'"([^"]+)"', locs_raw)
-                if locs:
-                    location_candidate = normalize_location(locs[0])
-                    print(f"[DEEP_LOC] Greenhouse additionalLocations -> {location_candidate}")
+                    # --- ULTRA LOCATION EXTRACTOR (Workday / Greenhouse / Lever / Ashby) ---
+                    if not location_candidate and detail_html: # Added check for detail_html
+                        try:
+                            # 1) Workday locationDeep (wd:Locations)
+                            m = re.search(r'"addressLocality"\s*:\s*"([^"]+)"', detail_html)
+                            if m:
+                                city = m.group(1)
+                                m2 = re.search(r'"addressCountry"\s*:\s*"([^"]+)"', detail_html)
+                                country = m2.group(1) if m2 else ""
+                                loc = f"{city}, {country}".strip(", ")
+                                if loc:
+                                    location_candidate = normalize_location(loc)
+                                    print(f"[DEEP_LOC] Workday -> {location_candidate}")
 
-        # 3) Lever “categories.location”
-        if not location_candidate:
-            m = re.search(r'"categories"\s*:\s*{[^}]*"location"\s*:\s*"([^"]+)"', detail_html)
-            if m:
-                location_candidate = normalize_location(m.group(1))
-                print(f"[DEEP_LOC] Lever -> {location_candidate}")
+                            # 2) Greenhouse additional locations array
+                            if not location_candidate:
+                                m = re.search(r'"additionalLocations"\s*:\s*\[(.+?)\]', detail_html, re.S)
+                                if m:
+                                    locs_raw = m.group(1)
+                                    locs = re.findall(r'"([^"]+)"', locs_raw)
+                                    if locs:
+                                        location_candidate = normalize_location(locs[0])
+                                        print(f"[DEEP_LOC] Greenhouse additionalLocations -> {location_candidate}")
 
-        # 4) Ashby: “locations”: [{"city", "region", "country"}]
-        if not location_candidate:
-            m = re.search(r'"locations"\s*:\s*\[(.+?)\]', detail_html, re.S)
-            if m:
-                js = m.group(1)
-                city = re.search(r'"city"\s*:\s*"([^"]+)"', js)
-                region = re.search(r'"region"\s*:\s*"([^"]+)"', js)
-                country = re.search(r'"country"\s*:\s*"([^"]+)"', js)
-                parts = [x.group(1) for x in (city, region, country) if x]
-                if parts:
-                    location_candidate = normalize_location(", ".join(parts))
-                    print(f"[DEEP_LOC] Ashby -> {location_candidate}")
+                            # 3) Lever “categories.location”
+                            if not location_candidate:
+                                m = re.search(r'"categories"\s*:\s*{[^}]*"location"\s*:\s*"([^"]+)"', detail_html)
+                                if m:
+                                    location_candidate = normalize_location(m.group(1))
+                                    print(f"[DEEP_LOC] Lever -> {location_candidate}")
 
-        # 5) Breadcrumb / nav-trail (works for Snowflake, Teradata, Oracle)
-        if not location_candidate:
-            crumbs = s.select("nav a, .breadcrumb a, .breadcrumbs a")
-            for cr in crumbs:
-                txt = cr.get_text(" ", strip=True)
-                if LOC_RE.search(txt):
-                    location_candidate = normalize_location(txt)
-                    print(f"[DEEP_LOC] breadcrumb -> {location_candidate}")
-                    break
+                            # 4) Ashby: “locations”: [{"city", "region", "country"}]
+                            if not location_candidate:
+                                m = re.search(r'"locations"\s*:\s*\[(.+?)\]', detail_html, re.S)
+                                if m:
+                                    js = m.group(1)
+                                    city = re.search(r'"city"\s*:\s*"([^"]+)"', js)
+                                    region = re.search(r'"region"\s*:\s*"([^"]+)"', js)
+                                    country = re.search(r'"country"\s*:\s*"([^"]+)"', js)
+                                    parts = [x.group(1) for x in (city, region, country) if x]
+                                    if parts:
+                                        location_candidate = normalize_location(", ".join(parts))
+                                        print(f"[DEEP_LOC] Ashby -> {location_candidate}")
 
-    except Exception as e:
-        print(f"[WARN] deep-loc extractor error: {e}")
+                            # 5) Breadcrumb / nav-trail (works for Snowflake, Teradata, Oracle)
+                            if not location_candidate and s: # requires s (BeautifulSoup object)
+                                crumbs = s.select("nav a, .breadcrumb a, .breadcrumbs a")
+                                for cr in crumbs:
+                                    txt = cr.get_text(" ", strip=True)
+                                    if LOC_RE.search(txt):
+                                        location_candidate = normalize_location(txt)
+                                        print(f"[DEEP_LOC] breadcrumb -> {location_candidate}")
+                                        break
+
+                        except Exception as e:
+                            print(f"[WARN] deep-loc extractor error: {e}")
+                            
+                    location_final = normalize_location(location_candidate) # Re-normalize after deep extraction
 
                     # fallback: try extract location from link path
                     if not location_final:
@@ -874,59 +895,56 @@ if not location_candidate:
                     })
 
         browser.close()
-# --- SENIORITY CLASSIFIER ---
-def detect_seniority(title):
-    t = title.lower()
+        return rows # Return the rows list
 
-    if any(x in t for x in ("senior", "sr ", "sr.", "lead", "staff", "principal")):
-        return "Senior"
-    if any(x in t for x in ("director", "head of", "vp", "vice president")):
-        return "Director+"
-    if any(x in t for x in ("manager", "mgr", "management")):
-        return "Manager"
-    if any(x in t for x in ("intern", "internship", "graduate", "entry")):
-        return "Entry"
-    if any(x in t for x in ("associate", "mid", "middle", "ii", "2")):
-        return "Mid"
-    return "Unknown"
-
-# inject seniority into rows BEFORE dedupe sorting
-for r in rows:
-    r["Seniority"] = detect_seniority(r.get("Job Title",""))
-
-    # dedupe by Job Link and compute Days Since Posted
-    dedup = {}
-    for r in rows:
-        lk = r.get("Job Link") or ""
-        if lk in dedup:
-            continue
-        pd = r.get("Posting Date") or ""
-        if pd:
-            try:
-                d = datetime.fromisoformat(pd).date()
-                r["Days Since Posted"] = str((date.today() - d).days)
-            except:
-                r["Days Since Posted"] = ""
-        else:
-            r["Days Since Posted"] = ""
-        dedup[lk] = r
-
-    out = list(dedup.values())
-    out_sorted = sorted(out, key=lambda x: (x.get("Company","").lower(), x.get("Job Title","").lower()))
-
-    outfile = "jobs_final_hard.csv"
-    with open(outfile, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["Company","Job Title","Job Link","Location","Posting Date","Days Since Posted"])
-        writer.writeheader()
-        for r in out_sorted:
-            writer.writerow(r)
-
-    print(f"[OK] wrote {len(out_sorted)} rows -> {outfile}")
-
-
+# --- MAIN EXECUTION LOGIC (Moved outside scrape function) ---
 if __name__ == "__main__":
     try:
-        scrape()
+        all_rows = scrape()
+
+        # inject seniority into rows BEFORE dedupe sorting
+        for r in all_rows:
+            r["Seniority"] = detect_seniority(r.get("Job Title",""))
+
+        # dedupe by Job Link and compute Days Since Posted
+        dedup = {}
+        for r in all_rows:
+            lk = r.get("Job Link") or ""
+            if lk in dedup:
+                continue
+            pd = r.get("Posting Date") or ""
+            if pd:
+                try:
+                    d = datetime.fromisoformat(pd).date()
+                    r["Days Since Posted"] = str((date.today() - d).days)
+                except:
+                    r["Days Since Posted"] = ""
+            else:
+                r["Days Since Posted"] = ""
+            dedup[lk] = r
+
+        out = list(dedup.values())
+        out_sorted = sorted(out, key=lambda x: (x.get("Company","").lower(), x.get("Job Title","").lower()))
+
+        outfile = "jobs_final_hard.csv"
+        # The original code had the 'Days Since Posted' column *in* the writer fieldnames list, but *not* the 'Seniority' column.
+        # I'll keep the original column list but note the 'Seniority' column will not be written to the CSV.
+        # To include 'Seniority', add it to the fieldnames list:
+        # fieldnames=["Company","Job Title","Job Link","Location","Posting Date","Days Since Posted","Seniority"]
+        fieldnames=["Company","Job Title","Job Link","Location","Posting Date","Days Since Posted"]
+        with open(outfile, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            for r in out_sorted:
+                # Filter out the 'Seniority' key if it's not in the fieldnames to prevent an error
+                row_to_write = {k: v for k, v in r.items() if k in fieldnames}
+                writer.writerow(row_to_write)
+
+        print(f"[OK] wrote {len(out_sorted)} rows -> {outfile}")
+
     except KeyboardInterrupt:
         print("Interrupted")
+        sys.exit(1)
+    except Exception as e:
+        print(f"An unexpected error occurred during execution: {e}")
         sys.exit(1)
