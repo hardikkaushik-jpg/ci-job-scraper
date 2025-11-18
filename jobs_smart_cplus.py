@@ -1,5 +1,7 @@
-# jobs_smart_cplus.py  (FULL FIXED — paste / replace existing)
+# jobs_smart_cplus_fixed.py  (REPAIRED)
 # Playwright + BeautifulSoup hybrid scraper, ATS-aware, safe detail quota.
+# Run with: python3 jobs_smart_cplus_fixed.py
+
 from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
@@ -8,7 +10,7 @@ from datetime import datetime, date, timedelta
 
 # ---------- CONFIG ----------
 COMPANIES = {
-     "Airtable": ["https://airtable.com/careers#open-positions"],
+    "Airtable": ["https://airtable.com/careers#open-positions"],
     "Alation": ["https://alation.wd503.myworkdayjobs.com/ExternalSite"],
     "Alteryx": ["https://alteryx.wd108.myworkdayjobs.com/AlteryxCareers"],
     "Ataccama": ["https://jobs.ataccama.com/#one-team"],
@@ -61,6 +63,7 @@ COMPANIES = {
     "Vertica": ["https://careers.opentext.com/us/en/home"],
     "Pentaho": ["https://www.hitachivantara.com/en-us/company/careers/job-search"]
 }
+
 # Timeouts (ms)
 PAGE_NAV_TIMEOUT = 40000
 PAGE_DOM_TIMEOUT = 15000       # shorter detail DOM timeout
@@ -74,16 +77,16 @@ FORBIDDEN_WORDS = [
     "press","blog","partners","pricing","docs","documentation","support",
     "events","resources","login","signin","register","apply now","careers home"
 ]
-FORBIDDEN_RE = re.compile(r'\b(?:' + '|'.join(re.escape(x) for x in FORBIDDEN_WORDS) + r')\b', re.I)
+FORBIDDEN_RE = re.compile(r'\\b(?:' + '|'.join(re.escape(x) for x in FORBIDDEN_WORDS) + r')\\b', re.I)
 
 LOC_TOKENS = [
     "remote","hybrid","usa","united states","uk","united kingdom","germany","france","canada",
     "london","new york","singapore","bengaluru","bangalore","chennai","berlin","paris","india",
     "amsterdam","toronto","zurich","dublin","stockholm","oslo","helsinki","australia","brazil"
 ]
-LOC_RE = re.compile(r'\b(?:' + '|'.join(re.escape(x) for x in LOC_TOKENS) + r')\b', re.I)
+LOC_RE = re.compile(r'\\b(?:' + '|'.join(re.escape(x) for x in LOC_TOKENS) + r')\\b', re.I)
 
-ROLE_WORDS_RE = re.compile(r'\b(engineer|developer|analyst|manager|director|product|data|scientist|architect|consultant|sales|designer|sre|qa|specialist)\b', re.I)
+ROLE_WORDS_RE = re.compile(r'\\b(engineer|developer|analyst|manager|director|product|data|scientist|architect|consultant|sales|designer|sre|qa|specialist)\\b', re.I)
 
 # Company-specific skip rules to avoid non-job pages (tweak as needed)
 COMPANY_SKIP_RULES = {
@@ -109,6 +112,7 @@ def normalize_link(base, href):
     except:
         return href
 
+
 def clean_title(raw):
     if not raw:
         return ""
@@ -117,6 +121,7 @@ def clean_title(raw):
     t = FORBIDDEN_RE.sub('', t)
     t = re.sub(r'\s{2,}', ' ', t).strip(" -:,.")
     return t
+
 
 def normalize_location(loc):
     if not loc:
@@ -136,6 +141,7 @@ def normalize_location(loc):
             out.append(p.title())
     return ", ".join(out)
 
+
 def _iso_only_date(s):
     try:
         return datetime.fromisoformat(s.split("T")[0]).date().isoformat()
@@ -144,6 +150,7 @@ def _iso_only_date(s):
             return datetime.strptime(s.split("T")[0], "%Y-%m-%d").date().isoformat()
         except:
             return s.split("T")[0]
+
 
 def extract_date_from_html(html_text):
     if not html_text:
@@ -174,6 +181,7 @@ def extract_date_from_html(html_text):
         return mm2.group(1)
     return ""
 
+
 def is_likely_job_anchor(href, text):
     if not href and not text:
         return False
@@ -193,6 +201,7 @@ def is_likely_job_anchor(href, text):
         return True
     return False
 
+
 def extract_location_from_text(txt):
     if not txt:
         return "", ""
@@ -201,42 +210,84 @@ def extract_location_from_text(txt):
     paren = re.search(r'\(([^)]+)\)\s*$', s)
     if paren:
         loc = paren.group(1); title = s[:paren.start()].strip(" -:,"); return title, normalize_location(loc)
-    # split heuristics
     parts = re.split(r'\s{2,}| - | — | – | \| |·|•| — |,', s)
     parts = [p.strip() for p in parts if p and p.strip()]
     if len(parts) >= 2:
         last = parts[-1]
         if LOC_RE.search(last) or (len(last.split()) <= 4 and re.search(r'[A-Za-z]', last)):
             return " ".join(parts[:-1]), normalize_location(last)
-    # inline token match
     m = LOC_RE.search(s)
     if m:
         idx = m.start(); candidate = s[idx:].strip(" -,:;"); candidate = re.split(r'\s{2,}| - | — | – | \| ', candidate)[0].strip()
         title = s.replace(candidate, '').strip(" -:,"); return title, normalize_location(candidate)
     return s, ""
 
+
 def try_extract_location_from_card(el):
-    if not el: return ""
+    if not el:
+        return ""
     search_selectors = [
         ".location", ".job-location", "span[class*='location']", ".posting-location",
         ".job_meta_location", ".location--name", ".job-card__location", ".opening__meta",
-        ".job-meta__location", ".opening__location"
+        ".job-meta__location", ".opening__location", ".jobCard-location", ".locationTag"
     ]
-    tag = el
-    if getattr(el, "name", None) == 'a':
-        parent = el.parent; depth=0
-        while parent and depth < 6:
-            for sel in search_selectors:
-                found = parent.select_one(sel)
-                if found and found.get_text(strip=True):
-                    return normalize_location(found.get_text(" ", strip=True))
-            parent = parent.parent; depth += 1
-    else:
+
+    def attr_location(tag):
+        if not tag:
+            return ""
+        for attr in ("data-location", "data-geo", "aria-label", "title", "data-qa-location", "data-test-location"):
+            v = tag.get(attr)
+            if v and isinstance(v, str) and v.strip():
+                return normalize_location(v.strip())
+        return ""
+
+    v = attr_location(el)
+    if v:
+        return v
+
+    for sel in search_selectors:
+        try:
+            found = el.select_one(sel)
+        except Exception:
+            found = None
+        if found and found.get_text(strip=True):
+            return normalize_location(found.get_text(" ", strip=True))
+
+    parent = el.parent
+    depth = 0
+    while parent and depth < 8:
+        v = attr_location(parent)
+        if v:
+            return v
         for sel in search_selectors:
-            found = tag.select_one(sel)
+            try:
+                found = parent.select_one(sel)
+            except Exception:
+                found = None
             if found and found.get_text(strip=True):
                 return normalize_location(found.get_text(" ", strip=True))
+        for sib in parent.find_all(recursive=False):
+            try:
+                txt = sib.get_text(" ", strip=True)
+            except Exception:
+                txt = ""
+            if txt and LOC_RE.search(txt):
+                if len(txt.split()) <= 6:
+                    return normalize_location(txt)
+        parent = parent.parent
+        depth += 1
+
+    try:
+        nearby_text = el.get_text(" ", strip=True)
+        if nearby_text and LOC_RE.search(nearby_text):
+            cand = re.split(r'\s{2,}| - | \| |—|–|,', nearby_text)[-1].strip()
+            if len(cand.split()) <= 6:
+                return normalize_location(cand)
+    except Exception:
+        pass
+
     return ""
+
 
 def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=PAGE_DOM_TIMEOUT):
     try:
@@ -254,6 +305,7 @@ def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=PAGE
         print(f"[WARN] fetch failed: {url} -> {e}")
         return ""
 
+
 # ---------- MAIN SCRAPE ----------
 def scrape():
     rows = []
@@ -262,6 +314,7 @@ def scrape():
         browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
         context = browser.new_context()
         page = context.new_page()
+
         for company, url_list in COMPANIES.items():
             for main_url in url_list:
                 print(f"[SCRAPING] {company} -> {main_url}")
@@ -270,9 +323,9 @@ def scrape():
                     print(f"[WARN] no html for {company} ({main_url}) - skipping")
                     continue
 
-                # parse listing anchors & job-cards
                 soup = BeautifulSoup(listing_html, "lxml")
                 candidates = []
+
                 # standard anchors
                 for a in soup.find_all("a", href=True):
                     href = a.get("href"); text = (a.get_text(" ", strip=True) or "")
@@ -296,7 +349,6 @@ def scrape():
                             src_full = normalize_link(main_url, src)
                             iframe_html = fetch_page_content(page, src_full)
                             if iframe_html:
-                                # attempt to parse anchors in iframe HTML
                                 f_soup = BeautifulSoup(iframe_html, "lxml")
                                 for a in f_soup.find_all("a", href=True):
                                     href = a.get("href"); text = (a.get_text(" ", strip=True) or "")
@@ -305,19 +357,19 @@ def scrape():
                                         candidates.append((href_abs, text, a))
 
                 # dedupe preserve order and apply company specific skip rules
-                seen=set(); filtered=[]
+                seen = set(); filtered = []
                 for href, text, el in candidates:
                     if not href or href.rstrip("/") == main_url.rstrip("/"):
                         continue
                     if href in seen: continue
                     seen.add(href)
-                    skip=False
+                    skip = False
                     low_text = (text or "").lower()
                     for c, rules in COMPANY_SKIP_RULES.items():
                         if c.lower() == company.lower():
                             for r in rules:
                                 if re.search(r, low_text) or (href and re.search(r, href, re.I)):
-                                    skip=True; break
+                                    skip = True; break
                         if skip: break
                     if skip: continue
                     filtered.append((href, text, el))
@@ -337,33 +389,29 @@ def scrape():
                         location_candidate = card_loc
 
                     posting_date = ""
-                    # --- C++ detail logic start ---
-                                        # --- C++ detail logic start ---
+
+                    # --- Detail decision logic ---
                     must_detail = False
                     must_reasons = []
 
-                    # Critical companies always need detail scraping
                     if company.lower() in CRITICAL_COMPANIES:
                         must_detail = True
                         must_reasons.append("critical_company")
 
-                    # Missing important fields -> must detail
                     if not location_candidate:
                         must_detail = True
                         must_reasons.append("no_location")
                     if not posting_date:
                         must_detail = True
                         must_reasons.append("no_posting_date")
-                    if len(title_clean.split()) < 2:
+                    if len((title_clean or "").split()) < 2:
                         must_detail = True
                         must_reasons.append("short_title")
 
-                    # Title includes location token -> must detail
                     if LOC_RE.search(title_candidate):
                         must_detail = True
                         must_reasons.append("title_contains_loc_token")
 
-                    # Link looks like ATS detail page -> must detail
                     if any(x in (link or "").lower() for x in [
                         "/job/", "/jobs/", "greenhouse", "lever.co", "ashbyhq",
                         "bamboohr", "myworkdayjobs", "gr8people",
@@ -372,20 +420,21 @@ def scrape():
                         must_detail = True
                         must_reasons.append("link_looks_like_ats")
 
-                    # Debug print
                     if must_detail:
                         print(f"[DETAIL_DECISION] company={company} link={link} reasons={','.join(must_reasons)} detail_count={detail_count}")
 
-                    # TEMP DEBUG: increase detail scraping quota for diagnosis
+                    # Perform detail scraping
+                    detail_html = ""
                     if must_detail and detail_count < MAX_DETAIL_PAGES:
                         detail_count += 1
                         print(f"[DETAIL_FETCH] #{detail_count} -> {company} -> {link}")
 
-                        detail_html = fetch_page_content(page, link, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=15000)
+                        detail_html = fetch_page_content(page, link, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=PAGE_DOM_TIMEOUT)
+
                         if detail_html:
                             try:
                                 s = BeautifulSoup(detail_html, "lxml")
-                                
+
                                 # H1/title fallback
                                 header = s.find("h1")
                                 if header:
@@ -393,13 +442,13 @@ def scrape():
                                     title_clean = clean_title(header.get_text(" ", strip=True))
                                     if title_clean != old_title:
                                         print(f"[DETAIL_TITLE] replaced '{old_title}' -> '{title_clean}'")
-                                
+
                                 # location selectors
                                 found_loc = None
                                 for sel in [
-                                    "span.location",".job-location",".location","[data-test='job-location']",
-                                    ".posting-location",".job_meta_location",".location--name",
-                                    ".opening__meta",".job-card__location",".posting__location"
+                                    "span.location", ".job-location", ".location", "[data-test='job-location']",
+                                    ".posting-location", ".job_meta_location", ".location--name",
+                                    ".opening__meta", ".job-card__location", ".posting__location"
                                 ]:
                                     eloc = s.select_one(sel)
                                     if eloc and eloc.get_text(strip=True):
@@ -410,65 +459,84 @@ def scrape():
                                     location_candidate = found_loc
                                     print(f"[DETAIL_LOC] found -> {location_candidate}")
 
-                                # JSON-LD robust parsing
-                                found_date = None
+                                # JSON-LD robust parsing (jobLocation / datePosted)
                                 for script in s.find_all("script", type="application/ld+json"):
                                     text = script.string
                                     if not text:
                                         continue
-                                    attempts = [text, "[" + text + "]"]
-                                    for attempt in attempts:
+
+                                    payload = None
+                                    for attempt in (text, "[" + text + "]"):
                                         try:
                                             payload = json.loads(attempt)
+                                            break
                                         except:
-                                            cleaned = re.sub(r'[\x00-\x1f]+',' ', text or "")
+                                            cleaned = re.sub(r'[\x00-\x1f]+', ' ', text)
                                             try:
                                                 payload = json.loads(cleaned)
-                                            except:
-                                                payload=None
-                                        if not payload:
-                                            continue
-                                        if isinstance(payload, list):
-                                            entries = payload
-                                        else:
-                                            entries=[payload]
-                                        for entry in entries:
-                                            if not isinstance(entry, dict):
-                                                continue
-                                            for key in ("datePosted","datePublished","postedOn","created","created_at"):
-                                                if entry.get(key):
-                                                    found_date = _iso_only_date(str(entry.get(key)))
-                                                    break
-                                            if found_date:
                                                 break
-                                        if found_date:
-                                            break
-                                    if found_date:
-                                        break
+                                            except:
+                                                payload = None
 
-                                # if found in JSON-LD
-                                if found_date:
-                                    posting_date = found_date
-                                    print(f"[DETAIL_DATE] found -> {posting_date}")
+                                    if not payload:
+                                        continue
 
-                                # fallback text date parse
+                                    items = payload if isinstance(payload, list) else [payload]
+
+                                    for item in items:
+                                        if not isinstance(item, dict):
+                                            continue
+
+                                        # jobLocation parsing
+                                        jl = item.get("jobLocation") or item.get("jobLocations")
+                                        if jl:
+                                            jl_entry = jl[0] if isinstance(jl, list) else jl
+                                            if isinstance(jl_entry, dict):
+                                                addr = jl_entry.get("address") or jl_entry
+                                                if isinstance(addr, dict):
+                                                    parts = []
+                                                    for k in ("addressLocality","addressRegion","addressCountry","postalCode"):
+                                                        v = addr.get(k)
+                                                        if v:
+                                                            parts.append(str(v))
+                                                    if parts:
+                                                        location_candidate = normalize_location(", ".join(parts))
+                                                        print(f"[DETAIL_JSON_LOC] found -> {location_candidate}")
+                                                        break
+
+                                                if jl_entry.get("name"):
+                                                    location_candidate = normalize_location(str(jl_entry.get("name")))
+                                                    print(f"[DETAIL_JSON_LOC] found -> {location_candidate}")
+                                                    break
+
+                                            elif isinstance(jl_entry, str):
+                                                location_candidate = normalize_location(jl_entry)
+                                                print(f"[DETAIL_JSON_LOC] found -> {location_candidate}")
+                                                break
+
+                                        # datePosted parsing
+                                        if isinstance(item.get("datePosted"), str) and not posting_date:
+                                            posting_date = _iso_only_date(item.get("datePosted"))
+                                            print(f"[DETAIL_DATE] found -> {posting_date}")
+
+                                # fallback: extract date via regex from entire HTML if still missing
                                 if not posting_date:
-                                    pd = extract_date_from_html(detail_html)
-                                    if pd:
-                                        posting_date = pd
+                                    found_date = extract_date_from_html(detail_html)
+                                    if found_date:
+                                        posting_date = found_date
                                         print(f"[DETAIL_DATE_FALLBACK] parsed -> {posting_date}")
 
                             except Exception as e:
                                 print(f"[WARN] detail parse fail {link} -> {e}")
-                    # --- C++ detail logic end ---
-                    # final normalization
-                    title_final = clean_title(title_clean) if title_clean else clean_title(anchor_text)
+
+                    # final normalization and record
+                    title_final = clean_title(title_clean) if title_clean else clean_title(anchor_text or "")
                     location_final = normalize_location(location_candidate)
                     posting_date_final = posting_date or ""
 
                     # fallback: try extract location from link path
                     if not location_final:
-                        mloc = re.search(r'/(remote|new[-_]york|london|berlin|singapore|bengaluru|chennai|munich|frankfurt)[/\-]?', link, re.I)
+                        mloc = re.search(r'/(remote|new[-_]york|london|berlin|singapore|bengaluru|chennai|munich|frankfurt)[/\-]?', link or "", re.I)
                         if mloc:
                             location_final = mloc.group(1).replace('-', ' ').title()
 
@@ -479,7 +547,6 @@ def scrape():
                             d = date.today() - timedelta(days=int(posted_from_anchor.group(1)))
                             posting_date_final = d.isoformat()
 
-                    # record row
                     rows.append({
                         "Company": company,
                         "Job Title": title_final,
@@ -519,6 +586,7 @@ def scrape():
             writer.writerow(r)
 
     print(f"[OK] wrote {len(out_sorted)} rows -> {outfile}")
+
 
 if __name__ == "__main__":
     try:
