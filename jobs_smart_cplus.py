@@ -329,77 +329,105 @@ def scrape():
                         location_candidate = card_loc
 
                     # --- C++ detail page logic ---
-CRITICAL_COMPANIES = ["fivetran","ataccama","datadog","snowflake","matillion","oracle"]
+                    posting_date = ""  # ensure defined
 
-must_detail = False
+                    CRITICAL_COMPANIES = ["fivetran","ataccama","datadog","snowflake","matillion","oracle"]
 
-# 1. Critical companies always scrape detail pages
-if company.lower() in CRITICAL_COMPANIES:
-    must_detail = True
+                    must_detail = False
 
-# 2. Missing important fields → MUST scrape detail
-if not location_candidate or not posting_date or len(title_clean.split()) < 2:
-    must_detail = True
+                    # 1. Critical companies always scrape detail pages
+                    if company.lower() in CRITICAL_COMPANIES:
+                        must_detail = True
 
-# 3. Title includes location text → re-extract from detail page
-if LOC_RE.search(title_candidate):
-    must_detail = True
+                    # 2. Missing important fields → MUST scrape detail
+                    if not location_candidate or not posting_date or len(title_clean.split()) < 2:
+                        must_detail = True
 
-# 4. Link looks like a detailed ATS job page
-if any(x in link.lower() for x in [
-    "/job/", "/jobs/", "greenhouse", "lever.co", "ashbyhq",
-    "bamboohr", "myworkdayjobs", "gr8people",
-    "welcometothejungle", "career"
-]):
-    must_detail = True
+                    # 3. Title includes location text → re-extract from detail page
+                    if LOC_RE.search(title_candidate):
+                        must_detail = True
 
-# --- Perform detail scraping if allowed ---
-if must_detail and detail_count < MAX_DETAIL_PAGES:
-    detail_count += 1
-    detail_html = fetch_page_content(page, link)
-    if detail_html:
-        try:
-            s = BeautifulSoup(detail_html, "lxml")
+                    # 4. Link looks like a detailed ATS job page
+                    if any(x in link.lower() for x in [
+                        "/job/", "/jobs/", "greenhouse", "lever.co", "ashbyhq",
+                        "bamboohr", "myworkdayjobs", "gr8people",
+                        "welcometothejungle", "career"
+                    ]):
+                        must_detail = True
 
-            # Extract clean H1 title
-            header = s.find("h1")
-            if header:
-                title_clean = clean_title(header.get_text(" ", strip=True))
+                    # --- Perform detail scraping if allowed ---
+                    if must_detail and detail_count < MAX_DETAIL_PAGES:
+                        detail_count += 1
+                        detail_html = fetch_page_content(page, link)
+                        if detail_html:
+                            try:
+                                s = BeautifulSoup(detail_html, "lxml")
 
-            # Extract location from known selectors
-            for sel in [
-                "span.location",".job-location",".location","[data-test='job-location']",
-                ".posting-location",".job_meta_location",".location--name",
-                ".opening__meta",".job-card__location",".posting__location"
-            ]:
-                eloc = s.select_one(sel)
-                if eloc and eloc.get_text(strip=True):
-                    location_candidate = normalize_location(eloc.get_text(" ", strip=True))
-                    break
+                                # Extract clean H1 title
+                                header = s.find("h1")
+                                if header:
+                                    title_clean = clean_title(header.get_text(" ", strip=True))
 
-            # JSON-LD date extraction
-            for script in s.find_all("script", type="application/ld+json"):
-                try:
-                    payload = json.loads(script.string or "{}")
-                    if isinstance(payload, dict):
-                        if payload.get("datePosted"):
-                            posting_date = _iso_only_date(payload["datePosted"])
-                            break
-                        if payload.get("datePublished"):
-                            posting_date = _iso_only_date(payload["datePublished"])
-                            break
-                except:
-                    pass
+                                # Extract location from known selectors
+                                for sel in [
+                                    "span.location",".job-location",".location","[data-test='job-location']",
+                                    ".posting-location",".job_meta_location",".location--name",
+                                    ".opening__meta",".job-card__location",".posting__location"
+                                ]:
+                                    eloc = s.select_one(sel)
+                                    if eloc and eloc.get_text(strip=True):
+                                        location_candidate = normalize_location(eloc.get_text(" ", strip=True))
+                                        break
 
-            # Fallback date parsing from full HTML text
-            if not posting_date:
-                parsed = extract_date_from_html(detail_html)
-                if parsed:
-                    posting_date = parsed
+                                # JSON-LD date extraction
+                                for script in s.find_all("script", type="application/ld+json"):
+                                    try:
+                                        payload = json.loads(script.string or "{}")
+                                        if isinstance(payload, dict):
+                                            if payload.get("datePosted"):
+                                                posting_date = _iso_only_date(payload["datePosted"])
+                                                break
+                                            if payload.get("datePublished"):
+                                                posting_date = _iso_only_date(payload["datePublished"])
+                                                break
+                                    except:
+                                        pass
 
-        except Exception as e:
-            print(f"[WARN] detail parse fail {link} -> {e}")
+                                # Fallback date parsing from HTML
+                                if not posting_date:
+                                    parsed = extract_date_from_html(detail_html)
+                                    if parsed:
+                                        posting_date = parsed
 
+                            except Exception as e:
+                                print(f"[WARN] detail parse fail {link} -> {e}")
+
+                    # Final normalization
+                    title_final = clean_title(title_clean) if title_clean else clean_title(anchor_text)
+                    location_final = normalize_location(location_candidate)
+                    posting_date_final = posting_date or ""
+
+                    # fallback: extract location from link path if plausible
+                    if not location_final:
+                        mloc = re.search(r'/(remote|new[-_]york|london|berlin|singapore|bengaluru|chennai|munich|frankfurt)[/\-]?', link, re.I)
+                        if mloc:
+                            location_final = mloc.group(1).replace('-', ' ').title()
+
+                    # posting date from anchor text
+                    if not posting_date_final:
+                        posted_from_anchor = re.search(r'posted\s+(\d+)\s+days?\s+ago', anchor_text or "", re.I)
+                        if posted_from_anchor:
+                            d = date.today() - timedelta(days=int(posted_from_anchor.group(1)))
+                            posting_date_final = d.isoformat()
+
+                    rows.append({
+                        "Company": company,
+                        "Job Title": title_final,
+                        "Job Link": link,
+                        "Location": location_final,
+                        "Posting Date": posting_date_final,
+                        "Days Since Posted": ""
+                    })
                     # final normalization
                     title_final = clean_title(title_clean) if title_clean else clean_title(anchor_text)
                     location_final = normalize_location(location_candidate)
