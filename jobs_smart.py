@@ -1,17 +1,12 @@
-# jobs_smart.py
-# Hybrid Playwright + BeautifulSoup ATS scraper
-# Output -> jobs_final_hard.csv
-# Usage:
-#   pip install -r requirements.txt
-#   python jobs_smart.py
-
+# jobs_smart.py (Option C)
+# Playwright + BeautifulSoup hybrid scraper with safer detail fetch and ATS-aware extraction
 from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
-import re, csv, time, sys
+import re, csv, time, sys, json
 from datetime import datetime, date, timedelta
 
-# ------------------ CONFIG: canonical career URLs (use only these) ------------------
+# ------------------ CONFIG ------------------
 COMPANIES = {
     "Airtable": ["https://airtable.com/careers#open-positions"],
     "Alation": ["https://alation.wd503.myworkdayjobs.com/ExternalSite"],
@@ -64,46 +59,34 @@ COMPANIES = {
     "Teradata": ["https://careers.teradata.com/jobs"],
     "Yellowbrick": ["https://yellowbrick.com/careers/#positions"],
     "Vertica": ["https://careers.opentext.com/us/en/home"],
-    "Pentaho": ["https://www.hitachivantara.com/en-us/company/careers/job-search"]
+    "Pentaho": ["https://www.hitachivantara.com/en-us/company/careers/job-search"]    
 }
-# ---------------------------------------------------------------------------------
+# timeouts (ms)
+PAGE_NAV_TIMEOUT = 40000
+PAGE_DOM_TIMEOUT = 7000     # reduced detailed fetch timeout
+PAGE_IDLE_TIMEOUT = 5000
+SLEEP_BETWEEN_REQUESTS = 0.18
 
-# --- timeouts / throttles ---
-PAGE_NAV_TIMEOUT = 45000          # ms for main listing
-PAGE_IDLE_TIMEOUT = 30000         # ms for listing networkidle
-DETAIL_NAV_TIMEOUT = 20000        # ms per detail page (strict)
-DETAIL_IDLE_TIMEOUT = 10000
-SLEEP_BETWEEN_REQUESTS = 0.18     # polite
-
-# --- lists and patterns ---
 IMAGE_EXT = re.compile(r"\.(jpg|jpeg|png|gif|svg|webp)$", re.I)
+
 FORBIDDEN = [
-    "privacy", "privacy policy", "company", "about", "about us", "legal", "terms",
-    "terms of service", "terms & conditions", "cookie", "cookie policy", "data processing",
-    "policies", "resources", "blog", "events", "news", "docs", "documentation", "partners",
-    "partner program", "community", "open source", "security", "trust", "whitepapers",
-    "customer stories", "product", "pricing", "platform", "solutions", "use cases",
-    "comparison", "dashboard", "profile", "account", "contact", "contact us",
-    "help", "support", "subscribe", "newsletter", "faq", "language", "careers", "career",
-    "view all", "view openings", "home", "locations", "our locations", "company overview",
-    "testimonials", "press", "press releases", "sitemap", "investors", "leadership",
-    "team", "management", "load more", "featured", "apply now"
+    "privacy", "privacy policy", "company", "about", "legal", "terms",
+    "cookie", "cookies", "resources", "blog", "press", "partners", "pricing",
+    "documentation", "docs", "contact", "subscribe", "newsletter", "faq",
 ]
 FORBIDDEN_RE = re.compile(r'\b(?:' + '|'.join(re.escape(x) for x in FORBIDDEN) + r')\b', re.I)
 
-# common location tokens (extend as needed)
 LOC_TOKENS = [
     "remote", "hybrid", "usa", "united states", "united kingdom", "uk", "germany",
     "france", "canada", "london", "new york", "singapore", "bengaluru", "bangalore",
-    "chennai", "berlin", "paris", "india", "atlanta", "georgia", "amsterdam",
-    "barcelona", "sao paulo", "brazil", "toronto", "zürich", "zurich", "dublin",
-    "stockholm", "oslo", "helsinki", "remote -", "remote,"
+    "chennai", "berlin", "paris", "india", "amsterdam", "toronto", "zurich",
+    "dublin", "stockholm", "oslo", "helsinki", "australia", "brazil", "sao paulo"
 ]
 LOC_RE = re.compile(r'\b(?:' + '|'.join(re.escape(x) for x in LOC_TOKENS) + r')\b', re.I)
 
 ROLE_WORDS_RE = re.compile(r'\b(engineer|developer|analyst|manager|director|product|data|scientist|architect|consultant|sales|designer|sre|qa|engineering|specialist)\b', re.I)
 
-# Helpers
+# ------------------ HELPERS ------------------
 def normalize_link(base, href):
     if not href:
         return ""
@@ -118,88 +101,72 @@ def normalize_link(base, href):
     except:
         return href
 
-def extract_date_from_html(html_text):
-    if not html_text:
-        return ""
-    m = re.search(r'"datePosted"\s*:\s*"([^"]+)"', html_text)
-    if m:
-        return m.group(1).split("T")[0]
-    m2 = re.search(r'<meta[^>]+property=["\']article:published_time["\'][^>]+content=["\']([^"\']+)["\']', html_text, re.I)
-    if m2:
-        try:
-            return datetime.fromisoformat(m2.group(1)).date().isoformat()
-        except:
-            return m2.group(1)
-    m3 = re.search(r'<time[^>]+datetime=["\']([^"\']+)["\']', html_text, re.I)
-    if m3:
-        return m3.group(1).split("T")[0]
-    # "Posted 21 days ago" -> compute date
-    mm = re.search(r'posted\s+(\d+)\s+days?\s+ago', html_text, re.I)
-    if mm:
-        days = int(mm.group(1))
-        return (date.today() - timedelta(days=days)).isoformat()
-    return ""
-
 def clean_title(raw):
     if not raw:
         return ""
     t = re.sub(r'\s+', ' ', raw).strip()
-    # remove bad phrases, languages and 'learn more' style noise
     t = re.sub(r'learn\s*more.*', '', t, flags=re.I)
     t = FORBIDDEN_RE.sub('', t)
     t = re.sub(r'\s{2,}', ' ', t).strip(" -:,.")
     return t
 
-def extract_location_from_text(txt):
-    """
-    Heuristic: given a string that may contain role + location,
-    attempt to extract a location portion and return (title_without_location, location_str)
-    """
-    if not txt:
-        return "", ""
-    s = txt.replace("\r", " ").replace("\n", " ").strip()
-    # split heuristics: often "Role  Location" or "Role - Location" or multiline -> last segment is location
-    parts = re.split(r'\s{2,}| - | — | – | \| |,|\n', txt)
-    parts = [p.strip() for p in parts if p and p.strip()]
-    possible_location = ""
-    possible_title = s
-    if len(parts) >= 2:
-        # last part often location if it contains a location token or looks short
-        last = parts[-1]
-        if LOC_RE.search(last) or re.search(r'^[A-Za-z .,-]{2,40}$', last) and len(last.split()) <= 4:
-            possible_location = last
-            possible_title = " ".join(parts[:-1])
-    # fallback: search inline for location tokens
-    if not possible_location:
-        m = LOC_RE.search(s)
-        if m:
-            # take substring around match (up to end)
-            idx = m.start()
-            candidate = s[idx:].strip(" -,:;")
-            # clean candidate (stop at ' - ' or long tail)
-            candidate = re.split(r'\s{2,}| - | — | – | \| ', candidate)[0].strip()
-            possible_location = candidate
-            # remove candidate text from title
-            possible_title = s.replace(candidate, '').strip(" -:,")
-    # normalize duplicates and commas
-    possible_location = normalize_location(possible_location)
-    possible_title = re.sub(r'\s{2,}', ' ', possible_title).strip(" -:,")
-    return possible_title, possible_location
-
 def normalize_location(loc):
     if not loc:
         return ""
-    # catch comma separated duplicates like "Remote, singapore, singapore"
-    parts = [p.strip() for p in re.split(r'[,/]+', loc) if p.strip()]
-    # dedupe preserving order (case-insensitive)
+    s = re.sub(r'[\n\r\t]', ' ', loc)
+    parts = [p.strip() for p in re.split(r'[,/]+', s) if p.strip()]
     seen = set()
     out = []
     for p in parts:
         key = p.lower()
         if key not in seen:
             seen.add(key)
-            out.append(p.title() if p.lower() != 'remote' else 'Remote')
+            # Normalize common forms
+            if key == "remote":
+                out.append("Remote")
+            else:
+                out.append(p.title())
     return ", ".join(out)
+
+def extract_date_from_html(html_text):
+    if not html_text:
+        return ""
+    # JSON-LD datePosted
+    m = re.search(r'"datePosted"\s*:\s*"([^"]+)"', html_text)
+    if m:
+        return _iso_only_date(m.group(1))
+    # Workday "postedOn"
+    m2 = re.search(r'"postedOn"\s*:\s*"([^"]+)"', html_text)
+    if m2:
+        return _iso_only_date(m2.group(1))
+    # meta property article:published_time
+    m3 = re.search(r'<meta[^>]+property=["\']article:published_time["\'][^>]+content=["\']([^"\']+)["\']', html_text, re.I)
+    if m3:
+        return _iso_only_date(m3.group(1))
+    # <time datetime="">
+    m4 = re.search(r'<time[^>]+datetime=["\']([^"\']+)["\']', html_text, re.I)
+    if m4:
+        return _iso_only_date(m4.group(1))
+    # textual "posted X days ago"
+    mm = re.search(r'posted\s+(\d+)\s+days?\s+ago', html_text, re.I)
+    if mm:
+        days = int(mm.group(1))
+        return (date.today() - timedelta(days=days)).isoformat()
+    # Greenhouse / Ashby fallback: look for date formats like YYYY-MM-DD
+    mm2 = re.search(r'(\d{4}-\d{2}-\d{2})', html_text)
+    if mm2:
+        return mm2.group(1)
+    return ""
+
+def _iso_only_date(s):
+    try:
+        # attempt to parse ISO-ish timestamps
+        return datetime.fromisoformat(s.split("T")[0]).date().isoformat()
+    except:
+        try:
+            return datetime.strptime(s.split("T")[0], "%Y-%m-%d").date().isoformat()
+        except:
+            return s.split("T")[0]
 
 def is_likely_job_anchor(href, text):
     if not href and not text:
@@ -209,18 +176,48 @@ def is_likely_job_anchor(href, text):
     low = (text or href or "").lower()
     if FORBIDDEN_RE.search(low):
         return False
-    positives = ['jobs', '/job/', '/jobs/', 'careers', 'open-positions', 'openings', 'greenhouse', 'lever.co', 'myworkdayjobs', 'bamboohr', 'ashby', 'comeet', 'gr8people', 'boards.greenhouse', 'job-boards', 'job-boards.eu']
+    positives = ['jobs', '/job/', '/jobs/', 'careers', 'open-positions', 'openings',
+                 'greenhouse', 'lever.co', 'myworkdayjobs', 'bamboohr', 'ashby', 'comeet',
+                 'gr8people', 'boards.greenhouse', 'job-boards']
     if href and any(p in href.lower() for p in positives):
         return True
     if any(p in low for p in positives):
         return True
-    # heuristic: looks like a role
-    if text and ROLE_WORDS_RE.search(text):
-        # but avoid very long marketing text
-        if len(text) < 120:
-            return True
+    if text and ROLE_WORDS_RE.search(text) and len(text) < 140:
+        return True
     return False
 
+def extract_location_from_text(txt):
+    if not txt:
+        return "", ""
+    s = txt.replace("\r", " ").replace("\n", " ").strip()
+    # parentheses at end -> often location like "(NYC, Remote)"
+    paren = re.search(r'\(([^)]+)\)\s*$', s)
+    if paren:
+        loc = paren.group(1)
+        title = s[:paren.start()].strip(" -:,")
+        return title, normalize_location(loc)
+    # split heuristics
+    parts = re.split(r'\s{2,}| - | — | – | \| |·|•| — |,', s)
+    parts = [p.strip() for p in parts if p and p.strip()]
+    possible_location = ""
+    possible_title = s
+    if len(parts) >= 2:
+        last = parts[-1]
+        if LOC_RE.search(last) or (len(last.split()) <= 4 and re.search(r'[A-Za-z]', last)):
+            possible_location = last
+            possible_title = " ".join(parts[:-1])
+    if not possible_location:
+        m = LOC_RE.search(s)
+        if m:
+            idx = m.start()
+            candidate = s[idx:].strip(" -,:;")
+            candidate = re.split(r'\s{2,}| - | — | – | \| ', candidate)[0].strip()
+            possible_location = candidate
+            possible_title = s.replace(candidate, '').strip(" -:,")
+    return possible_title, normalize_location(possible_location)
+
+# ------------------ PARSING helpers ------------------
 def parse_listing_for_links(base_url, html):
     soup = BeautifulSoup(html, "lxml")
     anchors = soup.find_all("a", href=True)
@@ -230,40 +227,69 @@ def parse_listing_for_links(base_url, html):
         text = (a.get_text(" ", strip=True) or "")
         href_abs = normalize_link(base_url, href)
         if is_likely_job_anchor(href_abs, text):
-            candidates.append((href_abs, text))
-    # job-card containers fallback
-    for el in soup.select("[data-job], .job, .job-listing, .job-card, .opening, .position, .posting, .role"):
+            candidates.append((href_abs, text, a))
+    # find explicit job-card containers & try to attach location metadata
+    for el in soup.select("[data-job], .job, .job-listing, .job-card, .opening, .position, .posting, .role, .job-row"):
+        # anchor inside card
         a = el.find("a", href=True)
-        if a:
-            href = normalize_link(base_url, a.get("href"))
-            text = a.get_text(" ", strip=True) or el.get_text(" ", strip=True)
-            if is_likely_job_anchor(href, text):
-                candidates.append((href, text))
-    # dedupe while preserving order
+        text = a.get_text(" ", strip=True) if a else el.get_text(" ", strip=True)
+        href = normalize_link(base_url, a.get("href")) if a else ""
+        if is_likely_job_anchor(href, text):
+            candidates.append((href, text, el))
+    # dedupe preserving order
     seen = set()
     out = []
-    for href, text in candidates:
+    for href, text, el in candidates:
         if not href:
             continue
-        # drop same-as-main landing page
         if href.rstrip("/") == base_url.rstrip("/"):
             continue
         if href in seen:
             continue
         seen.add(href)
-        out.append((href, text))
+        out.append((href, text, el))
     return out
 
-def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT, idle_timeout=PAGE_IDLE_TIMEOUT, wait_dom=False):
+def try_extract_location_from_card(el):
+    # el may be BeautifulSoup Tag or anchor element
+    if not el:
+        return ""
+    # if it's a Tag representing the card, search for location selectors
+    search_selectors = [
+        ".location", ".job-location", "span[class*='location']", ".posting-location",
+        ".job_meta_location", ".location--name", ".job-card__location", ".opening__meta"
+    ]
+    # if el is Tag, use select_one; if it's an <a> element, check parent nodes
+    tag = el
+    if el.name == 'a':
+        # check parent containers up to 3 levels
+        parent = el.parent
+        depth = 0
+        while parent and depth < 4:
+            for sel in search_selectors:
+                found = parent.select_one(sel)
+                if found and found.get_text(strip=True):
+                    return normalize_location(found.get_text(" ", strip=True))
+            parent = parent.parent
+            depth += 1
+    else:
+        for sel in search_selectors:
+            found = tag.select_one(sel)
+            if found and found.get_text(strip=True):
+                return normalize_location(found.get_text(" ", strip=True))
+    return ""
+
+def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=PAGE_DOM_TIMEOUT, wait_dom=True):
     try:
+        # prefer DOMContentLoaded to avoid networkidle stalls
         if wait_dom:
             page.goto(url, timeout=nav_timeout, wait_until="domcontentloaded")
         else:
             page.goto(url, timeout=nav_timeout)
-        page.wait_for_load_state("networkidle", timeout=idle_timeout)
+        # small wait to allow minimal dynamic content
+        page.wait_for_timeout(300)  # 300ms
         return page.content()
     except PWTimeout:
-        # fallback as best-effort
         try:
             page.goto(url, timeout=nav_timeout, wait_until="domcontentloaded")
             return page.content()
@@ -274,6 +300,7 @@ def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT, idle_timeout=PAG
         print(f"[WARN] fetch failed: {url} -> {e}")
         return ""
 
+# ------------------ MAIN SCRAPE ------------------
 def scrape():
     rows = []
     with sync_playwright() as p:
@@ -288,93 +315,109 @@ def scrape():
                     print(f"[WARN] no html for {company} ({main_url}) - skipping")
                     continue
 
-                # get candidates from listing HTML
                 candidates = parse_listing_for_links(main_url, listing_html)
 
-                # if listing had iframe to ATS, try that
+                # if still nothing, check if there's an iframe to ATS and try it
                 if not candidates:
                     soup = BeautifulSoup(listing_html, "lxml")
                     for iframe in soup.find_all("iframe", src=True):
                         src = iframe.get("src")
-                        if src and any(k in src for k in ("greenhouse", "lever", "myworkday", "bamboohr", "ashby", "job-boards")):
+                        if src and any(k in src for k in ("greenhouse", "lever", "myworkday", "bamboohr", "ashby", "job-boards", "jobs.lever")):
                             src_full = normalize_link(main_url, src)
                             print(f"[INFO] found iframe src -> {src_full} (trying)")
-                            iframe_html = fetch_page_content(page, src_full)
+                            iframe_html = fetch_page_content(page, src_full, wait_dom=True)
                             if iframe_html:
                                 candidates += parse_listing_for_links(src_full, iframe_html)
 
-                # final lightweight fallback: try any anchors (best-effort)
+                # final fallback: any anchors (best-effort)
                 if not candidates:
                     soup = BeautifulSoup(listing_html, "lxml")
                     for a in soup.find_all("a", href=True):
                         text = a.get_text(" ", strip=True) or ""
                         href = normalize_link(main_url, a.get("href"))
                         if is_likely_job_anchor(href, text):
-                            candidates.append((href, text))
+                            candidates.append((href, text, a))
 
-                # final filter: remove product/docs/marketing pages
+                # Filter & dedupe
                 filtered = []
-                for href, text in candidates:
+                for href, text, el in candidates:
                     if IMAGE_EXT.search(href):
                         continue
+                    low = (text or href or "").lower()
                     if re.search(r'/product|/features|/pricing|/docs|/resources|/legal|/contact', href, re.I):
                         if not ROLE_WORDS_RE.search(text):
                             continue
-                    filtered.append((href, text))
+                    filtered.append((href, text, el))
 
-                # For each candidate, try lightweight extraction from anchor text (no detail visit)
-                for link, anchor_text in filtered:
+                # parse candidates
+                for link, anchor_text, el in filtered:
                     time.sleep(SLEEP_BETWEEN_REQUESTS)
-                    # try to parse title & location from anchor text
                     title_candidate = anchor_text or ""
                     title_candidate = re.sub(r'\s+', ' ', title_candidate).strip()
                     title_clean, location_candidate = extract_location_from_text(title_candidate)
                     if not title_clean:
                         title_clean = clean_title(title_candidate)
 
-                    # posting date best-effort from anchor text
                     posting_date = ""
-                    posted_from_anchor = re.search(r'posted\s+(\d+)\s+days?\s+ago', anchor_text or "", re.I)
-                    if posted_from_anchor:
-                        d = date.today() - timedelta(days=int(posted_from_anchor.group(1)))
-                        posting_date = d.isoformat()
+                    need_detail = (not location_candidate) or (len(title_clean) < 3)
 
-                    # If location or posting_date missing, only then open detail page (BUT max 20s)
-                    need_detail = (not location_candidate) or (not posting_date)
+                    # try lightweight extraction from card (if available)
+                    card_loc = try_extract_location_from_card(el)
+                    if card_loc and not location_candidate:
+                        location_candidate = card_loc
+
                     detail_html = ""
                     if need_detail:
-                        detail_html = fetch_page_content(page, link, nav_timeout=DETAIL_NAV_TIMEOUT, idle_timeout=DETAIL_IDLE_TIMEOUT)
+                        # limit heavy detail fetches, use dom-only small timeout
+                        detail_html = fetch_page_content(page, link, nav_timeout=PAGE_DOM_TIMEOUT*6, dom_timeout=PAGE_DOM_TIMEOUT, wait_dom=True)
                         if detail_html:
-                            # extract H1 title if title was noisy
                             try:
                                 s = BeautifulSoup(detail_html, "lxml")
+                                # H1 fallback
                                 if (not title_clean or len(title_clean) < 3) and s.find("h1"):
                                     title_clean = clean_title(s.find("h1").get_text(" ", strip=True))
-                                # location selectors
-                                for sel in ["span.location", ".job-location", ".location", "[data-test='job-location']", ".posting-location", ".job_meta_location", ".location--name"]:
-                                    el = s.select_one(sel)
-                                    if el and el.get_text(strip=True):
-                                        location_candidate = el.get_text(" ", strip=True)
+                                # common location selectors
+                                for sel in ["span.location", ".job-location", ".location", "[data-test='job-location']", ".posting-location", ".job_meta_location", ".location--name", ".opening__meta", ".job-card__location"]:
+                                    eloc = s.select_one(sel)
+                                    if eloc and eloc.get_text(strip=True):
+                                        location_candidate = normalize_location(eloc.get_text(" ", strip=True))
                                         break
-                                # posting date
+                                # date extraction
                                 pd = extract_date_from_html(detail_html)
                                 if pd:
                                     posting_date = pd
-                                else:
-                                    # search textual posted X days ago
-                                    txt = s.get_text(" ", strip=True)
-                                    pd2 = re.search(r'posted\s+(\d+)\s+days?\s+ago', txt, re.I)
-                                    if pd2:
-                                        posting_date = (date.today() - timedelta(days=int(pd2.group(1)))).isoformat()
+                                # Greenhouse specific: check meta or time tags
+                                if not posting_date:
+                                    # try small set of selectors
+                                    for sel in ["time", ".posted-date", ".job-posted", ".posting-date", ".opening__posted"]:
+                                        t = s.select_one(sel)
+                                        if t and t.get("datetime"):
+                                            posting_date = _iso_only_date(t.get("datetime"))
+                                            break
+                                        if t and t.get_text(strip=True):
+                                            dt = re.search(r'(\d{4}-\d{2}-\d{2})', t.get_text(" ", strip=True))
+                                            if dt:
+                                                posting_date = dt.group(1)
+                                                break
                             except Exception as e:
                                 print(f"[WARN] detail parse fail {link} -> {e}")
 
-                    # final normalization
                     title_final = clean_title(title_clean) if title_clean else clean_title(anchor_text)
                     location_final = normalize_location(location_candidate)
                     posting_date_final = posting_date or ""
 
-                    # if title still empty, fallback to anchor text trimmed
+                    # fallback: if location still blank but link contains location token, parse from url
+                    if not location_final:
+                        mloc = re.search(r'/(remote|new-york|london|berlin|singapore|bengaluru|chennai|munich|frankfurt)[/\-]?', link, re.I)
+                        if mloc:
+                            location_final = mloc.group(1).replace('-', ' ').title()
+                    if not posting_date_final:
+                        # attempt posted X days in anchor text
+                        posted_from_anchor = re.search(r'posted\s+(\d+)\s+days?\s+ago', anchor_text or "", re.I)
+                        if posted_from_anchor:
+                            d = date.today() - timedelta(days=int(posted_from_anchor.group(1)))
+                            posting_date_final = d.isoformat()
+
                     if not title_final:
                         title_final = clean_title(anchor_text)
 
@@ -389,14 +432,12 @@ def scrape():
 
         browser.close()
 
-    # compute Days Since Posted and dedupe by Job Link
+    # dedupe by Job Link and compute Days Since Posted
     dedup = {}
     for r in rows:
         lk = r.get("Job Link") or ""
-        # keep first occurrence (the earliest added)
         if lk in dedup:
             continue
-        # days since posted
         pd = r.get("Posting Date") or ""
         if pd:
             try:
@@ -409,8 +450,6 @@ def scrape():
         dedup[lk] = r
 
     out = list(dedup.values())
-
-    # sort output by Company then Job Title (Option A)
     out_sorted = sorted(out, key=lambda x: (x.get("Company","").lower(), x.get("Job Title","").lower()))
 
     outfile = "jobs_final_hard.csv"
