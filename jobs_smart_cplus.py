@@ -486,7 +486,39 @@ def scrape():
                                     for item in items:
                                         if not isinstance(item, dict):
                                             continue
-# --- UNIVERSAL DEEP DATE EXTRACTOR ---
+                                        # jobLocation parsing
+                                        jl = item.get("jobLocation") or item.get("jobLocations")
+                                        if jl:
+                                            jl_entry = jl[0] if isinstance(jl, list) else jl
+                                            if isinstance(jl_entry, dict):
+                                                addr = jl_entry.get("address") or jl_entry
+                                                if isinstance(addr, dict):
+                                                    parts = []
+                                                    for k in ("addressLocality","addressRegion","addressCountry","postalCode"):
+                                                        v = addr.get(k)
+                                                        if v:
+                                                            parts.append(str(v))
+                                                    if parts:
+                                                        location_candidate = normalize_location(", ".join(parts))
+                                                        print(f"[DETAIL_JSON_LOC] found -> {location_candidate}")
+                                                        break
+
+                                                if jl_entry.get("name"):
+                                                    location_candidate = normalize_location(str(jl_entry.get("name")))
+                                                    print(f"[DETAIL_JSON_LOC] found -> {location_candidate}")
+                                                    break
+
+                                            elif isinstance(jl_entry, str):
+                                                location_candidate = normalize_location(jl_entry)
+                                                print(f"[DETAIL_JSON_LOC] found -> {location_candidate}")
+                                                break
+
+                                        # datePosted parsing
+                                        if isinstance(item.get("datePosted"), str) and not posting_date:
+                                            posting_date = _iso_only_date(item.get("datePosted"))
+                                            print(f"[DETAIL_DATE] found -> {posting_date}")
+
+                            # --- UNIVERSAL DEEP DATE EXTRACTOR ---
 if not posting_date:
     try:
         # 1) Search ANY ISO date inside any script tag
@@ -539,38 +571,7 @@ if not posting_date:
 
     except Exception as e:
         print(f"[WARN] deep date extractor failed: {e}")
-                                        # jobLocation parsing
-                                        jl = item.get("jobLocation") or item.get("jobLocations")
-                                        if jl:
-                                            jl_entry = jl[0] if isinstance(jl, list) else jl
-                                            if isinstance(jl_entry, dict):
-                                                addr = jl_entry.get("address") or jl_entry
-                                                if isinstance(addr, dict):
-                                                    parts = []
-                                                    for k in ("addressLocality","addressRegion","addressCountry","postalCode"):
-                                                        v = addr.get(k)
-                                                        if v:
-                                                            parts.append(str(v))
-                                                    if parts:
-                                                        location_candidate = normalize_location(", ".join(parts))
-                                                        print(f"[DETAIL_JSON_LOC] found -> {location_candidate}")
-                                                        break
-
-                                                if jl_entry.get("name"):
-                                                    location_candidate = normalize_location(str(jl_entry.get("name")))
-                                                    print(f"[DETAIL_JSON_LOC] found -> {location_candidate}")
-                                                    break
-
-                                            elif isinstance(jl_entry, str):
-                                                location_candidate = normalize_location(jl_entry)
-                                                print(f"[DETAIL_JSON_LOC] found -> {location_candidate}")
-                                                break
-
-                                        # datePosted parsing
-                                        if isinstance(item.get("datePosted"), str) and not posting_date:
-                                            posting_date = _iso_only_date(item.get("datePosted"))
-                                            print(f"[DETAIL_DATE] found -> {posting_date}")
-
+        
                                 # fallback: extract date via regex from entire HTML if still missing
                                 if not posting_date:
                                     found_date = extract_date_from_html(detail_html)
