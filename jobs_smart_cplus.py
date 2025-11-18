@@ -517,6 +517,60 @@ def scrape():
                                         if isinstance(item.get("datePosted"), str) and not posting_date:
                                             posting_date = _iso_only_date(item.get("datePosted"))
                                             print(f"[DETAIL_DATE] found -> {posting_date}")
+                                            
+        # --- UNIVERSAL DEEP DATE EXTRACTOR ---
+if not posting_date:
+    try:
+        # 1) Search ANY ISO date inside any script tag
+        for script in s.find_all("script"):
+            t = script.string or script.text or ""
+            if not t:
+                continue
+
+            # ISO formats: 2024-11-20 / 2024-11-20T10:30:00Z
+            m = re.search(r'(\d{4}-\d{2}-\d{2})(?:[T ][\d:Z+-]*)?', t)
+            if m:
+                posting_date = _iso_only_date(m.group(1))
+                print(f"[DETAIL_DEEP_DATE] ISO found -> {posting_date}")
+                break
+
+            # 2) Workday-style
+            m2 = re.search(r'"posted(Date|On)"\s*:\s*"([^"]+)"', t, re.I)
+            if m2:
+                posting_date = _iso_only_date(m2.group(2))
+                print(f"[DETAIL_DEEP_DATE] Workday -> {posting_date}")
+                break
+
+            # 3) Lever createdAt
+            m3 = re.search(r'"createdAt"\s*:\s*"([^"]+)"', t)
+            if m3:
+                posting_date = _iso_only_date(m3.group(1))
+                print(f"[DETAIL_DEEP_DATE] Lever createdAt -> {posting_date}")
+                break
+
+            # 4) Greenhouse updated_at
+            m4 = re.search(r'"updated_at"\s*:\s*"([^"]+)"', t)
+            if m4:
+                posting_date = _iso_only_date(m4.group(1))
+                print(f"[DETAIL_DEEP_DATE] Greenhouse updated_at -> {posting_date}")
+                break
+
+            # 5) ATS generic posted keys
+            m5 = re.search(r'"(posted|postingDate|date_created)"\s*:\s*"([^"]+)"', t, re.I)
+            if m5:
+                posting_date = _iso_only_date(m5.group(2))
+                print(f"[DETAIL_DEEP_DATE] ATS generic -> {posting_date}")
+                break
+
+        # FINAL HTML SCAN
+        if not posting_date:
+            m6 = re.findall(r'\d{4}-\d{2}-\d{2}', detail_html)
+            if m6:
+                posting_date = m6[0]
+                print(f"[DETAIL_DEEP_DATE] HTML fallback -> {posting_date}")
+
+    except Exception as e:
+        print(f"[WARN] deep date extractor failed: {e}")
         
                                 # fallback: extract date via regex from entire HTML if still missing
                                 if not posting_date:
