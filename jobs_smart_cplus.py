@@ -328,46 +328,77 @@ def scrape():
                     if card_loc and not location_candidate:
                         location_candidate = card_loc
 
-                    posting_date = ""
-                    need_detail = (not location_candidate) or (not posting_date) or (len(title_clean) < 3)
+                    # --- C++ detail page logic ---
+CRITICAL_COMPANIES = ["fivetran","ataccama","datadog","snowflake","matillion","oracle"]
 
-                    if need_detail and detail_count < MAX_DETAIL_PAGES:
-                        detail_count += 1
-                        detail_html = fetch_page_content(page, link)
-                        if detail_html:
-                            try:
-                                s = BeautifulSoup(detail_html, "lxml")
-                                # H1 fallback
-                                if (not title_clean or len(title_clean)<3) and s.find("h1"):
-                                    title_clean = clean_title(s.find("h1").get_text(" ", strip=True))
-                                # location selectors
-                                for sel in ["span.location",".job-location",".location","[data-test='job-location']", ".posting-location", ".job_meta_location", ".location--name", ".opening__meta", ".job-card__location", ".posting__location"]:
-                                    eloc = s.select_one(sel)
-                                    if eloc and eloc.get_text(strip=True):
-                                        location_candidate = normalize_location(eloc.get_text(" ", strip=True))
-                                        break
-                                # JSON-LD / script parsing
-                                for script in s.find_all("script", type="application/ld+json"):
-                                    try:
-                                        payload = json.loads(script.string or "{}")
-                                        # datePosted may be at root or in itemListElement
-                                        if isinstance(payload, dict):
-                                            if payload.get("datePosted"):
-                                                posting_date = _iso_only_date(str(payload.get("datePosted")))
-                                                break
-                                            # nested check
-                                            for k in ["datePosted","postedOn","datePublished"]:
-                                                if k in payload:
-                                                    posting_date = _iso_only_date(str(payload.get(k))); break
-                                    except Exception:
-                                        continue
-                                # fallback text date parse
-                                if not posting_date:
-                                    pd = extract_date_from_html(detail_html)
-                                    if pd:
-                                        posting_date = pd
-                            except Exception as e:
-                                print(f"[WARN] detail parse fail {link} -> {e}")
+must_detail = False
+
+# 1. Critical companies always scrape detail pages
+if company.lower() in CRITICAL_COMPANIES:
+    must_detail = True
+
+# 2. Missing important fields → MUST scrape detail
+if not location_candidate or not posting_date or len(title_clean.split()) < 2:
+    must_detail = True
+
+# 3. Title includes location text → re-extract from detail page
+if LOC_RE.search(title_candidate):
+    must_detail = True
+
+# 4. Link looks like a detailed ATS job page
+if any(x in link.lower() for x in [
+    "/job/", "/jobs/", "greenhouse", "lever.co", "ashbyhq",
+    "bamboohr", "myworkdayjobs", "gr8people",
+    "welcometothejungle", "career"
+]):
+    must_detail = True
+
+# --- Perform detail scraping if allowed ---
+if must_detail and detail_count < MAX_DETAIL_PAGES:
+    detail_count += 1
+    detail_html = fetch_page_content(page, link)
+    if detail_html:
+        try:
+            s = BeautifulSoup(detail_html, "lxml")
+
+            # Extract clean H1 title
+            header = s.find("h1")
+            if header:
+                title_clean = clean_title(header.get_text(" ", strip=True))
+
+            # Extract location from known selectors
+            for sel in [
+                "span.location",".job-location",".location","[data-test='job-location']",
+                ".posting-location",".job_meta_location",".location--name",
+                ".opening__meta",".job-card__location",".posting__location"
+            ]:
+                eloc = s.select_one(sel)
+                if eloc and eloc.get_text(strip=True):
+                    location_candidate = normalize_location(eloc.get_text(" ", strip=True))
+                    break
+
+            # JSON-LD date extraction
+            for script in s.find_all("script", type="application/ld+json"):
+                try:
+                    payload = json.loads(script.string or "{}")
+                    if isinstance(payload, dict):
+                        if payload.get("datePosted"):
+                            posting_date = _iso_only_date(payload["datePosted"])
+                            break
+                        if payload.get("datePublished"):
+                            posting_date = _iso_only_date(payload["datePublished"])
+                            break
+                except:
+                    pass
+
+            # Fallback date parsing from full HTML text
+            if not posting_date:
+                parsed = extract_date_from_html(detail_html)
+                if parsed:
+                    posting_date = parsed
+
+        except Exception as e:
+            print(f"[WARN] detail parse fail {link} -> {e}")
 
                     # final normalization
                     title_final = clean_title(title_clean) if title_clean else clean_title(anchor_text)
