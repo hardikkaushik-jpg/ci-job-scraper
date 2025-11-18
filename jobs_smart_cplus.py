@@ -63,9 +63,9 @@ COMPANIES = {
 }
 # Timeouts (ms)
 PAGE_NAV_TIMEOUT = 40000
-PAGE_DOM_TIMEOUT = 8000       # shorter detail DOM timeout
+PAGE_DOM_TIMEOUT = 15000       # shorter detail DOM timeout
 SLEEP_BETWEEN_REQUESTS = 0.18
-MAX_DETAIL_PAGES = 250        # increased quota to capture needed details
+MAX_DETAIL_PAGES = 9999        # increased quota to capture needed details
 
 # Patterns
 IMAGE_EXT = re.compile(r"\.(jpg|jpeg|png|gif|svg|webp)$", re.I)
@@ -338,19 +338,30 @@ def scrape():
 
                     posting_date = ""
                     # --- C++ detail logic start ---
+                                        # --- C++ detail logic start ---
                     must_detail = False
+                    must_reasons = []
 
                     # Critical companies always need detail scraping
                     if company.lower() in CRITICAL_COMPANIES:
                         must_detail = True
+                        must_reasons.append("critical_company")
 
                     # Missing important fields -> must detail
-                    if not location_candidate or not posting_date or len(title_clean.split()) < 2:
+                    if not location_candidate:
                         must_detail = True
+                        must_reasons.append("no_location")
+                    if not posting_date:
+                        must_detail = True
+                        must_reasons.append("no_posting_date")
+                    if len(title_clean.split()) < 2:
+                        must_detail = True
+                        must_reasons.append("short_title")
 
                     # Title includes location token -> must detail
                     if LOC_RE.search(title_candidate):
                         must_detail = True
+                        must_reasons.append("title_contains_loc_token")
 
                     # Link looks like ATS detail page -> must detail
                     if any(x in (link or "").lower() for x in [
@@ -359,20 +370,32 @@ def scrape():
                         "welcometothejungle", "career"
                     ]):
                         must_detail = True
+                        must_reasons.append("link_looks_like_ats")
 
-                    # Perform detail scraping if allowed by quota
+                    # Debug print
+                    if must_detail:
+                        print(f"[DETAIL_DECISION] company={company} link={link} reasons={','.join(must_reasons)} detail_count={detail_count}")
+
+                    # TEMP DEBUG: increase detail scraping quota for diagnosis
                     if must_detail and detail_count < MAX_DETAIL_PAGES:
                         detail_count += 1
-                        detail_html = fetch_page_content(page, link)
+                        print(f"[DETAIL_FETCH] #{detail_count} -> {company} -> {link}")
+
+                        detail_html = fetch_page_content(page, link, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=15000)
                         if detail_html:
                             try:
                                 s = BeautifulSoup(detail_html, "lxml")
+                                
                                 # H1/title fallback
                                 header = s.find("h1")
                                 if header:
+                                    old_title = title_clean
                                     title_clean = clean_title(header.get_text(" ", strip=True))
-
+                                    if title_clean != old_title:
+                                        print(f"[DETAIL_TITLE] replaced '{old_title}' -> '{title_clean}'")
+                                
                                 # location selectors
+                                found_loc = None
                                 for sel in [
                                     "span.location",".job-location",".location","[data-test='job-location']",
                                     ".posting-location",".job_meta_location",".location--name",
@@ -380,32 +403,64 @@ def scrape():
                                 ]:
                                     eloc = s.select_one(sel)
                                     if eloc and eloc.get_text(strip=True):
-                                        location_candidate = normalize_location(eloc.get_text(" ", strip=True))
+                                        found_loc = normalize_location(eloc.get_text(" ", strip=True))
                                         break
 
-                                # JSON-LD / script parsing for date
+                                if found_loc:
+                                    location_candidate = found_loc
+                                    print(f"[DETAIL_LOC] found -> {location_candidate}")
+
+                                # JSON-LD robust parsing
+                                found_date = None
                                 for script in s.find_all("script", type="application/ld+json"):
-                                    try:
-                                        payload = json.loads(script.string or "{}")
-                                        if isinstance(payload, dict):
-                                            if payload.get("datePosted"):
-                                                posting_date = _iso_only_date(payload.get("datePosted"))
-                                                break
-                                            if payload.get("datePublished"):
-                                                posting_date = _iso_only_date(payload.get("datePublished"))
-                                                break
-                                    except Exception:
+                                    text = script.string
+                                    if not text:
                                         continue
+                                    attempts = [text, "[" + text + "]"]
+                                    for attempt in attempts:
+                                        try:
+                                            payload = json.loads(attempt)
+                                        except:
+                                            cleaned = re.sub(r'[\x00-\x1f]+',' ', text or "")
+                                            try:
+                                                payload = json.loads(cleaned)
+                                            except:
+                                                payload=None
+                                        if not payload:
+                                            continue
+                                        if isinstance(payload, list):
+                                            entries = payload
+                                        else:
+                                            entries=[payload]
+                                        for entry in entries:
+                                            if not isinstance(entry, dict):
+                                                continue
+                                            for key in ("datePosted","datePublished","postedOn","created","created_at"):
+                                                if entry.get(key):
+                                                    found_date = _iso_only_date(str(entry.get(key)))
+                                                    break
+                                            if found_date:
+                                                break
+                                        if found_date:
+                                            break
+                                    if found_date:
+                                        break
+
+                                # if found in JSON-LD
+                                if found_date:
+                                    posting_date = found_date
+                                    print(f"[DETAIL_DATE] found -> {posting_date}")
 
                                 # fallback text date parse
                                 if not posting_date:
                                     pd = extract_date_from_html(detail_html)
                                     if pd:
                                         posting_date = pd
+                                        print(f"[DETAIL_DATE_FALLBACK] parsed -> {posting_date}")
+
                             except Exception as e:
                                 print(f"[WARN] detail parse fail {link} -> {e}")
                     # --- C++ detail logic end ---
-
                     # final normalization
                     title_final = clean_title(title_clean) if title_clean else clean_title(anchor_text)
                     location_final = normalize_location(location_candidate)
