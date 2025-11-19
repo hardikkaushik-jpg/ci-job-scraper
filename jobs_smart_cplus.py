@@ -11,7 +11,58 @@ from datetime import datetime, date, timedelta
 
 # ---------- CONFIG ----------
 COMPANIES = {
+    "Airtable": ["https://airtable.com/careers#open-positions"],
+    "Alation": ["https://alation.wd503.myworkdayjobs.com/ExternalSite"],
+    "Alteryx": ["https://alteryx.wd108.myworkdayjobs.com/AlteryxCareers"],
+    "Ataccama": ["https://jobs.ataccama.com/#one-team"],
+    "Atlan": ["https://atlan.com/careers"],
+    "Anomalo": ["https://boards.greenhouse.io/anomalojobs"],
+    "BigEye": ["https://www.bigeye.com/careers#positions"],
+    "Boomi": ["https://boomi.com/company/careers/#greenhouseapp"],
+    "CastorDoc (Coalesce)": ["https://jobs.ashbyhq.com/coalesce"],
+    "Cloudera": ["https://cloudera.wd5.myworkdayjobs.com/External_Career"],
+    "Collibra": ["https://www.collibra.com/company/careers#sub-menu-find-jobs"],
+    "Couchbase": ["https://www.couchbase.com/careers/"],
+    "Data.World": ["https://data.world/company/careers/#careers-list"],
+    "Databricks": ["https://www.databricks.com/company/careers/open-positions"],
+    "Datadog": ["https://careers.datadoghq.com/all-jobs/"],
+    "DataGalaxy": ["https://www.welcometothejungle.com/en/companies/datagalaxy/jobs"],
+    "Decube": ["https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41"],
+    "Exasol": ["https://careers.exasol.com/en/jobs"],
+    "Firebolt": ["https://www.firebolt.io/careers"],
     "Fivetran": ["https://www.fivetran.com/careers#jobs"],
+    "GoldenSource": ["https://www.thegoldensource.com/careers/"],
+    "InfluxData": ["https://www.influxdata.com/careers/#jobs"],
+    "Informatica": ["https://informatica.gr8people.com/jobs"],
+    "MariaDB": ["https://job-boards.eu.greenhouse.io/mariadbplc"],
+    "Matillion": ["https://jobs.lever.co/matillion"],
+    "MongoDB": [
+        "https://www.mongodb.com/company/careers/teams/engineering",
+        "https://www.mongodb.com/company/careers/teams/marketing",
+        "https://www.mongodb.com/company/careers/teams/sales",
+        "https://www.mongodb.com/company/careers/teams/product-management-and-design"
+    ],
+    "Monte Carlo": ["https://jobs.ashbyhq.com/montecarlodata"],
+    "Mulesoft": ["https://www.mulesoft.com/careers"],
+    "Nutanix": ["https://careers.nutanix.com/en/jobs/"],
+    "OneTrust": ["https://www.onetrust.com/careers/"],
+    "Oracle": ["https://careers.oracle.com/en/sites/jobsearch/jobs"],
+    "Panoply (Sqream)": ["https://sqream.com/careers/"],
+    "Precisely": [
+        "https://www.precisely.com/careers-and-culture/us-jobs",
+        "https://www.precisely.com/careers-and-culture/international-jobs"
+    ],
+    "Qlik": ["http://careerhub.qlik.com/careers"],
+    "Sifflet": ["https://www.welcometothejungle.com/en/companies/sifflet/jobs"],
+    "SnapLogic": ["https://www.snaplogic.com/company/careers/job-listings"],
+    "Snowflake": ["https://careers.snowflake.com/global/en/search-results"],
+    "Solidatus": ["https://solidatus.bamboohr.com/jobs"],
+    "Syniti": ["https://careers.syniti.com/go/Explore-Our-Roles/8777900/"],
+    "Tencent Cloud": ["https://careers.tencent.com/en-us/search.html"],
+    "Teradata": ["https://careers.teradata.com/jobs"],
+    "Yellowbrick": ["https://yellowbrick.com/careers/#positions"],
+    "Vertica": ["https://careers.opentext.com/us/en/home"],
+    "Pentaho": ["https://www.hitachivantara.com/en-us/company/careers/job-search"]
 }
 
 PAGE_NAV_TIMEOUT = 40000
@@ -228,8 +279,8 @@ def is_likely_job_anchor(href, text):
         "jobvite",
         "/jobs/",
         "/job/",
-        "fivetran.com", # PATCH 3: Fivetran ATS detection
-        "fivetran" # PATCH 3: Fivetran ATS detection
+        "fivetran.com", 
+        "fivetran" 
     ]
     if any(a in h for a in ATS):
         return True
@@ -355,7 +406,6 @@ def detect_seniority(title):
     return "Unknown"
 
 # ---------- SCRAPE ----------
-# PATCH 1: Replace fetch_page_content with SPA-aware version
 def fetch_page_content(page, url, nav_timeout=45000, dom_timeout=15000):
     try:
         # Load full SPA content (React)
@@ -410,7 +460,7 @@ def scrape():
                     if is_likely_job_anchor(href_abs, text):
                         candidates.append((href_abs, text, a))
                 
-                # PATCH 2: FIVETRAN SPECIAL JOB EXTRACTOR
+                # FIVETRAN SPECIAL JOB EXTRACTOR
                 if "fivetran.com" in main_url:
                     print("[FIVETRAN] Running React job-card extractor")
 
@@ -485,6 +535,13 @@ def scrape():
                     filtered.append((href, text, el))
                 # parse filtered candidates
                 for link, anchor_text, el in filtered:
+                    
+                    # HARD FILTER FOR FIVETRAN
+                    if company == "Fivetran":
+                        if not re.search(r'gh_jid=\d+', link):
+                            print(f"[FIVETRAN_DROP] marketing: {link}")
+                            continue
+
                     time.sleep(SLEEP_BETWEEN_REQUESTS)
                     title_candidate = anchor_text or ""
                     title_candidate = re.sub(r'\s+', ' ', title_candidate).strip()
@@ -702,17 +759,17 @@ def scrape():
                                                     posting_date = d.isoformat(); print(f"[TITLE_DATE] days-ago near title -> {posting_date}")
                                     except Exception as e:
                                         print(f"[WARN] title-date-extractor error: {e}")
-                                # STRICT ISO near keywords (Patch 1)
+                                # STRICT ISO near keywords 
                                 if not posting_date:
                                     snippet = detail_html[:50000]
                                     m = re.search(r'(?i)(posted|created|updated|date|time)[^0-9]{0,80}(\d{4}-\d{2}-\d{2})', snippet)
                                     if m:
-                                        posting_date = _iso_only_date(m.group(2)); print(f"[STRICT_ISO_PATCH1] -> {posting_date}")
+                                        posting_date = _iso_only_date(m.group(2)); print(f"[STRICT_ISO] -> {posting_date}")
                                 # final fallback helper
                                 if not posting_date:
                                     found_date = extract_date_from_html(detail_html)
                                     if found_date:
-                                        posting_date = found_date; print(f"[DETAIL_DATE_FALLBACK_PATCH1] -> {posting_date}")
+                                        posting_date = found_date; print(f"[DETAIL_DATE_FALLBACK] -> {posting_date}")
                             except Exception as e:
                                 print(f"[WARN] detail parse fail {link} -> {e}")
                     # final normalization
@@ -753,12 +810,12 @@ def scrape():
                                         location_candidate = normalize_location(", ".join(parts)); print(f"[DEEP_LOC] Ashby -> {location_candidate}")
                         except Exception as e:
                             print(f"[WARN] deep-loc extractor error: {e}")
-                    # ULTRA_LOC regex (Patch 2)
+                    # ULTRA_LOC regex
                     if not location_candidate and detail_html:
                         snippet = detail_html[:40000]
                         mm = re.search(r'([A-Z][a-zA-Z]+)[,\s\-–]+(USA|United States|UK|Germany|France|India|Singapore|Canada|Australia)', snippet)
                         if mm:
-                            location_candidate = normalize_location(mm.group(0)); print(f"[ULTRA_LOC_PATCH2] -> {location_candidate}")
+                            location_candidate = normalize_location(mm.group(0)); print(f"[ULTRA_LOC] -> {location_candidate}")
                     location_final = normalize_location(location_candidate)
                     # fallback location from link path
                     if not location_final:
