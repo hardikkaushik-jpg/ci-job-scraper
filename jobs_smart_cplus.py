@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 import re, csv, time, sys, json, os 
 from datetime import datetime, date, timedelta
+from clean_jobs_cplus import enrich_rows # <<< STEP A: Import the cleaner
 
 # ---------- CONFIG ----------
 COMPANIES = {
@@ -278,9 +279,7 @@ def is_likely_job_anchor(href, text):
         "smartrecruiters",
         "jobvite",
         "/jobs/",
-        "/job/",
-        "fivetran.com", 
-        "fivetran" 
+        "/job/"
     ]
     if any(a in h for a in ATS):
         return True
@@ -406,23 +405,21 @@ def detect_seniority(title):
     return "Unknown"
 
 # ---------- SCRAPE ----------
-def fetch_page_content(page, url, nav_timeout=45000, dom_timeout=15000):
+def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=PAGE_DOM_TIMEOUT):
     try:
-        # Load full SPA content (React)
-        page.goto(url, timeout=nav_timeout, wait_until="networkidle")
-        page.wait_for_load_state("networkidle")
-        page.wait_for_timeout(1200)  # Let React hydrate
+        page.goto(url, timeout=nav_timeout, wait_until="domcontentloaded")
+        page.wait_for_timeout(300)
         return page.content()
-    except Exception as e:
-        print(f"[WARN] SPA load failed {url}: {e}")
-        # fallback: domcontentloaded
+    except PWTimeout:
         try:
             page.goto(url, timeout=nav_timeout, wait_until="domcontentloaded")
-            page.wait_for_timeout(1200)
             return page.content()
-        except Exception as e2:
-            print(f"[WARN] fallback failed {url}: {e2}")
+        except Exception as e:
+            print(f"[WARN] fetch failed (timeout): {url} -> {e}")
             return ""
+    except Exception as e:
+        print(f"[WARN] fetch failed: {url} -> {e}")
+        return ""
 
 def should_drop_by_title(title):
     # after cleaning, if title lacks role words, drop it
@@ -459,37 +456,6 @@ def scrape():
                     href_abs = normalize_link(main_url, href)
                     if is_likely_job_anchor(href_abs, text):
                         candidates.append((href_abs, text, a))
-                
-                # FIVETRAN SPECIAL JOB EXTRACTOR
-                if "fivetran.com" in main_url:
-                    print("[FIVETRAN] Running React job-card extractor")
-
-                    # Find React job cards
-                    for job in soup.select("div[data-job-id], div.job-card, a[data-job-id]"):
-                        text = job.get_text(" ", strip=True)
-                        
-                        # Extract job link
-                        link = (
-                            job.get("href")
-                            or job.get("data-url")
-                            or job.get("data-job-url")
-                        )
-
-                        # If only job-id exists
-                        if not link:
-                            jid = job.get("data-job-id")
-                            if jid:
-                                link = f"https://www.fivetran.com/careers/job/{jid}"
-
-                        if not link:
-                            continue
-
-                        link = normalize_link(main_url, link)
-
-                        if text.strip():
-                            candidates.append((link, text, job))
-                            print(f"[FIVETRAN] Found job: {text} -> {link}")
-                
                 # job card containers
                 for el in soup.select("[data-job], .job, .job-listing, .job-card, .opening, .position, .posting, .role, .job-row"):
                     a = el.find("a", href=True)
@@ -847,9 +813,19 @@ def scrape():
 if __name__ == "__main__":
     try:
         all_rows = scrape()
-        # inject seniority into rows BEFORE dedupe sorting
+        
+        # Original seniority injection has been removed.
+        
+        # <<< STEP B: Run enrichment and add seniority safety fallback
+        print("[ENRICH] Running enrichment...")
+        all_rows = enrich_rows(all_rows)
+
+        # Seniority safety fallback
         for r in all_rows:
-            r["Seniority"] = detect_seniority(r.get("Job Title",""))
+            if "Seniority" not in r or not r.get("Seniority"):
+                r["Seniority"] = detect_seniority(r.get("Job Title", ""))
+        # End of STEP B
+        
         # dedupe by Job Link and compute Days Since Posted
         dedup = {}
         for r in all_rows:
@@ -877,11 +853,34 @@ if __name__ == "__main__":
         repo_root = os.path.dirname(os.path.abspath(__file__))
         outfile = os.path.join(repo_root, "jobs_final_hard.csv")
         
-        fieldnames=["Company","Job Title","Job Link","Location","Posting Date","Days Since Posted","Seniority"]
+        # <<< STEP C: Update CSV fieldnames
+        fieldnames = [
+            "Company","Job Title","Job Link","Location","Posting Date","Days Since Posted","Seniority",
+            "Company_Group","Product_Focus","Product_Focus_Tokens","Primary_Skill","Extracted_Skills",
+            "Relevancy_to_Actian","AI_Focus","Connector_Focus","Trend_Score"
+        ]
+        
         with open(outfile, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             for r in out_sorted:
+                
+                # <<< STEP D: Serialize lists before writing
+                # Note: 'import json' is already at the top of the file.
+                r["Extracted_Skills"] = json.dumps(
+                    r.get("Extracted_Skills", []),
+                    ensure_ascii=False
+                )
+
+                r["Product_Focus_Tokens"] = json.dumps(
+                    r.get("Product_Focus_Tokens", []),
+                    ensure_ascii=False
+                )
+
+                r["AI_Focus"] = str(r.get("AI_Focus", False))
+                r["Connector_Focus"] = str(r.get("Connector_Focus", False))
+                # End of STEP D
+                
                 row_to_write = {k: (v if v is not None else "") for k, v in r.items() if k in fieldnames}
                 for k in fieldnames:
                     if k not in row_to_write:
