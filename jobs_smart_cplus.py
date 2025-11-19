@@ -798,6 +798,17 @@ def scrape():
                                     except Exception as e:
                                         print(f"[WARN] ultra-date extractor failed: {e}")
 
+                                # --- STRICT ISO NEAR KEYWORDS (clean) ---
+                                if not posting_date:
+                                    snippet = detail_html[:30000]
+                                    m = re.search(
+                                        r'(?i)(posted|created|updated|date|time)[^0-9]{0,40}(\d{4}-\d{2}-\d{2})',
+                                        snippet
+                                    )
+                                    if m:
+                                        posting_date = _iso_only_date(m.group(2))
+                                        print(f"[STRICT_ISO] -> {posting_date}")
+
                                 # final fallback using existing helper
                                 if not posting_date:
                                     found_date = extract_date_from_html(detail_html)
@@ -814,9 +825,9 @@ def scrape():
                     posting_date_final = posting_date or ""
 
                     # --- ULTRA LOCATION EXTRACTOR (Workday / Greenhouse / Lever / Ashby) ---
-                    if not location_candidate and detail_html: # Added check for detail_html
+                    if not location_candidate and detail_html:
                         try:
-                            # 1) Workday locationDeep (wd:Locations)
+                            # 1. Workday
                             m = re.search(r'"addressLocality"\s*:\s*"([^"]+)"', detail_html)
                             if m:
                                 city = m.group(1)
@@ -827,7 +838,7 @@ def scrape():
                                     location_candidate = normalize_location(loc)
                                     print(f"[DEEP_LOC] Workday -> {location_candidate}")
 
-                            # 2) Greenhouse additional locations array
+                            # 2. Greenhouse: additionalLocations
                             if not location_candidate:
                                 m = re.search(r'"additionalLocations"\s*:\s*\[(.+?)\]', detail_html, re.S)
                                 if m:
@@ -837,14 +848,14 @@ def scrape():
                                         location_candidate = normalize_location(locs[0])
                                         print(f"[DEEP_LOC] Greenhouse additionalLocations -> {location_candidate}")
 
-                            # 3) Lever “categories.location”
+                            # 3. Lever
                             if not location_candidate:
                                 m = re.search(r'"categories"\s*:\s*{[^}]*"location"\s*:\s*"([^"]+)"', detail_html)
                                 if m:
                                     location_candidate = normalize_location(m.group(1))
                                     print(f"[DEEP_LOC] Lever -> {location_candidate}")
 
-                            # 4) Ashby: “locations”: [{"city", "region", "country"}]
+                            # 4. Ashby
                             if not location_candidate:
                                 m = re.search(r'"locations"\s*:\s*\[(.+?)\]', detail_html, re.S)
                                 if m:
@@ -857,8 +868,8 @@ def scrape():
                                         location_candidate = normalize_location(", ".join(parts))
                                         print(f"[DEEP_LOC] Ashby -> {location_candidate}")
 
-                            # 5) Breadcrumb / nav-trail (works for Snowflake, Teradata, Oracle)
-                            if not location_candidate and s: # requires s (BeautifulSoup object)
+                            # 5. Breadcrumb
+                            if not location_candidate and s:
                                 crumbs = s.select("nav a, .breadcrumb a, .breadcrumbs a")
                                 for cr in crumbs:
                                     txt = cr.get_text(" ", strip=True)
@@ -869,6 +880,17 @@ def scrape():
 
                         except Exception as e:
                             print(f"[WARN] deep-loc extractor error: {e}")
+                            
+                    # --- ULTRA_LOC regex ---
+                    if not location_candidate and detail_html:
+                        snippet = detail_html[:20000]
+                        mm = re.search(
+                            r'([A-Z][a-zA-Z]+)[,\s\-–]+(USA|United States|UK|Germany|France|India|Singapore|Canada|Australia)',
+                            snippet
+                        )
+                        if mm:
+                            location_candidate = normalize_location(mm.group(0))
+                            print(f"[ULTRA_LOC] regex -> {location_candidate}")
                             
                     location_final = normalize_location(location_candidate) # Re-normalize after deep extraction
 
