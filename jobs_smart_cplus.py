@@ -1,4 +1,4 @@
-# jobs_smart_cplus_final_full_mod.py
+# jobs_smart_cplus.py
 # Playwright + BeautifulSoup hybrid scraper, ATS-aware, enhanced cleaning and classification.
 # Run with: python3 jobs_smart_cplus_final_full_mod.py
 # Requires: playwright, beautifulsoup4, lxml
@@ -8,7 +8,6 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 import re, csv, time, sys, json, os 
 from datetime import datetime, date, timedelta
-from clean_jobs_cplus import enrich_rows # <<< STEP A: Import the cleaner
 
 # ---------- CONFIG ----------
 COMPANIES = {
@@ -279,7 +278,9 @@ def is_likely_job_anchor(href, text):
         "smartrecruiters",
         "jobvite",
         "/jobs/",
-        "/job/"
+        "/job/",
+        "fivetran.com", # PATCH 3: Fivetran ATS detection
+        "fivetran" # PATCH 3: Fivetran ATS detection
     ]
     if any(a in h for a in ATS):
         return True
@@ -405,21 +406,24 @@ def detect_seniority(title):
     return "Unknown"
 
 # ---------- SCRAPE ----------
-def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=PAGE_DOM_TIMEOUT):
+# PATCH 1: Replace fetch_page_content with SPA-aware version
+def fetch_page_content(page, url, nav_timeout=45000, dom_timeout=15000):
     try:
-        page.goto(url, timeout=nav_timeout, wait_until="domcontentloaded")
-        page.wait_for_timeout(300)
+        # Load full SPA content (React)
+        page.goto(url, timeout=nav_timeout, wait_until="networkidle")
+        page.wait_for_load_state("networkidle")
+        page.wait_for_timeout(1200)  # Let React hydrate
         return page.content()
-    except PWTimeout:
+    except Exception as e:
+        print(f"[WARN] SPA load failed {url}: {e}")
+        # fallback: domcontentloaded
         try:
             page.goto(url, timeout=nav_timeout, wait_until="domcontentloaded")
+            page.wait_for_timeout(1200)
             return page.content()
-        except Exception as e:
-            print(f"[WARN] fetch failed (timeout): {url} -> {e}")
+        except Exception as e2:
+            print(f"[WARN] fallback failed {url}: {e2}")
             return ""
-    except Exception as e:
-        print(f"[WARN] fetch failed: {url} -> {e}")
-        return ""
 
 def should_drop_by_title(title):
     # after cleaning, if title lacks role words, drop it
@@ -456,6 +460,37 @@ def scrape():
                     href_abs = normalize_link(main_url, href)
                     if is_likely_job_anchor(href_abs, text):
                         candidates.append((href_abs, text, a))
+                
+                # PATCH 2: FIVETRAN SPECIAL JOB EXTRACTOR
+                if "fivetran.com" in main_url:
+                    print("[FIVETRAN] Running React job-card extractor")
+
+                    # Find React job cards
+                    for job in soup.select("div[data-job-id], div.job-card, a[data-job-id]"):
+                        text = job.get_text(" ", strip=True)
+                        
+                        # Extract job link
+                        link = (
+                            job.get("href")
+                            or job.get("data-url")
+                            or job.get("data-job-url")
+                        )
+
+                        # If only job-id exists
+                        if not link:
+                            jid = job.get("data-job-id")
+                            if jid:
+                                link = f"https://www.fivetran.com/careers/job/{jid}"
+
+                        if not link:
+                            continue
+
+                        link = normalize_link(main_url, link)
+
+                        if text.strip():
+                            candidates.append((link, text, job))
+                            print(f"[FIVETRAN] Found job: {text} -> {link}")
+                
                 # job card containers
                 for el in soup.select("[data-job], .job, .job-listing, .job-card, .opening, .position, .posting, .role, .job-row"):
                     a = el.find("a", href=True)
@@ -501,13 +536,6 @@ def scrape():
                     filtered.append((href, text, el))
                 # parse filtered candidates
                 for link, anchor_text, el in filtered:
-                    
-                    # HARD FILTER FOR FIVETRAN
-                    if company == "Fivetran":
-                        if not re.search(r'gh_jid=\d+', link):
-                            print(f"[FIVETRAN_DROP] marketing: {link}")
-                            continue
-
                     time.sleep(SLEEP_BETWEEN_REQUESTS)
                     title_candidate = anchor_text or ""
                     title_candidate = re.sub(r'\s+', ' ', title_candidate).strip()
@@ -725,17 +753,17 @@ def scrape():
                                                     posting_date = d.isoformat(); print(f"[TITLE_DATE] days-ago near title -> {posting_date}")
                                     except Exception as e:
                                         print(f"[WARN] title-date-extractor error: {e}")
-                                # STRICT ISO near keywords 
+                                # STRICT ISO near keywords (Patch 1)
                                 if not posting_date:
                                     snippet = detail_html[:50000]
                                     m = re.search(r'(?i)(posted|created|updated|date|time)[^0-9]{0,80}(\d{4}-\d{2}-\d{2})', snippet)
                                     if m:
-                                        posting_date = _iso_only_date(m.group(2)); print(f"[STRICT_ISO] -> {posting_date}")
+                                        posting_date = _iso_only_date(m.group(2)); print(f"[STRICT_ISO_PATCH1] -> {posting_date}")
                                 # final fallback helper
                                 if not posting_date:
                                     found_date = extract_date_from_html(detail_html)
                                     if found_date:
-                                        posting_date = found_date; print(f"[DETAIL_DATE_FALLBACK] -> {posting_date}")
+                                        posting_date = found_date; print(f"[DETAIL_DATE_FALLBACK_PATCH1] -> {posting_date}")
                             except Exception as e:
                                 print(f"[WARN] detail parse fail {link} -> {e}")
                     # final normalization
@@ -776,12 +804,12 @@ def scrape():
                                         location_candidate = normalize_location(", ".join(parts)); print(f"[DEEP_LOC] Ashby -> {location_candidate}")
                         except Exception as e:
                             print(f"[WARN] deep-loc extractor error: {e}")
-                    # ULTRA_LOC regex
+                    # ULTRA_LOC regex (Patch 2)
                     if not location_candidate and detail_html:
                         snippet = detail_html[:40000]
                         mm = re.search(r'([A-Z][a-zA-Z]+)[,\s\-–]+(USA|United States|UK|Germany|France|India|Singapore|Canada|Australia)', snippet)
                         if mm:
-                            location_candidate = normalize_location(mm.group(0)); print(f"[ULTRA_LOC] -> {location_candidate}")
+                            location_candidate = normalize_location(mm.group(0)); print(f"[ULTRA_LOC_PATCH2] -> {location_candidate}")
                     location_final = normalize_location(location_candidate)
                     # fallback location from link path
                     if not location_final:
@@ -813,19 +841,9 @@ def scrape():
 if __name__ == "__main__":
     try:
         all_rows = scrape()
-        
-        # Original seniority injection has been removed.
-        
-        # <<< STEP B: Run enrichment and add seniority safety fallback
-        print("[ENRICH] Running enrichment...")
-        all_rows = enrich_rows(all_rows)
-
-        # Seniority safety fallback
+        # inject seniority into rows BEFORE dedupe sorting
         for r in all_rows:
-            if "Seniority" not in r or not r.get("Seniority"):
-                r["Seniority"] = detect_seniority(r.get("Job Title", ""))
-        # End of STEP B
-        
+            r["Seniority"] = detect_seniority(r.get("Job Title",""))
         # dedupe by Job Link and compute Days Since Posted
         dedup = {}
         for r in all_rows:
@@ -853,34 +871,11 @@ if __name__ == "__main__":
         repo_root = os.path.dirname(os.path.abspath(__file__))
         outfile = os.path.join(repo_root, "jobs_final_hard.csv")
         
-        # <<< STEP C: Update CSV fieldnames
-        fieldnames = [
-            "Company","Job Title","Job Link","Location","Posting Date","Days Since Posted","Seniority",
-            "Company_Group","Product_Focus","Product_Focus_Tokens","Primary_Skill","Extracted_Skills",
-            "Relevancy_to_Actian","AI_Focus","Connector_Focus","Trend_Score"
-        ]
-        
+        fieldnames=["Company","Job Title","Job Link","Location","Posting Date","Days Since Posted","Seniority"]
         with open(outfile, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             for r in out_sorted:
-                
-                # <<< STEP D: Serialize lists before writing
-                # Note: 'import json' is already at the top of the file.
-                r["Extracted_Skills"] = json.dumps(
-                    r.get("Extracted_Skills", []),
-                    ensure_ascii=False
-                )
-
-                r["Product_Focus_Tokens"] = json.dumps(
-                    r.get("Product_Focus_Tokens", []),
-                    ensure_ascii=False
-                )
-
-                r["AI_Focus"] = str(r.get("AI_Focus", False))
-                r["Connector_Focus"] = str(r.get("Connector_Focus", False))
-                # End of STEP D
-                
                 row_to_write = {k: (v if v is not None else "") for k, v in r.items() if k in fieldnames}
                 for k in fieldnames:
                     if k not in row_to_write:
@@ -893,3 +888,4 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"An unexpected error occurred during execution: {e}")
         sys.exit(1)
+
