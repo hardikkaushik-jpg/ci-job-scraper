@@ -1,6 +1,7 @@
-# jobs_smart_cplus_fixed.py (REPAIRED)
+# jobs_smart_cplus_patched.py
 # Playwright + BeautifulSoup hybrid scraper, ATS-aware, safe detail quota.
-# Run with: python3 jobs_smart_cplus_fixed.py
+# All patches applied: Date (Patch1), Location (Patch2), Title+Seniority (Patch3)
+# Run with: python3 jobs_smart_cplus_patched.py
 
 from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
 from bs4 import BeautifulSoup
@@ -116,12 +117,39 @@ def normalize_link(base, href):
 
 
 def clean_title(raw):
+    """
+    Patch 3: Title normalizer / cleaner.
+    - Remove common "at Company" fragments and trailing location in parentheses
+    - Remove CTA fragments like 'Apply now', 'Learn more'
+    - Collapse whitespace, strip punctuation
+    - Keep titles short and meaningful
+    """
     if not raw:
         return ""
-    t = re.sub(r'\s+', ' ', raw).strip()
-    t = re.sub(r'learn\s*more.*', '', t, flags=re.I)
-    t = FORBIDDEN_RE.sub('', t)
+    t = raw.strip()
+
+    # some common separators that split title/location or extraneous info
+    # remove any leading/trailing punctuation or separators
+    t = re.sub(r'[\r\n\t]+', ' ', t)
+    t = re.sub(r'\s{2,}', ' ', t)
+
+    # Remove "at Company" patterns: "Software Engineer at Acme" -> "Software Engineer"
+    t = re.sub(r'\s+at\s+[A-Z][\w\-\s&\.]{1,50}$', '', t, flags=re.I)
+
+    # Remove "(Location)" trailing parenthesis blocks that are likely location-only
+    t = re.sub(r'\s*\([^)]{1,60}\)\s*$', '', t)
+
+    # Remove trailing location tokens like ' - Remote' or ' — London'
+    t = re.sub(r'[\-\—\–]\s*(remote|hybrid|[A-Za-z][\w\s\-]{1,40})\s*$', '', t, flags=re.I)
+
+    # Remove CTA or boilerplate phrases
+    t = re.sub(r'(?i)\b(apply now|learn more|see more|view details|read more|more info)\b.*', '', t)
+
+    # Remove excessive punctuation and collapse spaces
+    t = re.sub(r'[|••­•·]+', ' ', t)
     t = re.sub(r'\s{2,}', ' ', t).strip(" -:,.")
+    # Strip leftover leading/trailing punctuation
+    t = t.strip(" -:,.")
     return t
 
 
@@ -153,16 +181,26 @@ def _iso_only_date(s):
 
 
 def extract_date_from_html(html_text):
+    """
+    Patch 1: Improved date extractor.
+    Tries JSON-LD, known ATS structures, 'posted X days ago', multiple regex windows,
+    and robust ISO searches with expanded context window.
+    """
     if not html_text:
         return ""
+
+    # 1) JSON-LD common date keys
+    # prefer "datePosted" if available
     m = re.search(r'"datePosted"\s*:\s*"([^"]+)"', html_text)
     if m:
         return _iso_only_date(m.group(1))
 
+    # common workday/postedOn
     m2 = re.search(r'"postedOn"\s*:\s*"([^"]+)"', html_text)
     if m2:
         return _iso_only_date(m2.group(1))
 
+    # meta article published_time
     m3 = re.search(
         r'<meta[^>]+property=["\']article:published_time["\'][^>]+content=["\']([^"\']+)["\']',
         html_text,
@@ -171,15 +209,52 @@ def extract_date_from_html(html_text):
     if m3:
         return _iso_only_date(m3.group(1))
 
+    # <time datetime="...">
     m4 = re.search(r'<time[^>]+datetime=["\']([^"\']+)["\']', html_text, re.I)
     if m4:
         return _iso_only_date(m4.group(1))
 
+    # posted X days ago
     mm = re.search(r'posted\s+(\d+)\s+days?\s+ago', html_text, re.I)
     if mm:
         days = int(mm.group(1))
         return (date.today() - timedelta(days=days)).isoformat()
 
+    # Try NextJS / __NEXT_DATA__ early, or other embedded JSON
+    m_next = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.+?)</script>', html_text, re.S)
+    if m_next:
+        try:
+            nd = json.loads(m_next.group(1))
+            # search for iso-like strings in the json object
+            def find_iso(o):
+                if isinstance(o, str):
+                    if re.match(r'\d{4}-\d{2}-\d{2}', o):
+                        return o
+                    return None
+                if isinstance(o, dict):
+                    for v in o.values():
+                        res = find_iso(v)
+                        if res:
+                            return res
+                if isinstance(o, list):
+                    for it in o:
+                        res = find_iso(it)
+                        if res:
+                            return res
+                return None
+            res = find_iso(nd)
+            if res:
+                return _iso_only_date(res)
+        except:
+            pass
+
+    # Broader scan: look for ISO dates near date keywords in a larger window
+    snippet = html_text[:120000]  # larger window
+    m_strict = re.search(r'(?i)(posted|created|updated|date|published|posted on|posted at|published on)[^0-9A-Za-z]{0,80}(\d{4}-\d{2}-\d{2})', snippet)
+    if m_strict:
+        return _iso_only_date(m_strict.group(2))
+
+    # fallback: find first ISO in page
     mm2 = re.search(r'(\d{4}-\d{2}-\d{2})', html_text)
     if mm2:
         return mm2.group(1)
@@ -359,56 +434,62 @@ def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=PAGE
         print(f"[WARN] fetch failed: {url} -> {e}")
         return ""
 
-# --- SENIORITY CLASSIFIER (Helper moved outside scrape) ---
+# --- SENIORITY CLASSIFIER (Patch 3: expanded)
 def detect_seniority(title):
     if not title:
         return "Unknown"
-
     t = title.lower()
 
-    # DIRECTOR / EXECUTIVE / LEADERSHIP
+    # Director / Executive / Leadership
     if any(x in t for x in [
         "chief ", "cxo", "cto", "ceo", "cfo", "coo",
-        "vp", "vice president", "svp", "evp",
+        "vp ", "vice president", "svp", "evp",
         "executive director", "executive", "head of",
         "director", "global director", "managing director"
     ]):
         return "Director+"
 
-    # PRINCIPAL / STAFF
-    if any(x in t for x in [
-        "staff ", "principal", "distinguished", "fellow"
-    ]):
+    # Principal / Staff / Distinguished
+    if any(x in t for x in ["principal", "staff ", "distinguished", "fellow"]):
         return "Principal/Staff"
 
-    # SENIOR
-    if any(x in t for x in [
-        "senior", "sr.", "sr ", "lead ", "lead-", "team lead",
-        "senior engineer", "senior manager"
+    # Senior keywords (cover many variants)
+    if any(re.search(r'\b' + re.escape(k) + r'\b', t) for k in [
+        "senior", "sr\\.", "sr ", "lead", "lead-", "team lead", "senior engineer", "principal engineer"
     ]):
         return "Senior"
 
-    # MID
-    if any(x in t for x in [
-        "mid ", "mid-", "intermediate", "experience", "level ii",
-        "ii ", "2 ", "associate", "regular"
+    # Manager
+    if any(x in t for x in ["manager", "mgr", "management", "people manager"]):
+        return "Manager"
+
+    # Mid / Associate
+    if any(re.search(r'\b' + re.escape(k) + r'\b', t) for k in [
+        "associate", "mid ", "mid-", "intermediate", "ii", "iii", "level 2", "level ii"
     ]):
         return "Mid"
 
-    # ENTRY / JUNIOR
-    if any(x in t for x in [
-        "junior", "jr.", "jr ", "entry", "graduate", "fresher"
+    # Entry / Junior
+    if any(re.search(r'\b' + re.escape(k) + r'\b', t) for k in [
+        "junior", "jr\\.", "jr ", "entry", "graduate", "fresher", "trainee"
     ]):
         return "Entry"
 
-    # INTERN
-    if any(x in t for x in [
-        "intern", "internship", "working student", "werkstudent"
-    ]):
+    # Intern / Working student
+    if any(x in t for x in ["intern", "internship", "working student", "werkstudent"]):
         return "Intern"
 
-    return "Unknown"
+    # Fallback heuristics: numeric seniority like '3+ years' or '5+ years' often mid or senior
+    m_years = re.search(r'(\d+)\+?\s+years', t)
+    if m_years:
+        yrs = int(m_years.group(1))
+        if yrs >= 7:
+            return "Senior"
+        if yrs >= 3:
+            return "Mid"
+        return "Entry"
 
+    return "Unknown"
 
 # ---------- MAIN SCRAPE ----------
 def scrape():
@@ -502,9 +583,14 @@ def scrape():
                     time.sleep(SLEEP_BETWEEN_REQUESTS)
                     title_candidate = anchor_text or ""
                     title_candidate = re.sub(r'\s+', ' ', title_candidate).strip()
+
+                    # Try extract location token from anchor text while preserving title text
                     title_clean, location_candidate = extract_location_from_text(title_candidate)
                     if not title_clean:
                         title_clean = clean_title(title_candidate)
+                    else:
+                        # Ensure title gets cleaned for leftover boilerplate
+                        title_clean = clean_title(title_clean)
 
                     # try card location extraction
                     card_loc = try_extract_location_from_card(el)
@@ -642,112 +728,26 @@ def scrape():
                                         if isinstance(item.get("datePosted"), str) and not posting_date:
                                             posting_date = _iso_only_date(item.get("datePosted"))
                                             print(f"[DETAIL_DATE] found -> {posting_date}")
-        
+
                                 # --- EXTENDED ATS-SPECIFIC DATE PARSERS ---
                                 if not posting_date:
                                     try:
                                         text_blob = detail_html
 
-                                        # 1) Workday: window.__WD_DATA__
-                                        m = re.search(r'window\.__WD_DATA__\s*=\s*({.+?});', text_blob, re.S)
-                                        if m:
-                                            try:
-                                                wd = json.loads(m.group(1))
-                                                def wd_find_date(obj):
-                                                    if isinstance(obj, dict):
-                                                        for k,v in obj.items():
-                                                            if isinstance(v, str) and re.match(r'\d{4}-\d{2}-\d{2}', v):
-                                                                return v
-                                                            res = wd_find_date(v)
-                                                            if res: return res
-                                                    if isinstance(obj, list):
-                                                        for it in obj:
-                                                            res = wd_find_date(it)
-                                                            if res: return res
-                                                    return None
-                                                res = wd_find_date(wd)
-                                                if res:
-                                                    posting_date = _iso_only_date(res)
-                                                    print(f"[DETAIL_AUX_DATE] Workday -> {posting_date}")
-                                            except:
-                                                pass
+                                        # Workday / Greenhouse / Lever / NextJS deep searches
+                                        # (reuse extract_date_from_html for broad heuristics)
+                                        found = extract_date_from_html(text_blob)
+                                        if found:
+                                            posting_date = found
+                                            print(f"[DETAIL_AUX_DATE] extract_date_from_html -> {posting_date}")
 
-                                        # 2) Greenhouse: window.__INITIAL_STATE__
-                                        if not posting_date:
-                                            m2 = re.search(r'window\.__INITIAL_STATE__\s*=\s*({.+?});', text_blob, re.S)
-                                            if m2:
-                                                try:
-                                                    st = json.loads(m2.group(1))
-                                                    for key in ("job","jobPosting","job_posting"):
-                                                        node = st.get(key) if isinstance(st, dict) else None
-                                                        if isinstance(node, dict):
-                                                            for k in ("posted_at","updated_at","created_at","date_posted","date"):
-                                                                if node.get(k):
-                                                                    posting_date = _iso_only_date(str(node.get(k)))
-                                                                    print(f"[DETAIL_AUX_DATE] Greenhouse->{k} -> {posting_date}")
-                                                                    break
-                                                            if posting_date:
-                                                                break
-                                                except:
-                                                    pass
-
-                                        # 3) Lever: createdAt / postingDate
-                                        if not posting_date:
-                                            m3 = re.search(r'({"jobPosting".+?})', text_blob, re.S) or re.search(r'window\.__INITIAL_STATE__\s*=\s*({.+?});', text_blob, re.S)
-                                            if m3:
-                                                try:
-                                                    payload = json.loads(m3.group(1))
-                                                    def find_lever_date(o):
-                                                        if isinstance(o, dict):
-                                                            for k,v in o.items():
-                                                                if k.lower() in ("createdat","created_at","postingdate","postedat","post_date") and isinstance(v,str):
-                                                                    return v
-                                                                res = find_lever_date(v)
-                                                                if res: return res
-                                                        if isinstance(o, list):
-                                                            for it in o:
-                                                                res = find_lever_date(it)
-                                                                if res: return res
-                                                        return None
-                                                    res = find_lever_date(payload)
-                                                    if res:
-                                                        posting_date = _iso_only_date(res)
-                                                        print(f"[DETAIL_AUX_DATE] Lever -> {posting_date}")
-                                                except:
-                                                    pass
-
-                                        # 4) NextJS / Ashby: __NEXT_DATA__
-                                        if not posting_date:
-                                            m4 = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.+?)</script>', text_blob, re.S)
-                                            if m4:
-                                                try:
-                                                    nd = json.loads(m4.group(1))
-                                                    def nd_find_date(obj):
-                                                        if isinstance(obj, dict):
-                                                            for v in obj.values():
-                                                                if isinstance(v, str) and re.match(r'\d{4}-\d{2}-\d{2}', v):
-                                                                    return v
-                                                                res = nd_find_date(v)
-                                                                if res: return res
-                                                        if isinstance(obj, list):
-                                                            for it in obj:
-                                                                res = nd_find_date(it)
-                                                                if res: return res
-                                                        return None
-                                                    res = nd_find_date(nd)
-                                                    if res:
-                                                        posting_date = _iso_only_date(res)
-                                                        print(f"[DETAIL_AUX_DATE] NextJS -> {posting_date}")
-                                                except:
-                                                    pass
-
-                                        # 5) BambooHR / other ATS: scan script keys
+                                        # additional script-key scans (BambooHR style)
                                         if not posting_date:
                                             for script in s.find_all("script"):
                                                 t = script.string or script.text or ""
                                                 if not t:
                                                     continue
-                                                for key in ("posted_at","post_date","date_posted","datePosted","date_published","created_at","createdAt"):
+                                                for key in ("posted_at","post_date","date_posted","datePosted","date_published","created_at","createdAt","postedOn"):
                                                     mkey = re.search(rf'"{key}"\s*:\s*"([^"]+)"', t, re.I)
                                                     if mkey:
                                                         posting_date = _iso_only_date(mkey.group(1))
@@ -756,17 +756,10 @@ def scrape():
                                                 if posting_date:
                                                     break
 
-                                        # 6) ISO fallback anywhere in HTML
-                                        if not posting_date:
-                                            mm = re.search(r'(\d{4}-\d{2}-\d{2})', detail_html)
-                                            if mm:
-                                                posting_date = _iso_only_date(mm.group(1))
-                                                print(f"[DETAIL_AUX_DATE] ISO fallback -> {posting_date}")
-
                                     except Exception as e:
                                         print(f"[WARN] extended-ats-date extractor failed: {e}")
 
-                                # --- DATE NEAR TITLE PARSER (ultra-precise) ---
+                                # --- DATE NEAR TITLE PARSER ---
                                 if not posting_date and s:
                                     try:
                                         h1 = s.find("h1")
@@ -774,81 +767,18 @@ def scrape():
                                             h1_block = h1.get_text(" ", strip=True)
                                             parent_block = h1.parent.get_text(" ", strip=True) if h1.parent else ""
                                             combined = h1_block + " " + parent_block
-
-                                            # ISO near title
                                             m_iso = re.search(r'(\d{4}-\d{2}-\d{2})', combined)
                                             if m_iso:
                                                 posting_date = _iso_only_date(m_iso.group(1))
                                                 print(f"[TITLE_DATE] ISO near title -> {posting_date}")
-
-                                            # Posted X days ago
                                             if not posting_date:
                                                 m_days = re.search(r'posted\s+(\d+)\s+days?\s+ago', combined, re.I)
                                                 if m_days:
                                                     d = date.today() - timedelta(days=int(m_days.group(1)))
                                                     posting_date = d.isoformat()
                                                     print(f"[TITLE_DATE] days-ago near title -> {posting_date}")
-
                                     except Exception as e:
                                         print(f"[WARN] title-date-extractor error: {e}")
-
-                                # --- ULTRA POSTING DATE (ATS DEEP PARSER) ---
-                                if not posting_date:
-                                    try:
-                                        # 1) Workday: "postedOn": "2024-10-05T00:00:00Z"
-                                        m = re.search(r'"postedOn"\s*:\s*"([^"]+)"', detail_html)
-                                        if m:
-                                            posting_date = _iso_only_date(m.group(1))
-                                            print(f"[ULTRA_DATE] postedOn -> {posting_date}")
-
-                                        # 2) Workday: "postedDate" / "datePosted"
-                                        if not posting_date:
-                                            m = re.search(r'"datePosted"\s*:\s*"([^"]+)"', detail_html)
-                                            if m:
-                                                posting_date = _iso_only_date(m.group(1))
-                                                print(f"[ULTRA_DATE] datePosted -> {posting_date}")
-
-                                        # 3) Greenhouse: "updated_at"
-                                        if not posting_date:
-                                            m = re.search(r'"updated_at"\s*:\s*"([^"]+)"', detail_html)
-                                            if m:
-                                                posting_date = _iso_only_date(m.group(1))
-                                                print(f"[ULTRA_DATE] updated_at -> {posting_date}")
-
-                                        # 4) Lever: "createdAt"
-                                        if not posting_date:
-                                            m = re.search(r'"createdAt"\s*:\s*"([^"]+)"', detail_html)
-                                            if m:
-                                                posting_date = _iso_only_date(m.group(1))
-                                                print(f"[ULTRA_DATE] createdAt -> {posting_date}")
-
-                                        # 5) ISO anywhere near job header (title block)
-                                        if not posting_date:
-                                            m = re.search(r'>\s*(\d{4}-\d{2}-\d{2})\s*<', detail_html)
-                                            if m:
-                                                posting_date = _iso_only_date(m.group(1))
-                                                print(f"[ULTRA_DATE] header-ISO -> {posting_date}")
-
-                                    except Exception as e:
-                                        print(f"[WARN] ultra-date extractor failed: {e}")
-
-                                # --- STRICT ISO NEAR KEYWORDS (Patch #1)
-                                if not posting_date:
-                                    snippet = detail_html[:50000]
-                                    m = re.search(
-                                        r'(?i)(posted|created|updated|date|time)[^0-9]{0,80}(\d{4}-\d{2}-\d{2})',
-                                        snippet
-                                    )
-                                    if m:
-                                        posting_date = _iso_only_date(m.group(2))
-                                        print(f"[STRICT_ISO_PATCH1] -> {posting_date}")
-
-                                # final fallback using existing helper
-                                if not posting_date:
-                                    found_date = extract_date_from_html(detail_html)
-                                    if found_date:
-                                        posting_date = found_date
-                                        print(f"[DETAIL_DATE_FALLBACK_PATCH1] -> {posting_date}")
 
                             except Exception as e:
                                 print(f"[WARN] detail parse fail {link} -> {e}")
@@ -858,10 +788,10 @@ def scrape():
                     location_final = normalize_location(location_candidate)
                     posting_date_final = posting_date or ""
 
-                    # --- ULTRA LOCATION EXTRACTOR (Workday / Greenhouse / Lever / Ashby) ---
+                    # --- ULTRA LOCATION EXTRACTOR (Patch 2 improvements) ---
                     if not location_candidate and detail_html:
                         try:
-                            # 1. Workday
+                            # Workday / addressLocality
                             m = re.search(r'"addressLocality"\s*:\s*"([^"]+)"', detail_html)
                             if m:
                                 city = m.group(1)
@@ -872,7 +802,7 @@ def scrape():
                                     location_candidate = normalize_location(loc)
                                     print(f"[DEEP_LOC] Workday -> {location_candidate}")
 
-                            # 2. Greenhouse: additionalLocations
+                            # Greenhouse additionalLocations
                             if not location_candidate:
                                 m = re.search(r'"additionalLocations"\s*:\s*\[(.+?)\]', detail_html, re.S)
                                 if m:
@@ -882,14 +812,14 @@ def scrape():
                                         location_candidate = normalize_location(locs[0])
                                         print(f"[DEEP_LOC] Greenhouse additionalLocations -> {location_candidate}")
 
-                            # 3. Lever
+                            # Lever categories.location
                             if not location_candidate:
                                 m = re.search(r'"categories"\s*:\s*{[^}]*"location"\s*:\s*"([^"]+)"', detail_html)
                                 if m:
                                     location_candidate = normalize_location(m.group(1))
                                     print(f"[DEEP_LOC] Lever -> {location_candidate}")
 
-                            # 4. Ashby
+                            # Ashby locations array
                             if not location_candidate:
                                 m = re.search(r'"locations"\s*:\s*\[(.+?)\]', detail_html, re.S)
                                 if m:
@@ -902,7 +832,7 @@ def scrape():
                                         location_candidate = normalize_location(", ".join(parts))
                                         print(f"[DEEP_LOC] Ashby -> {location_candidate}")
 
-                            # 5. Breadcrumb
+                            # breadcrumbs
                             if not location_candidate and s:
                                 crumbs = s.select("nav a, .breadcrumb a, .breadcrumbs a")
                                 for cr in crumbs:
@@ -914,19 +844,19 @@ def scrape():
 
                         except Exception as e:
                             print(f"[WARN] deep-loc extractor error: {e}")
-                            
-                    # --- ULTRA_LOC regex (Patch #2) ---
+
+                    # --- ULTRA_LOC regex fallback (Patch 2) ---
                     if not location_candidate and detail_html:
-                        snippet = detail_html[:40000]
+                        snippet = detail_html[:60000]
                         mm = re.search(
-                            r'([A-Z][a-zA-Z]+)[,\s\-–]+(USA|United States|UK|Germany|France|India|Singapore|Canada|Australia)',
+                            r'([A-Z][a-zA-Z]+(?:[ \-][A-Z][a-zA-Z]+)*)[,\s\-–]+(USA|United States|UK|Germany|France|India|Singapore|Canada|Australia|Netherlands|Switzerland|Ireland)',
                             snippet
                         )
                         if mm:
                             location_candidate = normalize_location(mm.group(0))
                             print(f"[ULTRA_LOC_PATCH2] -> {location_candidate}")
-                            
-                    location_final = normalize_location(location_candidate) # Re-normalize after deep extraction
+
+                    location_final = normalize_location(location_candidate)
 
                     # fallback: try extract location from link path
                     if not location_final:
@@ -984,7 +914,6 @@ if __name__ == "__main__":
 
         outfile = "jobs_final_hard.csv"
         # The original code had the 'Days Since Posted' column *in* the writer fieldnames list, but *not* the 'Seniority' column.
-        # I'll keep the original column list but note the 'Seniority' column will not be written to the CSV.
         # To include 'Seniority', add it to the fieldnames list:
         # fieldnames=["Company","Job Title","Job Link","Location","Posting Date","Days Since Posted","Seniority"]
         fieldnames=["Company","Job Title","Job Link","Location","Posting Date","Days Since Posted"]
