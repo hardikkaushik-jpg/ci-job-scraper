@@ -1,4 +1,5 @@
-# clean_jobs_cplus.py  (ENTERPRISE C+ CLEANER — FINAL FINAL)
+# clean_jobs_cplus.py  (ENTERPRISE C+ CLEANER — Category Upgrade vNext)
+
 import pandas as pd
 import re, json
 from datetime import datetime, date
@@ -12,16 +13,79 @@ SKILL_WORDS = [
     "r"
 ]
 
-# All skills will be uppercase without brackets.
 def normalize_skill(token):
     if not isinstance(token, str):
         return ""
-
-    # Remove brackets like [java], (python), {r}
     token = re.sub(r"[\[\]\(\)\{\}]", "", token).strip()
-
-    # Convert to uppercase
     return token.upper()
+
+# -----------------------------
+# NEW: COMPETITOR CATEGORY MAP
+# -----------------------------
+CATEGORY_MAP = {
+    # ---- Data Intelligence (metadata mgmt, governance, catalog) ----
+    "Collibra": "Data Intelligence",
+    "Informatica": "Data Intelligence",
+    "Alex Solutions": "Data Intelligence",
+    "Alation": "Data Intelligence",
+    "Atlan": "Data Intelligence",
+    "DataGalaxy": "Data Intelligence",
+    "Pentaho": "Data Intelligence",
+    "Microsoft": "Data Intelligence",    # Purview
+
+    # ---- Data Observability ----
+    "Monte Carlo": "Data Observability",
+    "BigEye": "Data Observability",
+    "Anomalo": "Data Observability",
+    "Acceldata": "Data Observability",
+
+    # ---- ETL / ELT / Data Integration Platforms ----
+    "Fivetran": "Data Integration",
+    "Matillion": "Data Integration",
+    "Couchbase": "Data Integration",
+    "Panoply": "Data Integration",
+    "Boomi": "Data Integration",
+    "SnapLogic": "Data Integration",
+    "Talend": "Data Integration",
+
+    # ---- Cloud Data Platforms / Lakehouse ----
+    "Databricks": "Cloud Data Platform",
+    "Snowflake": "Cloud Data Platform",
+    "Cloudera": "Cloud Data Platform",
+    "Exasol": "Cloud Data Platform",
+    "Vertica": "Cloud Data Platform",
+    "MariaDB": "Cloud Data Platform",
+
+    # ---- Application Performance / Monitoring / Observability ----
+    "Datadog": "Monitoring & APM",
+    "New Relic": "Monitoring & APM",
+
+    # ---- MDM / Governance ----
+    "Precisely": "Master Data Management",
+    "Syniti": "Master Data Management",
+
+    # ---- Dev Infra / Cloud Infra ----
+    "Nutanix": "Cloud Infrastructure",
+    "Oracle": "Cloud Infrastructure",
+    "Tencent": "Cloud Infrastructure",
+
+    # ---- Other (productivity, misc) ----
+    "Airtable": "Other",
+    "Yellowbrick": "Other",
+    "GoldenSource": "Other",
+    "Qlik": "Other",
+    "Data.World": "Other"
+}
+
+def detect_category(company):
+    if not isinstance(company, str):
+        return "Other"
+
+    for key, cat in CATEGORY_MAP.items():
+        if key.lower() in company.lower():
+            return cat
+
+    return "Other"
 
 
 FUNCTION_KEYWORDS = {
@@ -35,11 +99,12 @@ FUNCTION_KEYWORDS = {
 }
 
 SENIORITY_PATTERNS = [
-    ("Director+", r"\b(director|vp\b|vice president|head of|chief|c-)\b"),
-    ("Senior/Lead", r"\b(senior|sr\.|sr\b|lead|principal|staff|architect)\b"),
-    ("Mid", r"\b(mid|intermediate|experienced|level ii|ii\b)\b"),
-    ("Entry", r"\b(entry|junior|jr\.|graduate)\b"),
-    ("Intern", r"\b(intern|trainee|working student|werkstudent)\b"),
+    ("Director+", r"\b(director|vp\b|vice president|head of|chief|c-|executive director|managing director)\b"),
+    ("Senior/Lead", r"\b(senior|sr\.|sr\b|lead|principal|staff|architect|distinguished|fellow)\b"),
+    ("Manager", r"\b(manager|mgr|people manager|engineering manager)\b"),
+    ("Mid", r"\b(mid|intermediate|experienced|level ii|ii\b|iii|iv|2|3)\b"),
+    ("Entry", r"\b(entry|junior|jr\.|graduate|associate|trainee)\b"),
+    ("Intern", r"\b(intern|trainee|working student|werkstudent|internship)\b"),
 ]
 
 COMPANY_FIXES = {
@@ -127,24 +192,35 @@ def classify_function(title):
 
 
 def classify_seniority(title, location=""):
-    t = (title or "") + " " + (location or "")
-    for label, pattern in SENIORITY_PATTERNS:
-        if re.search(pattern, t, re.I):
-            return label
+    if not title:
+        return "Unknown"
+    t = (title + " " + (location or "")).lower()
+
+    if any(x in t for x in ["chief ", "cxo ", "cto", "ceo", "cfo", "coo", "vp ", "vice president", "svps", "evp", "executive director", "head of", "director", "managing director"]):
+        return "Director+"
+    if any(x in t for x in ["principal", "distinguished", "fellow", "lead", "staff", "senior", "sr."]):
+        return "Senior/Lead"
+    if any(x in t for x in ["manager", "people manager", "engineering manager", "mgr"]):
+        return "Manager"
+    if any(x in t for x in ["mid ", "intermediate", "level ii", "ii ", "2 "]):
+        return "Mid"
+    if any(x in t for x in ["junior", "jr.", "jr ", "entry", "graduate", "associate", "trainee"]):
+        return "Entry"
+    if any(x in t for x in ["intern", "internship", "working student", "werkstudent"]):
+        return "Intern"
+    if re.search(r'\b(ii|iii|iv|2|3)\b', t):
+        return "Mid"
     return "Unknown"
 
 
-# ---------- SKILLS EXTRACTION (NEW PATCH) ----------
 def extract_skills(title):
     tl = (title or "").lower()
-
     extracted = set()
 
     for skill in SKILL_WORDS:
         if skill in tl:
             extracted.add(normalize_skill(skill))
 
-    # Extract bracketed skills like [r], (java)
     bracketed = re.findall(r"[\[\(\{]([a-zA-Z0-9\+]+)[\]\)\}]", title)
     for b in bracketed:
         extracted.add(normalize_skill(b))
@@ -153,18 +229,20 @@ def extract_skills(title):
 
 # ---------- MAIN ----------
 def main():
-    # Locate input CSV reliably
     repo_root = os.path.dirname(os.path.abspath(__file__))
     input_path = os.path.join(repo_root, "jobs_final_hard.csv")
+    
+    if not os.path.exists(input_path):
+        print(f"[ERROR] Input file not found: {input_path}")
+        return
+
     df = pd.read_csv(input_path, dtype=str).fillna("")
 
-    # BASIC NORMALIZATION
     df["Company"] = df["Company"].apply(normalize_company)
     df["Job Title"] = df["Job Title"].apply(clean_text)
     df["Job Link"] = df["Job Link"].str.strip()
     df = df[~df["Job Title"].str.match(SKIP_TITLE_RE)]
 
-    # FIX DUPLICATES
     def best_row(group):
         with_date = group[group["Posting Date"].str.len() > 0]
         if len(with_date) > 0:
@@ -173,48 +251,34 @@ def main():
 
     df = df.groupby("Job Link", as_index=False).apply(best_row).reset_index(drop=True)
 
-    # LOCATION FIXING
     df["Location"] = df.apply(lambda r: extract_location_field(r["Job Title"], r["Location"]), axis=1)
     df["Location"] = df["Location"].apply(normalize_location_cell)
 
-    # TITLE CLEAN AFTER LOCATION EXTRACTION
     df["Job Title"] = df["Job Title"].apply(strip_location_from_title)
     df["Job Title"] = df["Job Title"].apply(lambda t: re.sub(r'\s{2,}', ' ', t).strip(" -,."))
     
-    # CLASSIFICATIONS
     df["Function"] = df["Job Title"].apply(classify_function)
     df["Seniority"] = df.apply(lambda r: classify_seniority(r["Job Title"], r["Location"]), axis=1)
     df["Skills_in_Title"] = df["Job Title"].apply(extract_skills)
 
-    # SENIORITY NORMALIZATION
-    def normalize_sen(s):
-        s = s or ""
-        if re.search(r'\b(principal|staff|architect)\b', s, re.I):
-            return "Senior/Lead"
-        if re.search(r'\b(director|vp|head|chief)\b', s, re.I):
-            return "Director+"
-        if re.search(r'\b(entry|junior|jr|graduate)\b', s, re.I):
-            return "Entry"
-        if re.search(r'\b(mid|intermediate|level ii)\b', s, re.I):
-            return "Mid"
-        if re.search(r'\bsenior\b', s, re.I):
-            return "Senior/Lead"
-        return s or "Unknown"
+    df["Category"] = df["Company"].apply(detect_category)
 
-    df["Seniority"] = df["Seniority"].apply(normalize_sen)
-
-    # DAYS SINCE POSTED
     def compute_days(pd_str):
         if not pd_str: return ""
         try:
-            d = datetime.fromisoformat(pd_str).date()
+            d_part = pd_str.split('T')[0]
+            d = datetime.fromisoformat(d_part).date()
             return (date.today() - d).days
         except:
-            return ""
+            try:
+                d_part = pd_str.split(' ')[0]
+                d = datetime.strptime(d_part, "%Y-%m-%d").date()
+                return (date.today() - d).days
+            except:
+                return ""
 
     df["Days Since Posted"] = df["Posting Date"].apply(compute_days)
 
-    # FINAL CLEANUP
     df = df.fillna("")
     df = df.sort_values(by=["Company","Job Title"])
     df["Skills_in_Title"] = df["Skills_in_Title"].apply(lambda x: json.dumps(x))
@@ -222,15 +286,13 @@ def main():
     out_cols = [
         "Company","Job Title","Job Link","Location",
         "Posting Date","Days Since Posted",
-        "Function","Seniority","Skills_in_Title"
+        "Function","Seniority","Skills_in_Title","Category"
     ]
 
-    # Write final output to repo root
     out_path = os.path.join(repo_root, "jobs_cleaned_final_enriched.csv")
     df[out_cols].to_csv(out_path, index=False)
 
     print("[OK] wrote jobs_cleaned_final_enriched.csv with", len(df), "rows")
-
 
 if __name__ == "__main__":
     main()
