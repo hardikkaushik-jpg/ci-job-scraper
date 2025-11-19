@@ -2,522 +2,404 @@ Company,Job Title,Job Link,Location,Posting Date,Days Since Posted,Function,Seni
 Airtable,Account Executive,https://boards.greenhouse.io/airtable/jobs/7883535002,Commercial Accounts Austin,,,Sales,Unknown,[]
 Airtable,Account Executive,https://boards.greenhouse.io/airtable/jobs/7888378002,Strategic Accounts San Francisco,,,Sales,Unknown,[]
 Airtable,Account Executive,https://boards.greenhouse.io/airtable/jobs/8186825002,Germany,,,Sales,Unknown,[]
-Airtable,Analytics Engineer,https://boards.greenhouse.io/airtable/jobs/8238502002,San Francisco,,,Engineering,Unknown,[]
-Airtable,Data Engineer,https://boards.greenhouse.io/airtable/jobs/8124953002,,,,Engineering,Unknown,[]
+Airtable,Analytics Engineer,https://boards.greenhouse.io/airtable/jobs/8238502002,San Francisco,,,Engineering,Unknown,"[""R""]"
+Airtable,Data Engineer,https://boards.greenhouse.io/airtable/jobs/8124953002,,,,Engineering,Unknown,"[""R""]"
 Airtable,Data Scientist,https://boards.greenhouse.io/airtable/jobs/8169952002,San Francisco,,,Data/Analytics,Unknown,[]
-Airtable,Delivery Consultant EMEA,https://boards.greenhouse.io/airtable/jobs/8236016002,Services London,,,Other,Unknown,[]
-Airtable,Delivery Consultant- East Coast/Central US,https://boards.greenhouse.io/airtable/jobs/8150599002,Us,,,Other,Unknown,[]
-Airtable,Engineering Manager,https://boards.greenhouse.io/airtable/jobs/8162391002,Web Marketing San Francisco,,,Engineering,Unknown,[]
-Airtable,Field Enablement Partner,https://boards.greenhouse.io/airtable/jobs/7962447002,Strategic Sales San Francisco,,,Other,Unknown,[]
-Airtable,Field Marketing Manager,https://boards.greenhouse.io/airtable/jobs/8170126002,New York,,,Marketing,Unknown,[]
-Airtable,Internal Airtable Solution Architect,https://boards.greenhouse.io/airtable/jobs/8227686002,Us,,,Other,Senior/Lead,"[""ai""]"
-Airtable,People Systems Engineer,https://boards.greenhouse.io/airtable/jobs/8222508002,San Francisco,,,Engineering,Unknown,[]
-Airtable,Program Manager EMEA,https://boards.greenhouse.io/airtable/jobs/8236018002,Services London,,,Other,Unknown,[]
-Airtable,Scaled Customer Success Manager,https://boards.greenhouse.io/airtable/jobs/8292724002,San Francisco,,,Customer Success,Unknown,[]
-Airtable,Security,https://www.airtable.com/security,,2023-11-07,743,Other,Unknown,[]
-Airtable,Senior Account Executive,https://boards.greenhouse.io/airtable/jobs/8297082002,Strategic Accounts London,,,Sales,Senior/Lead,[]
-Airtable,Senior Endpoint Engineer,https://boards.greenhouse.io/airtable/jobs/8237820002,San Francisco,,,Engineering,Senior/Lead,[]
-Airtable,"Senior Integrations Engineer, Enterprise Integrations & Agentic AI",https://boards.greenhouse.io/airtable/jobs/8117292002,San Francisco,,,Engineering,Senior/Lead,"[""ai""]"
-Airtable,Senior Manager,https://boards.greenhouse.io/airtable/jobs/8229185002,Finance Systems San Francisco,,,Other,Senior/Lead,[]
-Airtable,Senior Manager,https://boards.greenhouse.io/airtable/jobs/8235618002,People Systems San Francisco,,,Other,Senior/Lead,[]
-Airtable,Senior Program Manager,https://boards.greenhouse.io/airtable/jobs/8218814002,Us,,,Other,Senior/Lead,[]
-Airtable,Senior Software Engineer,https://boards.greenhouse.io/airtable/jobs/7906014002,San Francisco,,,Engineering,Senior/Lead,[]
-Airtable,Software Engineer,https://boards.greenhouse.io/airtable/jobs/7845293002,San Francisco,,,Engineering,Unknown,[]
-Airtable,Software Engineer,https://boards.greenhouse.io/airtable/jobs/7845295002,San Francisco,,,Engineering,Unknown,[]
-Airtable,Software Engineer,https://boards.greenhouse.io/airtable/jobs/7953553002,Android San Francisco,,,Engineering,Unknown,[]
-Airtable,Web Developer,https://boards.greenhouse.io/airtable/jobs/8194658002,,,,Engineering,Unknown,[]
-Anomalo,Senior Business Development Manager,https://job-boards.greenhouse.io/anomalojobs/jobs/4612604005,United States,,,Product,Senior/Lead,[]
-Anomalo,Senior Full Stack Software Engineer,https://job-boards.greenhouse.io/anomalojobs/jobs/4604208005,United States,,,Engineering,Senior/Lead,[]
-Ataccama,Content Designer/Technical Writer Intern,https://jobs.ataccama.com/4694266e-803f-4784-b80d-144623dc54b9/prague/core/,,,,Product,Intern,[]
-Ataccama,Senior Platform Engineer,https://jobs.ataccama.com/14e05d68-835a-4397-8667-69d4f954c014/prague/cloud/,,,,Engineering,Senior/Lead,[]
-Ataccama,security@ataccama.com,mailto:security@ataccama.com,,,,Other,Unknown,[]
-Atlan,Atlan Named a Leader in The Forrester Wave : Enterprise Data Catalogs,https://atlan.com/forrester-wave-2024/?ref=/careers/,,2020-09-06,1900,Other,Unknown,[]
-Atlan,Atlan Named a Leader in The Forrester Wave Data Governance,https://atlan.com/forrester-wave/?ref=/careers/,,2020-09-06,1900,Other,Unknown,"[""go""]"
-Atlan,"Data Dictionary: Examples, Templates, and How to Create One in 2025",https://atlan.com/what-is-a-data-dictionary/?ref=/careers/,,2022-11-16,1099,Other,Unknown,[]
-Atlan,Data Mesh Explained: Architecture Principles,https://atlan.com/what-is-data-mesh/?ref=/careers/,,2023-12-04,716,Other,Unknown,"[""ai""]"
-Atlan,Data Processing Agreement,https://atln.cm/ldpa/?ref=https://atlan.com/careers/,,,,Other,Unknown,[]
+Airtable,Delivery Consultant EMEA,https://boards.greenhouse.io/airtable/jobs/8236016002,Services London,,,Other,Unknown,"[""R""]"
+Airtable,Delivery Consultant- East Coast/Central US,https://boards.greenhouse.io/airtable/jobs/8150599002,Us,,,Other,Unknown,"[""R""]"
+Airtable,Engineering Manager,https://boards.greenhouse.io/airtable/jobs/8162391002,Web Marketing San Francisco,,,Engineering,Unknown,"[""R""]"
+Airtable,Field Enablement Partner,https://boards.greenhouse.io/airtable/jobs/7962447002,Strategic Sales San Francisco,,,Other,Unknown,"[""R""]"
+Airtable,Field Marketing Manager,https://boards.greenhouse.io/airtable/jobs/8170126002,New York,,,Marketing,Unknown,"[""R""]"
+Airtable,Internal Airtable Solution Architect,https://boards.greenhouse.io/airtable/jobs/8227686002,Us,,,Other,Senior/Lead,"[""AI"", ""R""]"
+Airtable,People Systems Engineer,https://boards.greenhouse.io/airtable/jobs/8222508002,San Francisco,,,Engineering,Unknown,"[""R""]"
+Airtable,Program Manager EMEA,https://boards.greenhouse.io/airtable/jobs/8236018002,Services London,,,Other,Unknown,"[""R""]"
+Airtable,Scaled Customer Success Manager,https://boards.greenhouse.io/airtable/jobs/8292724002,San Francisco,,,Customer Success,Unknown,"[""R""]"
+Airtable,Senior Account Executive,https://boards.greenhouse.io/airtable/jobs/8297082002,Strategic Accounts London,,,Sales,Senior/Lead,"[""R""]"
+Airtable,Senior Endpoint Engineer,https://boards.greenhouse.io/airtable/jobs/8237820002,San Francisco,,,Engineering,Senior/Lead,"[""R""]"
+Airtable,"Senior Integrations Engineer, Enterprise Integrations & Agentic AI",https://boards.greenhouse.io/airtable/jobs/8117292002,San Francisco,,,Engineering,Senior/Lead,"[""AI"", ""R""]"
+Airtable,Senior Manager,https://boards.greenhouse.io/airtable/jobs/8229185002,Finance Systems San Francisco,,,Other,Senior/Lead,"[""R""]"
+Airtable,Senior Manager,https://boards.greenhouse.io/airtable/jobs/8235618002,People Systems San Francisco,,,Other,Senior/Lead,"[""R""]"
+Airtable,Senior Program Manager,https://boards.greenhouse.io/airtable/jobs/8218814002,Us,,,Other,Senior/Lead,"[""R""]"
+Airtable,Senior Software Engineer,https://boards.greenhouse.io/airtable/jobs/7906014002,San Francisco,,,Engineering,Senior/Lead,"[""R""]"
+Airtable,Software Engineer,https://boards.greenhouse.io/airtable/jobs/7845293002,San Francisco,,,Engineering,Unknown,"[""R""]"
+Airtable,Software Engineer,https://boards.greenhouse.io/airtable/jobs/7845295002,San Francisco,,,Engineering,Unknown,"[""R""]"
+Airtable,Software Engineer,https://boards.greenhouse.io/airtable/jobs/7953553002,Android San Francisco,,,Engineering,Unknown,"[""R""]"
+Airtable,Web Developer,https://boards.greenhouse.io/airtable/jobs/8194658002,,,,Engineering,Unknown,"[""R""]"
+Anomalo,Senior Business Development Manager,https://job-boards.greenhouse.io/anomalojobs/jobs/4612604005,United States,,,Product,Senior/Lead,"[""R""]"
+Anomalo,Senior Full Stack Software Engineer,https://job-boards.greenhouse.io/anomalojobs/jobs/4604208005,United States,,,Engineering,Senior/Lead,"[""R""]"
+Ataccama,Content Designer/Technical Writer Intern,https://jobs.ataccama.com/4694266e-803f-4784-b80d-144623dc54b9/prague/core/,,,,Product,Intern,"[""R""]"
+Ataccama,Senior Platform Engineer,https://jobs.ataccama.com/14e05d68-835a-4397-8667-69d4f954c014/prague/cloud/,,,,Engineering,Senior/Lead,"[""R""]"
+Atlan,"Data Dictionary: Examples, Templates, and How to Create One in 2025",https://atlan.com/what-is-a-data-dictionary/?ref=/careers/,,2022-11-16,1099,Other,Unknown,"[""R""]"
+Atlan,Data Mesh Explained: Architecture Principles,https://atlan.com/what-is-data-mesh/?ref=/careers/,,2023-12-04,716,Other,Unknown,"[""AI"", ""R""]"
+Atlan,Data Processing Agreement,https://atln.cm/ldpa/?ref=https://atlan.com/careers/,,,,Other,Unknown,"[""R""]"
 Atlan,Data Quality by the Business,https://atlan.com/data-quality-studio/?ref=/careers/,Product Nav Link,2020-09-06,1900,Other,Unknown,[]
-Atlan,Governance that turns data + AI into value,https://atlan.com/active-data-governance/?ref=/careers/,Product Nav Link,2020-09-06,1900,Other,Unknown,"[""ai"", ""go""]"
-Atlan,Leading the Data and AI Generation Unified. Flexible. Future,https://atlan.com/about/?ref=/careers/,,2024-05-08,560,Other,Unknown,"[""ai""]"
-Atlan,Stories from the heroes of data,https://atlan.com/customers/?ref=/careers/,,2020-09-06,1900,Other,Unknown,[]
-Atlan,Sync Atlan with your data stack in minutes,https://atlan.com/diy-setup/?ref=/careers/,Product Nav Link,2020-09-06,1900,Other,Unknown,[]
-Atlan,The Amazon for Trusted Data Products,https://atlan.com/data-products-marketplace/?ref=/careers/,Product Nav Link,2020-09-06,1900,Product,Unknown,"[""rust""]"
-Atlan,The missing context layer for data and AI,https://atlan.com/?ref=/careers/,Atlan Logo,2020-09-06,1900,Other,Unknown,"[""ai""]"
-Atlan,Trusted by the world's most ambitious data & AI teams,https://atlan.com/customers/success-stories/?ref=/careers/,,2020-09-06,1900,Other,Unknown,"[""ai"", ""rust""]"
-Atlan,What Is a Data Catalog? Features,https://atlan.com/what-is-a-data-catalog/?ref=/careers/,,2023-06-27,876,Other,Unknown,[]
-Atlan,What is Data Governance? Definition Goals,https://atlan.com/what-is-data-governance/?ref=/careers/,,2022-12-09,1076,Other,Unknown,"[""go""]"
-BigEye,Data Observability Platform for Data Analysts,https://www.bigeye.com/solutions/data-analyst,,,,Engineering,Unknown,[]
-BigEye,Data Observability Platform for Data Architects,https://www.bigeye.com/solutions/data-architect,,,,Engineering,Unknown,[]
-BigEye,Data Observability Platform for Data Engineers,https://www.bigeye.com/solutions/data-engineer,,,,Engineering,Unknown,[]
-BigEye,Data Observability Platform for Data Executives,https://www.bigeye.com/solutions/data-executive,,,,Engineering,Unknown,[]
-BigEye,Data Observability Platform for Data Governance Teams,https://www.bigeye.com/solutions/data-governance,,,,Engineering,Unknown,"[""go""]"
-BigEye,Enterprise Data Observability Platform for Data Leaders,https://www.bigeye.com/solutions/data-leader,,,,Engineering,Unknown,[]
-BigEye,Great data starts with great people,https://www.bigeye.com/careers,,,,Operations,Unknown,[]
-Boomi,API Security,https://boomi.com/platform/api-security/,,2025-10-14,36,Other,Unknown,[]
-Boomi,Account Receivable,https://boomi.com/boomi-jobs/?gh_jid=5677606004,Sr Specialist,2024-12-06,348,Sales,Senior/Lead,[]
-Boomi,Advisory Presales Systems Engineer,https://boomi.com/boomi-jobs/?gh_jid=5652361004,Gsi,2024-12-06,348,Engineering,Unknown,[]
-Boomi,Boomi Data Integration,https://boomi.com/platform/boomi-data-integration/,,2025-10-23,27,Other,Unknown,[]
+Atlan,Governance that turns data + AI into value,https://atlan.com/active-data-governance/?ref=/careers/,Product Nav Link,2020-09-06,1900,Other,Unknown,"[""GO"", ""AI"", ""R""]"
+Atlan,What Is a Data Catalog? Features,https://atlan.com/what-is-a-data-catalog/?ref=/careers/,,2023-06-27,876,Other,Unknown,"[""R""]"
+Atlan,What is Data Governance? Definition Goals,https://atlan.com/what-is-data-governance/?ref=/careers/,,2022-12-09,1076,Other,Unknown,"[""GO"", ""R""]"
+Boomi,Account Receivable,https://boomi.com/boomi-jobs/?gh_jid=5677606004,Sr Specialist,2024-12-06,348,Sales,Senior/Lead,"[""R""]"
+Boomi,Advisory Presales Systems Engineer,https://boomi.com/boomi-jobs/?gh_jid=5652361004,Gsi,2024-12-06,348,Engineering,Unknown,"[""R""]"
+Boomi,Boomi Data Integration,https://boomi.com/platform/boomi-data-integration/,,2025-10-23,27,Other,Unknown,"[""R""]"
 Boomi,Boomi Data Management,https://boomi.com/platform/data-management/,,2025-10-23,27,Other,Unknown,[]
-Boomi,Boomi Developer,https://boomi.com/boomi-jobs/?gh_jid=5693232004,Servicenow Integration,2024-12-06,348,Engineering,Unknown,[]
+Boomi,Boomi Developer,https://boomi.com/boomi-jobs/?gh_jid=5693232004,Servicenow Integration,2024-12-06,348,Engineering,Unknown,"[""R""]"
 Boomi,Channel Sales Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5580029004,Hybrid,2024-12-06,348,Sales,Unknown,[]
-Boomi,Commercial Sales Account Executive Barcelona,https://boomi.com/boomi-jobs/?gh_jid=5004405004,Future Opportunities,2024-12-06,348,Sales,Unknown,[]
+Boomi,Commercial Sales Account Executive Barcelona,https://boomi.com/boomi-jobs/?gh_jid=5004405004,Future Opportunities,2024-12-06,348,Sales,Unknown,"[""R""]"
 Boomi,Consultant,https://boomi.com/boomi-jobs/?gh_jid=5568144004,Customer Journey,2024-12-06,348,Other,Unknown,[]
-Boomi,Corporate Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5681573004,Hybrid Vancouver,2024-12-06,348,Sales,Unknown,[]
-Boomi,Corporate Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5699994004,Hybrid Vancouver,2024-12-06,348,Sales,Unknown,[]
-Boomi,Corporate Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5706929004,Hybrid Vancouver,2024-12-06,348,Sales,Unknown,[]
-Boomi,Corporate Account Manager,https://boomi.com/boomi-jobs/?gh_jid=5698181004,Hybrid Vancouver,2024-12-06,348,Sales,Unknown,[]
-Boomi,Customer Success Manager,https://boomi.com/boomi-jobs/?gh_jid=5687253004,Hybrid,2024-12-06,348,Customer Success,Unknown,[]
+Boomi,Corporate Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5681573004,Hybrid Vancouver,2024-12-06,348,Sales,Unknown,"[""R""]"
+Boomi,Corporate Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5699994004,Hybrid Vancouver,2024-12-06,348,Sales,Unknown,"[""R""]"
+Boomi,Corporate Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5706929004,Hybrid Vancouver,2024-12-06,348,Sales,Unknown,"[""R""]"
+Boomi,Corporate Account Manager,https://boomi.com/boomi-jobs/?gh_jid=5698181004,Hybrid Vancouver,2024-12-06,348,Sales,Unknown,"[""R""]"
+Boomi,Customer Success Manager,https://boomi.com/boomi-jobs/?gh_jid=5687253004,Hybrid,2024-12-06,348,Customer Success,Unknown,"[""R""]"
 Boomi,Data Hub,https://boomi.com/platform/datahub/,,2025-10-23,27,Other,Unknown,[]
-Boomi,DevOps Engineer,https://boomi.com/boomi-jobs/?gh_jid=5636662004,India - Bangalore Metro,2024-12-06,348,Engineering,Unknown,[]
-Boomi,Director,https://boomi.com/boomi-jobs/?gh_jid=5698195004,Emea South,2024-12-06,348,Other,Director+,[]
-Boomi,Empower your sales team with intelligent,https://boomi.com/solutions/function/sales/,,2025-10-09,41,Sales,Unknown,[]
-Boomi,Enterprise Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5580033004,Hybrid,2024-12-06,348,Sales,Unknown,[]
-Boomi,Enterprise Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5684394004,Future Opportunities,2024-12-06,348,Sales,Unknown,[]
-Boomi,Enterprise Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5684396004,Future Opportunities,2024-12-06,348,Sales,Unknown,[]
-Boomi,Enterprise Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5685640004,Uk,2024-12-06,348,Sales,Unknown,[]
-Boomi,Enterprise Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5698191004,Based Paris,2024-12-06,348,Sales,Unknown,[]
-Boomi,Enterprise Account Manager,https://boomi.com/boomi-jobs/?gh_jid=5684408004,Future Opportunities,2024-12-06,348,Sales,Unknown,[]
-Boomi,Enterprise Account Manager,https://boomi.com/boomi-jobs/?gh_jid=5710593004,United States Of America,2024-12-06,348,Sales,Unknown,[]
-Boomi,Enterprise Sales Development Representative,https://boomi.com/boomi-jobs/?gh_jid=5603304004,Future Opportunities - Weekly Review Of Applications!,2024-12-06,348,Product,Unknown,[]
-Boomi,Field Marketing Manager META Region,https://boomi.com/boomi-jobs/?gh_jid=5687697004,Hybrid,2024-12-06,348,Marketing,Unknown,[]
-Boomi,Integration Partner Solution Consultant/ Pre Sales,https://boomi.com/boomi-jobs/?gh_jid=5651240004,Australia - Sydney Metro,2024-12-06,348,Sales,Unknown,[]
-Boomi,Manager Channel Sales,https://boomi.com/boomi-jobs/?gh_jid=5580031004,Hybrid,2024-12-06,348,Sales,Unknown,[]
-Boomi,Marketing automation,https://boomi.com/solutions/function/marketing/,,2025-10-09,41,Marketing,Unknown,[]
-Boomi,Mid Market Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5675502004,Hybrid Vancouver,2024-12-06,348,Sales,Mid,[]
-Boomi,Nucleus Research iPaaS Technology Value Matrix 2025,https://boomi.com/resources/resources-library/nucleus-ipaas-technology-value-matrix/,,2025-04-15,218,Other,Unknown,[]
-Boomi,Office Manager,https://boomi.com/boomi-jobs/?gh_jid=5696908004,India - Bangalore Metro,2024-12-06,348,Other,Unknown,[]
-Boomi,Partner Sales Manager,https://boomi.com/boomi-jobs/?gh_jid=5670960004,"Channel Sales Hunter - North America, Hybrid Vancouver",2024-12-06,348,Sales,Unknown,[]
-Boomi,Principal DevOps Engineer,https://boomi.com/boomi-jobs/?gh_jid=5687678004,India - Bangalore Metro,2024-12-06,348,Engineering,Senior/Lead,[]
-Boomi,Process automation for finance and insurance,https://boomi.com/solutions/industries/financial-services/,,2025-10-09,41,Operations,Unknown,[]
-Boomi,Sales Development Representative,https://boomi.com/boomi-jobs/?gh_jid=4984010004,Vancouver Hybrid,2024-12-06,348,Product,Unknown,[]
-Boomi,Sales Development Representative,https://boomi.com/boomi-jobs/?gh_jid=5685364004,Singapore,2024-12-06,348,Product,Unknown,[]
-Boomi,Scaled Customer Success Manager,https://boomi.com/boomi-jobs/?gh_jid=5675923004,"Hybrid, Vancouver",2024-12-06,348,Customer Success,Unknown,[]
-Boomi,Scaled Customer Success Manager German Speaking,https://boomi.com/boomi-jobs/?gh_jid=5703746004,Hybrid,2024-12-06,348,Customer Success,Unknown,[]
-Boomi,Senior Analyst,https://boomi.com/boomi-jobs/?gh_jid=5646379004,I6,2024-12-06,348,Other,Senior/Lead,[]
-Boomi,Senior Analyst,https://boomi.com/boomi-jobs/?gh_jid=5646381004,I6,2024-12-06,348,Other,Senior/Lead,[]
-Boomi,Senior Business Development Manager,https://boomi.com/boomi-jobs/?gh_jid=5710724004,Channel Sales,2024-12-06,348,Product,Senior/Lead,[]
-Boomi,Senior Manager,https://boomi.com/boomi-jobs/?gh_jid=5632357004,Hybrid Vancouver,2024-12-06,348,Other,Senior/Lead,[]
-Boomi,Senior Manager,https://boomi.com/boomi-jobs/?gh_jid=5670871004,Accounting,2024-12-06,348,Other,Senior/Lead,[]
-Boomi,Senior Performance Engineer,https://boomi.com/boomi-jobs/?gh_jid=5634062004,India - Bangalore Metro,2024-12-06,348,Engineering,Senior/Lead,[]
-Boomi,Senior Software Engineer,https://boomi.com/boomi-jobs/?gh_jid=5549812004,Fullstack,2024-12-06,348,Engineering,Senior/Lead,[]
-Boomi,Senior Software Engineer,https://boomi.com/boomi-jobs/?gh_jid=5633744004,Devsecops,2024-12-06,348,Engineering,Senior/Lead,[]
-Boomi,Site Reliability Engineer,https://boomi.com/boomi-jobs/?gh_jid=5670129004,India - Pune Metro,2024-12-06,348,Engineering,Unknown,[]
-Boomi,Software Engineer,https://boomi.com/boomi-jobs/?gh_jid=5634064004,2 Sre,2024-12-06,348,Engineering,Unknown,[]
-Boomi,Software Engineer 2,https://boomi.com/boomi-jobs/?gh_jid=5505535004,India - Bangalore Metro,2024-12-06,348,Engineering,Unknown,[]
-Boomi,Software Engineer 2,https://boomi.com/boomi-jobs/?gh_jid=5696910004,Platform Architecture Service,2024-12-06,348,Engineering,Unknown,[]
-Boomi,Software Engineer 2,https://boomi.com/boomi-jobs/?gh_jid=5701160004,India - Bangalore Metro,2024-12-06,348,Engineering,Unknown,[]
-Boomi,Software Performance Engineer,https://boomi.com/boomi-jobs/?gh_jid=5634066004,India - Bangalore Metro,2024-12-06,348,Engineering,Unknown,[]
-Boomi,Software Principal Engineer,https://boomi.com/boomi-jobs/?gh_jid=5617156004,Integration,2024-12-06,348,Engineering,Senior/Lead,[]
-Boomi,Software Quality Engineer 2,https://boomi.com/boomi-jobs/?gh_jid=5445768004,India - Bangalore Metro,2024-12-06,348,Engineering,Unknown,[]
-Boomi,Sr. Manager,https://boomi.com/boomi-jobs/?gh_jid=5646990004,Hybrid Vancouver,2024-12-06,348,Other,Senior/Lead,[]
-Boomi,Strategic Finance Lead,https://boomi.com/boomi-jobs/?gh_jid=5694146004,United States Of America,2024-12-06,348,Operations,Senior/Lead,[]
-Boomi,Talk to Our Sales Team,https://boomi.com/company/contact-sales/,,2025-10-01,49,Sales,Unknown,[]
-CastorDoc (Coalesce),Ashby Security Overview,https://www.ashbyhq.com/security,,2024-12-20,334,Other,Unknown,[]
-Collibra,Power possibility through data and your career,https://www.collibra.com/company/careers#main,,2025-06-30,142,Operations,Unknown,[]
-Collibra,Power possibility through data and your career,https://www.collibra.com/company/careers#sub-menu-benefits,,2025-06-30,142,Operations,Unknown,[]
-Collibra,Power possibility through data and your career,https://www.collibra.com/company/careers#sub-menu-esg,,2025-06-30,142,Operations,Unknown,[]
-Collibra,Power possibility through data and your career,https://www.collibra.com/company/careers#sub-menu-working-at-collibra,,2025-06-30,142,Operations,Unknown,[]
-Data.World,Automated data governance powered by Eureka Automations,https://data.world/product/data-governance/,,2024-11-05,379,Other,Unknown,"[""go""]"
-Data.World,Careers at data.world,https://data.world/company/careers/,,2025-01-28,295,Other,Unknown,[]
-Data.World,Clarity through connected data,https://data.world/product/catalog/,,2025-11-17,2,Operations,Unknown,[]
-Data.World,Data Engineers,https://data.world/solutions/data-engineers/,,2025-04-01,232,Engineering,Unknown,[]
-Data.World,Data Governance Specialists,https://data.world/solutions/data-governance-specialists/,,2025-04-01,232,Other,Unknown,"[""go""]"
-Data.World,Data Leaders,https://data.world/solutions/data-leaders/,,2025-04-01,232,Other,Unknown,[]
-Data.World,Find data 10x faster. Trust it 100%,https://data.world/product/why-data-world/,,2025-01-24,299,Other,Unknown,"[""rust""]"
-Data.World,Shop for data and AI,https://data.world/product/marketplace/,,2025-06-02,170,Other,Unknown,"[""ai""]"
-Data.World,Visualize your entire data ecosystem,https://data.world/product/explorer/,,2025-01-24,299,Other,Unknown,[]
-DataGalaxy,Data Governance Consultant,https://www.welcometothejungle.com/en/companies/datagalaxy/jobs/data-governance-consultant_paris,"Paris, Fr, 75002",2025-11-03,16,Other,Unknown,"[""go""]"
-DataGalaxy,Digital Marketing Manager,https://www.welcometothejungle.com/en/companies/datagalaxy/jobs/digital-marketing-manager-agency-lead-us-based_lyon,"Lyon, Rhône, Fr, 69003",2025-11-06,13,Marketing,Unknown,[]
-DataGalaxy,Sales Development Representative,https://www.welcometothejungle.com/en/companies/datagalaxy/jobs/sales-development-representative-sdr_paris,"Paris, Fr, 75002",2025-11-12,7,Product,Unknown,[]
-Databricks,Built for open,https://www.databricks.com/product/delta-lake-on-databricks,Security And Performance,"Mon, 05/19/2025 - 10:03",,Other,Unknown,[]
-Databricks,Champions of Data + AI,https://www.databricks.com/discover/champions-of-data-and-ai,Champions Of Data & Ai Podcast Page Link In Footer,"Fri, 03/17/2023 - 13:05",,Other,Unknown,"[""ai""]"
-Databricks,Data + AI World Tour 2025,https://www.databricks.com/dataaisummit/worldtour,Data + Ai World Tour,2025-10-14,36,Other,Unknown,"[""ai""]"
-Databricks,Data Brew: Let s talk data,https://www.databricks.com/discover/data-brew,Data Brew Podcast,"Wed, 02/22/2023 - 09:46",,Other,Unknown,[]
-Databricks,Data Intelligence for Marketing,https://www.databricks.com/solutions/industries/marketing,Marketing,"Mon, 04/21/2025 - 01:08",,Marketing,Unknown,[]
-Databricks,Data Science,https://www.databricks.com/product/data-science,Data Science,"Wed, 12/21/2022 - 22:37",,Other,Unknown,[]
-Databricks,Data Sharing,https://www.databricks.com/product/delta-sharing,Sharing,"Fri, 12/23/2022 - 12:29",,Other,Unknown,[]
-Databricks,Mosaic Research,https://www.databricks.com/research/mosaic,Mosaic Research,"Mon, 03/11/2024 - 09:45",,Other,Unknown,"[""ai""]"
-Databricks,Postgres for data apps and AI agents,https://www.databricks.com/product/lakebase,Database,,,Other,Unknown,"[""ai""]"
-Databricks,Research,https://www.databricks.com/research#careers,Jump To Research,,,Other,Unknown,[]
-Databricks,Security & Trust Center,https://www.databricks.com/trust,Security And Trust,2023-03-06,989,Other,Unknown,"[""rust""]"
-Databricks,The Best Data Warehouse Is a Lakehouse,https://www.databricks.com/product/databricks-sql,Data Warehousing,"Fri, 12/06/2024 - 10:27",,Other,Unknown,[]
-Databricks,The Databricks Data Intelligence Platform,https://www.databricks.com/product/data-intelligence-platform,Analytics And Ai,"Sun, 11/12/2023 - 19:48",,Engineering,Unknown,[]
-Databricks,Unified and open governance for data and AI,https://www.databricks.com/product/unity-catalog,Analytics And Ai Assets,,,Other,Unknown,"[""ai"", ""go""]"
-Datadog,Analyst Reports,https://www.datadoghq.com/about/analyst/,,0001-01-01,739573,Other,Unknown,[]
-Datadog,Cloud Security,https://www.datadoghq.com/product/cloud-security/,,2025-20-00,,Other,Unknown,[]
-Datadog,Cloud Security,https://www.datadoghq.com/product/cloud-security/#entitlement-management,,2025-20-00,,Other,Unknown,[]
-Datadog,Cloud Security,https://www.datadoghq.com/product/cloud-security/#posture-management,,2025-20-00,,Other,Unknown,[]
-Datadog,Code Security,https://www.datadoghq.com/product/code-security/,,2025-20-00,,Other,Unknown,[]
-Datadog,Data Jobs Monitoring,https://www.datadoghq.com/product/data-jobs-monitoring/,,2025-30-00,,Other,Unknown,[]
-Datadog,Data Streams Monitoring,https://www.datadoghq.com/product/data-streams-monitoring/,,2025-30-00,,Other,Unknown,[]
-Datadog,Field Enablement Manager (NYC) Sales New York New York,https://careers.datadoghq.com/detail/7398199/?gh_jid=7398199,Usa,,,Sales,Unknown,[]
-Datadog,Field Marketing Manager Marketing New York New York,https://careers.datadoghq.com/detail/7393800/?gh_jid=7393800,Usa,,,Marketing,Unknown,[]
-Datadog,IaC Security,https://www.datadoghq.com/product/iac-security,,0001-01-01,739573,Other,Unknown,[]
-Datadog,Infrastructure Monitoring,https://www.datadoghq.com/product/infrastructure-monitoring/,,2025-30-00,,Engineering,Unknown,[]
-Datadog,Internal Developer Portal,https://www.datadoghq.com/product/internal-developer-portal/,,2025-50-00,,Engineering,Unknown,[]
-Datadog,Manager Mid,https://careers.datadoghq.com/detail/7396612/?gh_jid=7396612,Australia,,,Other,Mid,[]
-Datadog,Marketing,https://careers.datadoghq.com/marketing/,Locations Americas Asia Pacific Emea Remote,,,Marketing,Unknown,[]
-Datadog,Marketing Analytics Engineer Marketing New York New York,https://careers.datadoghq.com/detail/7369285/?gh_jid=7369285,Usa,,,Engineering,Unknown,[]
-Datadog,Mid Market Account Executive (MENA) Sales Dubai,https://careers.datadoghq.com/detail/7267961/?gh_jid=7267961,United Arab Emirates,,,Sales,Mid,"[""ai""]"
+Boomi,DevOps Engineer,https://boomi.com/boomi-jobs/?gh_jid=5636662004,India - Bangalore Metro,2024-12-06,348,Engineering,Unknown,"[""R""]"
+Boomi,Developer Explore Boomi s APIs SDKs,https://developer.boomi.com/,And Technical Integration Guides,,,Engineering,Unknown,"[""R""]"
+Boomi,Director,https://boomi.com/boomi-jobs/?gh_jid=5698195004,Emea South,2024-12-06,348,Other,Director+,"[""R""]"
+Boomi,Enterprise Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5580033004,Hybrid,2024-12-06,348,Sales,Unknown,"[""R""]"
+Boomi,Enterprise Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5684394004,Future Opportunities,2024-12-06,348,Sales,Unknown,"[""R""]"
+Boomi,Enterprise Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5684396004,Future Opportunities,2024-12-06,348,Sales,Unknown,"[""R""]"
+Boomi,Enterprise Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5685640004,Uk,2024-12-06,348,Sales,Unknown,"[""R""]"
+Boomi,Enterprise Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5698191004,Based Paris,2024-12-06,348,Sales,Unknown,"[""R""]"
+Boomi,Enterprise Account Manager,https://boomi.com/boomi-jobs/?gh_jid=5684408004,Future Opportunities,2024-12-06,348,Sales,Unknown,"[""R""]"
+Boomi,Enterprise Account Manager,https://boomi.com/boomi-jobs/?gh_jid=5710593004,United States Of America,2024-12-06,348,Sales,Unknown,"[""R""]"
+Boomi,Enterprise Sales Development Representative,https://boomi.com/boomi-jobs/?gh_jid=5603304004,Future Opportunities - Weekly Review Of Applications!,2024-12-06,348,Product,Unknown,"[""R""]"
+Boomi,Field Marketing Manager META Region,https://boomi.com/boomi-jobs/?gh_jid=5687697004,Hybrid,2024-12-06,348,Marketing,Unknown,"[""R""]"
+Boomi,Integration Partner Solution Consultant/ Pre Sales,https://boomi.com/boomi-jobs/?gh_jid=5651240004,Australia - Sydney Metro,2024-12-06,348,Sales,Unknown,"[""R""]"
+Boomi,Manager Channel Sales,https://boomi.com/boomi-jobs/?gh_jid=5580031004,Hybrid,2024-12-06,348,Sales,Unknown,"[""R""]"
+Boomi,Mid Market Account Executive,https://boomi.com/boomi-jobs/?gh_jid=5675502004,Hybrid Vancouver,2024-12-06,348,Sales,Mid,"[""R""]"
+Boomi,Office Manager,https://boomi.com/boomi-jobs/?gh_jid=5696908004,India - Bangalore Metro,2024-12-06,348,Other,Unknown,"[""R""]"
+Boomi,Partner Sales Manager,https://boomi.com/boomi-jobs/?gh_jid=5670960004,"Channel Sales Hunter - North America, Hybrid Vancouver",2024-12-06,348,Sales,Unknown,"[""R""]"
+Boomi,Principal DevOps Engineer,https://boomi.com/boomi-jobs/?gh_jid=5687678004,India - Bangalore Metro,2024-12-06,348,Engineering,Senior/Lead,"[""R""]"
+Boomi,Sales Development Representative,https://boomi.com/boomi-jobs/?gh_jid=4984010004,Vancouver Hybrid,2024-12-06,348,Product,Unknown,"[""R""]"
+Boomi,Sales Development Representative,https://boomi.com/boomi-jobs/?gh_jid=5685364004,Singapore,2024-12-06,348,Product,Unknown,"[""R""]"
+Boomi,Scaled Customer Success Manager,https://boomi.com/boomi-jobs/?gh_jid=5675923004,"Hybrid, Vancouver",2024-12-06,348,Customer Success,Unknown,"[""R""]"
+Boomi,Scaled Customer Success Manager German Speaking,https://boomi.com/boomi-jobs/?gh_jid=5703746004,Hybrid,2024-12-06,348,Customer Success,Unknown,"[""R""]"
+Boomi,Senior Analyst,https://boomi.com/boomi-jobs/?gh_jid=5646379004,I6,2024-12-06,348,Other,Senior/Lead,"[""R""]"
+Boomi,Senior Analyst,https://boomi.com/boomi-jobs/?gh_jid=5646381004,I6,2024-12-06,348,Other,Senior/Lead,"[""R""]"
+Boomi,Senior Business Development Manager,https://boomi.com/boomi-jobs/?gh_jid=5710724004,Channel Sales,2024-12-06,348,Product,Senior/Lead,"[""R""]"
+Boomi,Senior Manager,https://boomi.com/boomi-jobs/?gh_jid=5632357004,Hybrid Vancouver,2024-12-06,348,Other,Senior/Lead,"[""R""]"
+Boomi,Senior Manager,https://boomi.com/boomi-jobs/?gh_jid=5670871004,Accounting,2024-12-06,348,Other,Senior/Lead,"[""R""]"
+Boomi,Senior Performance Engineer,https://boomi.com/boomi-jobs/?gh_jid=5634062004,India - Bangalore Metro,2024-12-06,348,Engineering,Senior/Lead,"[""R""]"
+Boomi,Senior Software Engineer,https://boomi.com/boomi-jobs/?gh_jid=5549812004,Fullstack,2024-12-06,348,Engineering,Senior/Lead,"[""R""]"
+Boomi,Senior Software Engineer,https://boomi.com/boomi-jobs/?gh_jid=5633744004,Devsecops,2024-12-06,348,Engineering,Senior/Lead,"[""R""]"
+Boomi,Site Reliability Engineer,https://boomi.com/boomi-jobs/?gh_jid=5670129004,India - Pune Metro,2024-12-06,348,Engineering,Unknown,"[""R""]"
+Boomi,Software Engineer,https://boomi.com/boomi-jobs/?gh_jid=5634064004,2 Sre,2024-12-06,348,Engineering,Unknown,"[""R""]"
+Boomi,Software Engineer 2,https://boomi.com/boomi-jobs/?gh_jid=5505535004,India - Bangalore Metro,2024-12-06,348,Engineering,Unknown,"[""R""]"
+Boomi,Software Engineer 2,https://boomi.com/boomi-jobs/?gh_jid=5696910004,Platform Architecture Service,2024-12-06,348,Engineering,Unknown,"[""R""]"
+Boomi,Software Engineer 2,https://boomi.com/boomi-jobs/?gh_jid=5701160004,India - Bangalore Metro,2024-12-06,348,Engineering,Unknown,"[""R""]"
+Boomi,Software Performance Engineer,https://boomi.com/boomi-jobs/?gh_jid=5634066004,India - Bangalore Metro,2024-12-06,348,Engineering,Unknown,"[""R""]"
+Boomi,Software Principal Engineer,https://boomi.com/boomi-jobs/?gh_jid=5617156004,Integration,2024-12-06,348,Engineering,Senior/Lead,"[""R""]"
+Boomi,Software Quality Engineer 2,https://boomi.com/boomi-jobs/?gh_jid=5445768004,India - Bangalore Metro,2024-12-06,348,Engineering,Unknown,"[""R""]"
+Boomi,Sr. Manager,https://boomi.com/boomi-jobs/?gh_jid=5646990004,Hybrid Vancouver,2024-12-06,348,Other,Senior/Lead,"[""R""]"
+DataGalaxy,Data Governance Consultant,https://www.welcometothejungle.com/en/companies/datagalaxy/jobs/data-governance-consultant_paris,"Paris, Fr, 75002",2025-11-03,16,Other,Unknown,"[""GO"", ""R""]"
+DataGalaxy,Digital Marketing Manager,https://www.welcometothejungle.com/en/companies/datagalaxy/jobs/digital-marketing-manager-agency-lead-us-based_lyon,"Lyon, Rhône, Fr, 69003",2025-11-06,13,Marketing,Unknown,"[""R""]"
+DataGalaxy,Sales Development Representative,https://www.welcometothejungle.com/en/companies/datagalaxy/jobs/sales-development-representative-sdr_paris,"Paris, Fr, 75002",2025-11-12,7,Product,Unknown,"[""R""]"
+Databricks,Champions of Data + AI,https://www.databricks.com/discover/champions-of-data-and-ai,Champions Of Data + Ai Podcast,"Fri, 03/17/2023 - 13:05",,Other,Unknown,"[""AI""]"
+Databricks,Data + AI World Tour 2025,https://www.databricks.com/dataaisummit/worldtour,Data + Ai World Tour,2025-10-14,36,Other,Unknown,"[""AI"", ""R""]"
+Databricks,Data Brew: Let s talk data,https://www.databricks.com/discover/data-brew,Data Brew Podcast,"Wed, 02/22/2023 - 09:46",,Other,Unknown,"[""R""]"
+Datadog,Field Enablement Manager (NYC) Sales New York New York,https://careers.datadoghq.com/detail/7398199/?gh_jid=7398199,Usa,,,Sales,Unknown,"[""NYC"", ""R""]"
+Datadog,Field Marketing Manager Marketing New York New York,https://careers.datadoghq.com/detail/7393800/?gh_jid=7393800,Usa,,,Marketing,Unknown,"[""R""]"
+Datadog,Manager Mid,https://careers.datadoghq.com/detail/7396612/?gh_jid=7396612,Australia,,,Other,Mid,"[""R""]"
+Datadog,Marketing Analytics Engineer Marketing New York New York,https://careers.datadoghq.com/detail/7369285/?gh_jid=7369285,Usa,,,Engineering,Unknown,"[""R""]"
+Datadog,Mid Market Account Executive (MENA) Sales Dubai,https://careers.datadoghq.com/detail/7267961/?gh_jid=7267961,United Arab Emirates,,,Sales,Mid,"[""MENA"", ""AI"", ""R""]"
 Datadog,Sales,https://careers.datadoghq.com/sales/,Locations Americas Asia Pacific Emea Remote,,,Sales,Unknown,[]
-Datadog,Security & Compliance,https://www.datadoghq.com/security/,,2016-07-14,3415,Other,Unknown,[]
-Datadog,Security Labs,https://securitylabs.datadoghq.com/,,,,Other,Unknown,[]
-Datadog,Senior Software Engineer IDE AI Experiences LLM Engineer Engineering Paris,https://careers.datadoghq.com/detail/7234695/?gh_jid=7234695,France,,,Engineering,Senior/Lead,"[""ai""]"
-Datadog,Senior Software Engineer IDE AI Experiences LLM Engineer Engineering Tel Aviv,https://careers.datadoghq.com/detail/7097751/?gh_jid=7097751,Israel,,,Engineering,Senior/Lead,"[""ai""]"
-Datadog,Sensitive Data Scanner,https://www.datadoghq.com/product/sensitive-data-scanner/,,2025-30-00,,Other,Unknown,[]
-Decube,Frontend Engineer,https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41/details/68f6f902f3690e0007f31d2b,Malaysia,,,Engineering,Unknown,[]
-Decube,Senior Frontend Engineer,https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41/details/6912674beb784e0008d044ce,Malaysia,,,Engineering,Senior/Lead,[]
-Decube,Software Engineer,https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41/details/68f6e635d5d0e1000816bbfc,Malaysia,,,Engineering,Unknown,[]
+Datadog,Senior Software Engineer IDE AI Experiences LLM Engineer Engineering Paris,https://careers.datadoghq.com/detail/7234695/?gh_jid=7234695,France,,,Engineering,Senior/Lead,"[""AI"", ""R""]"
+Datadog,Senior Software Engineer IDE AI Experiences LLM Engineer Engineering Tel Aviv,https://careers.datadoghq.com/detail/7097751/?gh_jid=7097751,Israel,,,Engineering,Senior/Lead,"[""AI"", ""R""]"
+Decube,Frontend Engineer,https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41/details/68f6f902f3690e0007f31d2b,Malaysia,,,Engineering,Unknown,"[""R""]"
+Decube,Senior Frontend Engineer,https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41/details/6912674beb784e0008d044ce,Malaysia,,,Engineering,Senior/Lead,"[""R""]"
+Decube,Software Engineer,https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41/details/68f6e635d5d0e1000816bbfc,Malaysia,,,Engineering,Unknown,"[""R""]"
 Firebolt,Big data game,https://www.firebolt.io/big-data-game,,,,Other,Unknown,[]
-Firebolt,Cloud Analytical Database Security with Multi,https://www.firebolt.io/data-security,,,,Other,Unknown,[]
-Firebolt,Elastic Analytical Database: The Future for AI Data Applications,https://www.firebolt.io/elasticity,,,,Other,Unknown,"[""ai""]"
-Fivetran,Adoptez le d placement de data,https://www.fivetran.com/fr/careers,Standard,,,Other,Unknown,[]
-Fivetran,Automate your data lake management with Fivetran,https://www.fivetran.com/data-movement/data-lakes,,,,Other,Unknown,[]
-Fivetran,Build beyond legacy,https://www.fivetran.com/use-case/operations/infrastructure-modernization,,,,Other,Unknown,[]
-Fivetran,Come join the data movement,https://www.fivetran.com/careers,Australia,,,Other,Unknown,[]
-Fivetran,Deliver large volumes of data into your warehouse within minutes,https://www.fivetran.com/data-movement/data-warehouses,,,,Other,Unknown,[]
-Fivetran,Democratize data and empower more data-driven decisions,https://www.fivetran.com/use-case/operations/data-democratization,,,,Other,Unknown,[]
-Fivetran,Governed data movement: Control without constraint,https://www.fivetran.com/governance,,,,Other,Unknown,"[""ai"", ""go""]"
-Fivetran,MIT research: Data readiness is key to AI readiness,https://www.fivetran.com/blog/mit-research-data-readiness-is-key-to-ai-readiness,,,,Other,Unknown,"[""ai""]"
-Fivetran,Modernize your data centralization without data leaving your secure environment,https://www.fivetran.com/data-movement/hybrid-deployment,Hybrid Deployment Securely Move All Of Your Data Without Compromising Performance,,,Other,Unknown,[]
-Fivetran,Move your data back to your business applications,https://www.fivetran.com/data-movement/retl,,,,Other,Unknown,[]
-Fivetran,One platform for all your data movement needs,https://www.fivetran.com/platform-overview,,,,Engineering,Unknown,[]
-Fivetran,Power your RAG application with automated data integration,https://www.fivetran.com/use-case/operations/embedded,,,,Other,Unknown,[]
-Fivetran,Schlie en Sie sich dem Data Movement an,https://www.fivetran.com/de/careers,Standard,,,Other,Unknown,[]
-Fivetran,Seriously secure data movement,https://www.fivetran.com/security,,,,Other,Unknown,[]
-Fivetran,The data movement platform to power your AI initiatives,https://www.fivetran.com/use-case/operations/data-readiness-ai,,,,Engineering,Unknown,"[""ai""]"
+Firebolt,Data Infrastructure Engineered for AI Applications,https://www.firebolt.io/architecture,,,,Engineering,Unknown,"[""AI"", ""R""]"
+Firebolt,Elastic Analytical Database: The Future for AI Data Applications,https://www.firebolt.io/elasticity,,,,Other,Unknown,"[""AI"", ""R""]"
+Fivetran,AI works smarter when your data moves faster,https://www.fivetran.com/use-case/operations/data-readiness-ai,,,,Other,Unknown,"[""AI"", ""R""]"
+Fivetran,Accelerate data movement into Databricks with Fivetran,https://www.fivetran.com/partners/technology/databricks,,,,Other,Unknown,"[""R""]"
+Fivetran,Automate your data lake management with Fivetran,https://www.fivetran.com/data-movement/data-lakes,,,,Other,Unknown,"[""R""]"
+Fivetran,Deliver large volumes of data into your warehouse within minutes,https://www.fivetran.com/data-movement/data-warehouses,,,,Other,Unknown,"[""R""]"
+Fivetran,Democratize data and empower more data-driven decisions,https://www.fivetran.com/use-case/operations/data-democratization,,,,Other,Unknown,"[""R""]"
+Fivetran,Every database every deployment,https://www.fivetran.com/data-movement/database-replication,,,,Other,Unknown,"[""R""]"
+Fivetran,Governed data movement: Control without constraint,https://www.fivetran.com/governance,,,,Other,Unknown,"[""GO"", ""AI"", ""R""]"
+Fivetran,Modernize your data centralization without data leaving your secure environment,https://www.fivetran.com/data-movement/hybrid-deployment,Hybrid Deployment Securely Move All Of Your Data Without Compromising Performance,,,Other,Unknown,"[""R""]"
+Fivetran,Move and activate all of your data,https://www.fivetran.com/data-movement/retl,,,,Other,Unknown,"[""R""]"
+Fivetran,One platform for all your data movement needs,https://www.fivetran.com/platform-overview,,,,Engineering,Unknown,"[""R""]"
+Fivetran,Power your RAG application with automated data integration,https://www.fivetran.com/use-case/operations/embedded,,,,Other,Unknown,"[""R""]"
 GoldenSource,Data Analytics,https://www.thegoldensource.com/data-analytics/,,2025-11-13,6,Data/Analytics,Unknown,[]
-GoldenSource,Market Data,https://www.thegoldensource.com/market-data/,,2025-11-14,5,Other,Unknown,[]
-GoldenSource,Reference Data,https://www.thegoldensource.com/reference-data/,,2025-11-14,5,Other,Unknown,[]
-GoldenSource,Reference Data,https://www.thegoldensource.com/reference-data/#security-master,,2025-11-14,5,Other,Unknown,[]
-GoldenSource,Reference Data Mastering,https://www.thegoldensource.com/reference-data-mastering/,,2025-11-14,5,Other,Unknown,[]
-InfluxData,Best Practices: How to Analyze IoT Sensor Data with InfluxDB,https://www.influxdata.com/resources/how-to-analyze-iot-sensor-data-with-influxdb/,Main Navigation,2017-03-30,3156,Product,Unknown,[]
-InfluxData,Data Warehouse,https://www.influxdata.com/glossary/data-warehouse/,,2017-03-30,3156,Other,Unknown,[]
-InfluxData,InfluxDB for Network & Infrastructure Monitoring,https://www.influxdata.com/solutions/network-monitoring/,,2017-03-30,3156,Engineering,Unknown,[]
-InfluxData,Infrastructure Monitoring Basics with Telegraf Grafana,https://www.influxdata.com/resources/infrastructure-monitoring-basics-with-telegraf-grafana-influxdb/,Main Navigation,2017-03-30,3156,Engineering,Unknown,[]
-InfluxData,Modern Data Historian,https://www.influxdata.com/historian-workloads/,,2017-03-30,3156,Other,Unknown,[]
-InfluxData,Security,https://www.influxdata.com/security/,,2017-03-30,3156,Other,Unknown,[]
-InfluxData,Time Series Data Analysis,https://www.influxdata.com/what-is-time-series-data/,,2017-03-30,3156,Other,Unknown,[]
-Informatica,FINANCE,https://informatica.gr8people.com/categories/9/job-categories/155/finance-careers,"States, Uk",,,Operations,Unknown,[]
-Informatica,MARKETING,https://informatica.gr8people.com/categories/9/job-categories/152/marketing-careers,"States, Uk",,,Marketing,Unknown,[]
+GoldenSource,Market Data,https://www.thegoldensource.com/market-data/,,2025-11-14,5,Other,Unknown,"[""R""]"
+GoldenSource,Reference Data,https://www.thegoldensource.com/reference-data/,,2025-11-14,5,Other,Unknown,"[""R""]"
+GoldenSource,Reference Data Mastering,https://www.thegoldensource.com/reference-data-mastering/,,2025-11-14,5,Other,Unknown,"[""R""]"
+InfluxData,Data Warehouse,https://www.influxdata.com/glossary/data-warehouse/,,2017-03-30,3156,Other,Unknown,"[""R""]"
+InfluxData,Modern Data Historian,https://www.influxdata.com/historian-workloads/,,2017-03-30,3156,Other,Unknown,"[""R""]"
+InfluxData,Time Series Data Analysis,https://www.influxdata.com/what-is-time-series-data/,,2017-03-30,3156,Other,Unknown,"[""R""]"
 Informatica,SALES,https://informatica.gr8people.com/categories/9/job-categories/56/sales-careers,"States, Uk",,,Sales,Unknown,[]
 MariaDB,Account Executive,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4693583101,Va,,,Sales,Unknown,[]
 MariaDB,Associate Account Executive,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4676573101,Uk,,,Sales,Unknown,[]
 MariaDB,Associate Account Executive,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4676574101,Singapore,,,Sales,Unknown,[]
 MariaDB,Associate Account Executive,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4676582101,Us,,,Sales,Unknown,[]
 MariaDB,Bilingual Associate Account Executive,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4694571101,Office,,,Sales,Unknown,[]
-MariaDB,Distributed Database Software Engineer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4654991101,Bulgaria,,,Engineering,Unknown,[]
-MariaDB,Distributed Database Software Engineer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4713204101,"Remote, Croatia",,,Engineering,Unknown,[]
-MariaDB,Distributed Database Software Engineer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4713209101,Serbia,,,Engineering,Unknown,[]
-MariaDB,Distributed Database Software Engineer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4713211101,India,,,Engineering,Unknown,[]
-MariaDB,Senior C++ Database Engine Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4523088101,Serbia,,,Engineering,Senior/Lead,[]
-MariaDB,Senior C++ Database Engine Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4528842101,"Remote, Croatia",,,Engineering,Senior/Lead,[]
-MariaDB,Senior C++ Database Engine Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4528843101,Bulgaria,,,Engineering,Senior/Lead,[]
-MariaDB,Senior C++ Database Engine Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4703234101,India,,,Engineering,Senior/Lead,[]
-MariaDB,Senior Cloud Test Engineer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4688959101,India,,,Engineering,Senior/Lead,[]
-MariaDB,Senior Full Stack Web Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4645632101,Bulgaria,,,Engineering,Senior/Lead,[]
-MariaDB,Senior Sales Engineer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4671393101,Us,,,Engineering,Senior/Lead,[]
-MariaDB,Senior Site Reliability Engineer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4696415101,Dominican Republic,,,Engineering,Senior/Lead,[]
-MariaDB,Senior Software Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4645633101,India,,,Engineering,Senior/Lead,[]
-MariaDB,Senior Software Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4652316101,Office,,,Engineering,Senior/Lead,[]
-MariaDB,Senior Software Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4652317101,"Remote, Croatia",,,Engineering,Senior/Lead,[]
-MariaDB,Senior Software Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4652319101,Serbia,,,Engineering,Senior/Lead,[]
-MariaDB,Senior Software Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4652321101,"Remote, Romania",,,Engineering,Senior/Lead,[]
-MariaDB,Senior Software Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4652322101,Estonia,,,Engineering,Senior/Lead,[]
-Matillion,IT and Security,https://jobs.lever.co/matillion?department=IT%20and%20Security,Manchester,2022-03-08,1352,Other,Unknown,[]
-Matillion,Marketing,https://jobs.lever.co/matillion?department=Marketing,United Kingdom,2022-03-08,1352,Marketing,Unknown,[]
-Matillion,Sales,https://jobs.lever.co/matillion?department=Field&team=Sales,Central Usa,2022-03-08,1352,Sales,Unknown,[]
-MongoDB,(Enterprise) Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7351297,,,,Sales,Unknown,[]
-MongoDB,Account Development Representative,https://www.mongodb.com/careers/job/?gh_jid=6753800,Uk&I Location Dublin Suitcase Full-Time Chevron-Right,,,Product,Unknown,[]
-MongoDB,Account Development Representative,https://www.mongodb.com/careers/job/?gh_jid=6758185,German Speaking Location Dublin Suitcase Full-Time Chevron-Right,,,Product,Unknown,[]
-MongoDB,Account Development Representative,https://www.mongodb.com/careers/job/?gh_jid=6758195,Arabic Speaking (Emea) Location Dublin Suitcase Full-Time Chevron-Right,,,Product,Unknown,[]
-MongoDB,Account Development Representative,https://www.mongodb.com/careers/job/?gh_jid=6758218,French Speaking Location Dublin Suitcase Full-Time Chevron-Right,,,Product,Unknown,[]
-MongoDB,Account Development Representative,https://www.mongodb.com/careers/job/?gh_jid=7337554,Dutch Speaking Location Dublin Suitcase Full-Time Chevron-Right,,,Product,Unknown,[]
-MongoDB,Account Development Representative Atlanta,https://www.mongodb.com/careers/job/?gh_jid=7317925,,,,Product,Unknown,[]
-MongoDB,Account Development Representative Austin,https://www.mongodb.com/careers/job/?gh_jid=7311204,,,,Product,Unknown,[]
-MongoDB,Account Development Representative Mexico City,https://www.mongodb.com/careers/job/?gh_jid=7318049,,,,Product,Unknown,[]
-MongoDB,Account Development Representative New York City,https://www.mongodb.com/careers/job/?gh_jid=7310506,New York City Suitcase Full-Time Chevron-Right,,,Product,Unknown,[]
-MongoDB,Account Development Representative S o Paulo,https://www.mongodb.com/careers/job/?gh_jid=7318028,,,,Product,Unknown,[]
-MongoDB,Account Development Representative Toronto,https://www.mongodb.com/careers/job/?gh_jid=7311234,Toronto Suitcase Full-Time Chevron-Right,,,Product,Unknown,[]
-MongoDB,Account Development Representative location Boston suitcase Full-time chevron-right,https://www.mongodb.com/careers/job/?gh_jid=7310552,"Remote, Australia",,,Product,Unknown,[]
-MongoDB,"Account Development Representative, German & Turkish Speaking Dublin",https://www.mongodb.com/careers/job/?gh_jid=7298536,German & Turkish Speaking Location Dublin Suitcase Full-Time Chevron-Right,,,Product,Unknown,[]
-MongoDB,Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7154017,,,,Sales,Unknown,[]
+MariaDB,Distributed Database Software Engineer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4654991101,Bulgaria,,,Engineering,Unknown,"[""R""]"
+MariaDB,Distributed Database Software Engineer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4713204101,"Remote, Croatia",,,Engineering,Unknown,"[""R""]"
+MariaDB,Distributed Database Software Engineer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4713209101,Serbia,,,Engineering,Unknown,"[""R""]"
+MariaDB,Distributed Database Software Engineer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4713211101,India,,,Engineering,Unknown,"[""R""]"
+MariaDB,Senior C++ Database Engine Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4523088101,Serbia,,,Engineering,Senior/Lead,"[""R""]"
+MariaDB,Senior C++ Database Engine Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4528842101,"Remote, Croatia",,,Engineering,Senior/Lead,"[""R""]"
+MariaDB,Senior C++ Database Engine Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4528843101,Bulgaria,,,Engineering,Senior/Lead,"[""R""]"
+MariaDB,Senior C++ Database Engine Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4703234101,India,,,Engineering,Senior/Lead,"[""R""]"
+MariaDB,Senior Cloud Test Engineer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4688959101,India,,,Engineering,Senior/Lead,"[""R""]"
+MariaDB,Senior Full Stack Web Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4645632101,Bulgaria,,,Engineering,Senior/Lead,"[""R""]"
+MariaDB,Senior Sales Engineer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4671393101,Us,,,Engineering,Senior/Lead,"[""R""]"
+MariaDB,Senior Site Reliability Engineer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4696415101,Dominican Republic,,,Engineering,Senior/Lead,"[""R""]"
+MariaDB,Senior Software Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4645633101,India,,,Engineering,Senior/Lead,"[""R""]"
+MariaDB,Senior Software Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4652316101,Office,,,Engineering,Senior/Lead,"[""R""]"
+MariaDB,Senior Software Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4652317101,"Remote, Croatia",,,Engineering,Senior/Lead,"[""R""]"
+MariaDB,Senior Software Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4652319101,Serbia,,,Engineering,Senior/Lead,"[""R""]"
+MariaDB,Senior Software Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4652321101,"Remote, Romania",,,Engineering,Senior/Lead,"[""R""]"
+MariaDB,Senior Software Developer,https://job-boards.eu.greenhouse.io/mariadbplc/jobs/4652322101,Estonia,,,Engineering,Senior/Lead,"[""R""]"
+Matillion,Marketing,https://jobs.lever.co/matillion?department=Marketing,United Kingdom,2022-03-08,1352,Marketing,Unknown,"[""R""]"
+MongoDB,"(Enterprise) Account Executive, Acquisition location Seoul suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7351297,"Remote, Australia",,,Sales,Unknown,"[""ENTERPRISE"", ""R""]"
+MongoDB,Account Development Representative,https://www.mongodb.com/careers/job/?gh_jid=6753800,Uk&I Location Dublin Suitcase Full-Time Chevron-Right,,,Product,Unknown,"[""R""]"
+MongoDB,Account Development Representative,https://www.mongodb.com/careers/job/?gh_jid=6758185,German Speaking Location Dublin Suitcase Full-Time Chevron-Right,,,Product,Unknown,"[""R""]"
+MongoDB,Account Development Representative,https://www.mongodb.com/careers/job/?gh_jid=6758195,Arabic Speaking (Emea) Location Dublin Suitcase Full-Time Chevron-Right,,,Product,Unknown,"[""R""]"
+MongoDB,Account Development Representative,https://www.mongodb.com/careers/job/?gh_jid=6758218,French Speaking Location Dublin Suitcase Full-Time Chevron-Right,,,Product,Unknown,"[""R""]"
+MongoDB,Account Development Representative,https://www.mongodb.com/careers/job/?gh_jid=7298536,German & Turkish Speaking Location Dublin Suitcase Full-Time Chevron-Right,,,Product,Unknown,"[""R""]"
+MongoDB,Account Development Representative,https://www.mongodb.com/careers/job/?gh_jid=7337554,Dutch Speaking Location Dublin Suitcase Full-Time Chevron-Right,,,Product,Unknown,"[""R""]"
+MongoDB,Account Development Representative Atlanta,https://www.mongodb.com/careers/job/?gh_jid=7317925,,,,Product,Unknown,"[""R""]"
+MongoDB,Account Development Representative Austin,https://www.mongodb.com/careers/job/?gh_jid=7311204,,,,Product,Unknown,"[""R""]"
+MongoDB,Account Development Representative Boston,https://www.mongodb.com/careers/job/?gh_jid=7310552,,,,Product,Unknown,"[""R""]"
+MongoDB,Account Development Representative New York City,https://www.mongodb.com/careers/job/?gh_jid=7310506,New York City Suitcase Full-Time Chevron-Right,,,Product,Unknown,"[""R""]"
+MongoDB,Account Development Representative S o Paulo,https://www.mongodb.com/careers/job/?gh_jid=7318028,,,,Product,Unknown,"[""R""]"
+MongoDB,Account Development Representative Toronto,https://www.mongodb.com/careers/job/?gh_jid=7311234,Toronto Suitcase Full-Time Chevron-Right,,,Product,Unknown,"[""R""]"
+MongoDB,Account Development Representative location Mexico City suitcase Full-time chevron-right,https://www.mongodb.com/careers/job/?gh_jid=7318049,"Remote, Australia",,,Product,Unknown,"[""R""]"
+MongoDB,Account Executive,https://www.mongodb.com/careers/job/?gh_jid=5573926,,,,Sales,Unknown,[]
 MongoDB,Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7217822,Growth Location Zurich Suitcase Full-Time Chevron-Right,,,Sales,Unknown,[]
-MongoDB,Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7383653,,,,Sales,Unknown,[]
-MongoDB,"Account Executive ( Bahasa, Thai or Vietnamese Speaker) Singapore",https://www.mongodb.com/careers/job/?gh_jid=7211619,Thai Or Vietnamese Speaker) Location Singapore Suitcase Full-Time Chevron-Right,,,Sales,Unknown,"[""ai""]"
-MongoDB,"Account Executive, Growth location Milan suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=5573926,"Remote, Australia",,,Sales,Unknown,[]
-MongoDB,Addressing Security Vulnerabilities,https://www.mongodb.com/company/contact/mongodb-vulnerability-disclosure-policy,,2021-05-21,1643,Other,Unknown,[]
-MongoDB,"Associate Account Executive, Strategic Accounts location Seoul suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7372303,"Remote, Australia",,,Sales,Unknown,[]
-MongoDB,Commercial Growth Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6826191,Uki Market Location Dublin Suitcase Full-Time Chevron-Right,,,Sales,Unknown,[]
-MongoDB,Commercial Growth Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7276216,Native German Speaking Location Dublin Suitcase Full-Time Chevron-Right,,,Sales,Unknown,[]
-MongoDB,Director,https://www.mongodb.com/careers/job/?gh_jid=7298154,"Brand & Creative Marketing Location Austin, New York City, San Francisco Suitcase Full-Time Chevron-Right",,,Other,Director+,[]
-MongoDB,Director,https://www.mongodb.com/careers/job/?gh_jid=7301901,"Escalation Management Location Bengaluru, Gurugram Suitcase Full-Time Chevron-Right",,,Other,Director+,[]
-MongoDB,Director,https://www.mongodb.com/careers/job/?gh_jid=7380930,Engineering C2C Location Dublin Suitcase Full-Time Chevron-Right,,,Other,Director+,[]
-MongoDB,"Director, IT New York City; San Francisco",https://www.mongodb.com/careers/job/?gh_jid=7103182,"It Location New York City, San Francisco Suitcase Full-Time Chevron-Right",,,Other,Director+,[]
-MongoDB,"Director, Storage Engines location Sydney suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7355907,"Remote, Australia",,,Other,Director+,[]
-MongoDB,EMEA PMO Manager Dublin,https://www.mongodb.com/careers/job/?gh_jid=6527524,Dublin Suitcase Full-Time Chevron-Right,,,Product,Unknown,[]
-MongoDB,Engineering Manager,https://www.mongodb.com/careers/job/?gh_jid=7201364,,,,Engineering,Unknown,[]
-MongoDB,Engineering Manager,https://www.mongodb.com/careers/job/?gh_jid=7229699,Query Location United States Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,[]
-MongoDB,Engineering Manager,https://www.mongodb.com/careers/job/?gh_jid=7229701,"Query Location Toronto, Vancouver Suitcase Full-Time Chevron-Right",,,Engineering,Unknown,[]
-MongoDB,"Engineering Manager, Stream Processing New York City; United States",https://www.mongodb.com/careers/job/?gh_jid=7336498,"Stream Processing Location New York City, United States Suitcase Full-Time Chevron-Right",,,Engineering,Unknown,[]
-MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=5607962,,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=5615484,,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6122476,,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6275509,,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6380607,,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6603246,,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6688075,,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6740470,,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6848268,Growth Location Frankfurt Suitcase Full-Time Chevron-Right,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6987968,,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7027846,,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7032023,Growth Location New York City Suitcase Full-Time Chevron-Right,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7211805,Acquisition (Thai Speaking) Location Singapore Suitcase Full-Time Chevron-Right,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7217805,Growth Location Zurich Suitcase Full-Time Chevron-Right,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7256796,Growth Location Paris Suitcase Full-Time Chevron-Right,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7257122,,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive Amsterdam,https://www.mongodb.com/careers/job/?gh_jid=7215596,Amsterdam Suitcase Full-Time Chevron-Right,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive London,https://www.mongodb.com/careers/job/?gh_jid=7026136,London Suitcase Full-Time Chevron-Right,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive London,https://www.mongodb.com/careers/job/?gh_jid=7227824,London Suitcase Full-Time Chevron-Right,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive Los Angeles,https://www.mongodb.com/careers/job/?gh_jid=6587328,,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive Madrid,https://www.mongodb.com/careers/job/?gh_jid=7257330,,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive Tel Aviv,https://www.mongodb.com/careers/job/?gh_jid=6640101,,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive location,https://www.mongodb.com/careers/job/?gh_jid=7160353,Frankfurt Suitcase Full-Time Chevron-Right,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive location,https://www.mongodb.com/careers/job/?gh_jid=7219459,London Suitcase Full-Time Chevron-Right,,,Sales,Unknown,[]
-MongoDB,Enterprise Account Executive location Madrid suitcase Full-time chevron-right,https://www.mongodb.com/careers/job/?gh_jid=7256756,"Remote, Australia",,,Sales,Unknown,[]
-MongoDB,"Enterprise Account Executive, Growth (Defence & MHA) Gurugram",https://www.mongodb.com/careers/job/?gh_jid=7363143,,,,Sales,Unknown,[]
-MongoDB,"Enterprise Account Executive, Growth location Atlanta; Florida; North Carolina; South Carolina suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7031396,,,,Sales,Unknown,[]
-MongoDB,"Enterprise Account Executive, Growth location Melbourne suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7403891,"Remote, Australia",,,Sales,Unknown,[]
-MongoDB,"Enterprise Account Executive, Growth location Michigan suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7362411,,,,Sales,Unknown,[]
-MongoDB,"Enterprise Account Executive, Growth location Seattle suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7306003,,,,Sales,Unknown,[]
-MongoDB,"Enterprise Account Executive, Growth location Tel Aviv suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7326631,"Remote, Australia",,,Sales,Unknown,[]
-MongoDB,Enterprise Account Manager,https://www.mongodb.com/careers/job/?gh_jid=6829771,"Oem Beijing, Shanghai, Shenzhen",,,Sales,Unknown,[]
-MongoDB,Escalation Engineer Alberta; British Columbia; Manitoba; Nova Scotia; Ontario; Quebec; Toronto,https://www.mongodb.com/careers/job/?gh_jid=7209918,Toronto Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,"[""scala""]"
-MongoDB,Escalation Engineer New York City; United States,https://www.mongodb.com/careers/job/?gh_jid=7209916,"New York City, United States Suitcase Full-Time Chevron-Right",,,Engineering,Unknown,"[""scala""]"
-MongoDB,InfoSec Engineer II location,https://www.mongodb.com/careers/job/?gh_jid=7248114,Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Mid,[]
-MongoDB,Lead Engineer,https://www.mongodb.com/careers/job/?gh_jid=7195895,,,,Engineering,Senior/Lead,[]
-MongoDB,Lead Engineer,https://www.mongodb.com/careers/job/?gh_jid=7201997,Server Programmability Location United States Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Lead Engineer,https://www.mongodb.com/careers/job/?gh_jid=7259791,Atlas Dedicated Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Lead Engineer,https://www.mongodb.com/careers/job/?gh_jid=7316445,"Online Archive Storage Systems Location New York City, San Francisco, Seattle Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,[]
-MongoDB,"Lead Engineer, Atlas Clusters New York City",https://www.mongodb.com/careers/job/?gh_jid=7271659,Atlas Clusters Location New York City Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,"Lead Engineer, Identity and Access Management Toronto",https://www.mongodb.com/careers/job/?gh_jid=7069039,Identity And Access Management Location Toronto Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,"Lead Engineer, Server Programmability Alberta; British Columbia; Manitoba; Nova Scotia; Ontario; Quebec",https://www.mongodb.com/careers/job/?gh_jid=7201999,,,,Engineering,Senior/Lead,[]
-MongoDB,Lead Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7310369,,,,Engineering,Senior/Lead,[]
-MongoDB,Manager of Crisis Management and IT Disaster Recovery location,https://www.mongodb.com/careers/job/?gh_jid=7365604,United States Suitcase Full-Time Chevron-Right,,,Other,Unknown,[]
-MongoDB,"Manager, Sales Development location Gurugram suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7250833,,,,Product,Unknown,[]
-MongoDB,Market Intelligence Senior Consultant Dublin,https://www.mongodb.com/careers/job/?gh_jid=7344380,Dublin Suitcase Full-Time Chevron-Right,,,Other,Senior/Lead,[]
-MongoDB,Marketing Operations Manager Dublin,https://www.mongodb.com/careers/job/?gh_jid=7346475,Dublin Suitcase Full-Time Chevron-Right,,,Marketing,Unknown,[]
-MongoDB,Marketing Operations Specialist India,https://www.mongodb.com/careers/job/?gh_jid=7361598,India Suitcase Full-Time Chevron-Right,,,Marketing,Unknown,[]
-MongoDB,MongoDB Compass: The free GUI tool for data exploration,https://www.mongodb.com/products/tools/compass,,2025-08-04,107,Other,Unknown,"[""go""]"
-MongoDB,MongoDB for Students Take advantage of student benefits,https://www.mongodb.com/students,,2023-01-08,1046,Other,Unknown,"[""go""]"
-MongoDB,Partner Marketing Manager,https://www.mongodb.com/careers/job/?gh_jid=7388978,Aws Location United States Suitcase Full-Time Chevron-Right,,,Marketing,Unknown,[]
-MongoDB,Principal Cloud Sales Specialist Frankfurt,https://www.mongodb.com/careers/job/?gh_jid=6848317,Frankfurt Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,[]
-MongoDB,Principal Cloud Sales Specialist London,https://www.mongodb.com/careers/job/?gh_jid=6848318,London Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,[]
-MongoDB,Principal Cloud Sales Specialist Munich,https://www.mongodb.com/careers/job/?gh_jid=6848316,Munich Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,[]
-MongoDB,"Principal Research Scientist, Database Systems New York City; Palo Alto",https://www.mongodb.com/careers/job/?gh_jid=6819978,"Database Systems Location New York City, Palo Alto Suitcase Full-Time Chevron-Right",,,Other,Senior/Lead,[]
-MongoDB,Principal Sales Operations Analyst location,https://www.mongodb.com/careers/job/?gh_jid=7397516,Dublin Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,[]
-MongoDB,Public Sector Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6630142,,,,Sales,Unknown,[]
-MongoDB,Public Sector Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6633264,Growth Location Amsterdam Suitcase Full-Time Chevron-Right,,,Sales,Unknown,[]
-MongoDB,Public Sector Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6635587,Growth Location Germany Suitcase Full-Time Chevron-Right,,,Sales,Unknown,[]
-MongoDB,Regional Director,https://www.mongodb.com/careers/job/?gh_jid=7096399,,,,Other,Director+,[]
-MongoDB,Regional Director,https://www.mongodb.com/careers/job/?gh_jid=7231309,,,,Other,Director+,[]
-MongoDB,Regional Director,https://www.mongodb.com/careers/job/?gh_jid=7255293,,,,Other,Director+,[]
-MongoDB,Regional Director,https://www.mongodb.com/careers/job/?gh_jid=7360817,Enterprise Growth Location United States Suitcase Full-Time Chevron-Right,,,Other,Director+,[]
-MongoDB,Regional Director Enterprise,https://www.mongodb.com/careers/job/?gh_jid=7259560,,,,Other,Director+,[]
-MongoDB,Regional Director Enterprise,https://www.mongodb.com/careers/job/?gh_jid=7261528,Growth Location Singapore Suitcase Full-Time Chevron-Right,,,Other,Director+,[]
-MongoDB,Research Engineer location Palo Alto suitcase Full-time chevron-right,https://www.mongodb.com/careers/job/?gh_jid=7275322,"Remote, Australia",,,Engineering,Unknown,[]
-MongoDB,Sales Development Representative Beijing; Shanghai; Shenzhen,https://www.mongodb.com/careers/job/?gh_jid=7380221,,,,Product,Unknown,"[""ai""]"
-MongoDB,Sales Development Representative Gurugram,https://www.mongodb.com/careers/job/?gh_jid=7318036,,,,Product,Unknown,[]
-MongoDB,Sales Development Representative Hong Kong,https://www.mongodb.com/careers/job/?gh_jid=7318091,,,,Product,Unknown,[]
-MongoDB,Sales Development Representative Seoul,https://www.mongodb.com/careers/job/?gh_jid=7317788,,,,Product,Unknown,[]
-MongoDB,Sales Development Representative location,https://www.mongodb.com/careers/job/?gh_jid=6753948,Dublin Suitcase Full-Time Chevron-Right,,,Product,Unknown,[]
-MongoDB,"Senior Business Analyst, Technical Services New York City",https://www.mongodb.com/careers/job/?gh_jid=6841436,Technical Services Location New York City Suitcase Full-Time Chevron-Right,,,Other,Senior/Lead,[]
-MongoDB,Senior Developer Advocate location Gurugram suitcase Full-time chevron-right,https://www.mongodb.com/careers/job/?gh_jid=7242158,,,,Engineering,Senior/Lead,[]
-MongoDB,Senior Developer Advocate location Ireland suitcase Full-time chevron-right,https://www.mongodb.com/careers/job/?gh_jid=7241758,"Remote, Australia",,,Engineering,Senior/Lead,[]
-MongoDB,Senior Engineer,https://www.mongodb.com/careers/job/?gh_jid=6477783,Storage Layer Services Location United States Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Senior Engineer,https://www.mongodb.com/careers/job/?gh_jid=6484467,Storage Layer Services Location Canada Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,"Senior Engineer, Coupa & P2P Processes Bengaluru; Gurugram",https://www.mongodb.com/careers/job/?gh_jid=7257748,"Coupa & P2P Processes Location Bengaluru, Gurugram Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,[]
-MongoDB,Senior Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6582052,Growth Location Stockholm Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,[]
-MongoDB,Senior Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6955099,,,,Sales,Senior/Lead,[]
-MongoDB,Senior Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7165267,Growth Location Amsterdam Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,[]
-MongoDB,Senior Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7177654,Growth Location London Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,[]
-MongoDB,Senior Enterprise Account Executive London,https://www.mongodb.com/careers/job/?gh_jid=7227836,London Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,[]
-MongoDB,Senior Enterprise Account Executive London,https://www.mongodb.com/careers/job/?gh_jid=7228531,London Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,[]
-MongoDB,Senior Enterprise Account Executive Toronto,https://www.mongodb.com/careers/job/?gh_jid=7141759,Toronto Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,[]
-MongoDB,Senior Industry Consultant,https://www.mongodb.com/careers/job/?gh_jid=7388643,,,,Other,Senior/Lead,[]
-MongoDB,Senior Industry Consultant Dublin; Ireland,https://www.mongodb.com/careers/job/?gh_jid=7216777,"Dublin, Ireland Suitcase Full-Time Chevron-Right",,,Other,Senior/Lead,[]
-MongoDB,"Senior InfoSec Engineer, Red Team New York City; San Francisco; Seattle; United States",https://www.mongodb.com/careers/job/?gh_jid=7280331,"Red Team Location New York City, San Francisco, Seattle, United States Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,[]
-MongoDB,Senior Java Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7194687,"Database Location Toronto, Vancouver Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,"[""java""]"
-MongoDB,Senior Manager,https://www.mongodb.com/careers/job/?gh_jid=7349101,Sales Operations Location Singapore Suitcase Full-Time Chevron-Right,,,Other,Senior/Lead,[]
-MongoDB,Senior Partner Marketing Manager Dublin,https://www.mongodb.com/careers/job/?gh_jid=7261916,Dublin Suitcase Full-Time Chevron-Right,,,Marketing,Senior/Lead,[]
-MongoDB,Senior Regional Marketing Manager Chicago,https://www.mongodb.com/careers/job/?gh_jid=7267154,,,,Marketing,Senior/Lead,"[""go""]"
-MongoDB,Senior Research Scientist Palo Alto,https://www.mongodb.com/careers/job/?gh_jid=7365646,,,,Other,Senior/Lead,[]
-MongoDB,Senior Sales Operations Analyst location,https://www.mongodb.com/careers/job/?gh_jid=7312488,Dublin Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,[]
-MongoDB,Senior Software Development Engineer Dublin,https://www.mongodb.com/careers/job/?gh_jid=7243860,Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6720794,Cloud Payments Location United States Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6749138,Mongodb Server Clusters And Interfaces Location United States Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7059646,Identity And Access Management Location Toronto Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7111375,Observability Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7156016,Atlas Clusters Automation Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7251405,"Developer Productivity Location Ontario, Toronto Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,[]
-MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7254433,Atlas Clusters Security Location New York City Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7345260,Search Systems Location Toronto Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7346405,Developer Tools Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7392427,,,,Engineering,Senior/Lead,[]
-MongoDB,Senior Software Engineer Dublin,https://www.mongodb.com/careers/job/?gh_jid=7391511,Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,"Senior Software Engineer, Atlas Search Query location San Francisco suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7263533,"Remote, Australia",,,Engineering,Senior/Lead,[]
-MongoDB,"Senior Software Engineer, Deployments Boston; New York City; Pittsburgh; United States; Washington DC",https://www.mongodb.com/careers/job/?gh_jid=7364854,"Deployments Location Boston, New York City, Pittsburgh, United States, Washington Dc Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,[]
-MongoDB,"Senior Software Engineer, Developer Productivity Austin; New York City; United States",https://www.mongodb.com/careers/job/?gh_jid=7251403,"Developer Productivity Location Austin, New York City, United States Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,[]
-MongoDB,"Senior Software Engineer, Enterprise Advanced location Gurugram suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=6683531,,,,Engineering,Senior/Lead,[]
-MongoDB,"Senior Software Engineer, Frontend Platform New York City",https://www.mongodb.com/careers/job/?gh_jid=7283432,Frontend Platform Location New York City Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,"Senior Software Engineer, Frontend and AI New York City",https://www.mongodb.com/careers/job/?gh_jid=7304325,Frontend And Ai Location New York City Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""ai""]"
-MongoDB,"Senior Software Engineer, MongoDB Server Clusters and Interfaces Toronto",https://www.mongodb.com/careers/job/?gh_jid=6749360,Mongodb Server Clusters And Interfaces Location Toronto Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""go""]"
-MongoDB,"Senior Software Engineer, Storage Layer Services location Sydney suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=6866771,,,,Engineering,Senior/Lead,[]
-MongoDB,Senior Staff Engineer,https://www.mongodb.com/careers/job/?gh_jid=6394590,Cluster Scalability Location United States Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Senior Staff Engineer,https://www.mongodb.com/careers/job/?gh_jid=6713492,Server Networking & Observability Location United States Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,"Senior Staff Engineer, Cluster Scalability Montreal; Quebec; Toronto; Vancouver",https://www.mongodb.com/careers/job/?gh_jid=6394601,"Cluster Scalability Location Montreal, Quebec, Toronto, Vancouver Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,"[""scala""]"
-MongoDB,"Senior Staff Engineer, Server Networking & Observability New York City",https://www.mongodb.com/careers/job/?gh_jid=6659380,Server Networking & Observability Location New York City Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,"Senior Staff Engineer, Server Networking & Observability Palo Alto",https://www.mongodb.com/careers/job/?gh_jid=6661887,,,,Engineering,Senior/Lead,[]
-MongoDB,"Senior Staff Engineer, Server Networking & Observability Seattle",https://www.mongodb.com/careers/job/?gh_jid=6661893,,,,Engineering,Senior/Lead,[]
-MongoDB,"Senior Staff Engineer, Server Networking & Observability Toronto",https://www.mongodb.com/careers/job/?gh_jid=6659382,Server Networking & Observability Location Toronto Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Senior Staff Technical Program Manager Dublin,https://www.mongodb.com/careers/job/?gh_jid=7340968,Dublin Suitcase Full-Time Chevron-Right,,,Other,Senior/Lead,[]
-MongoDB,Senior Technical Program Manager,https://www.mongodb.com/careers/job/?gh_jid=7287421,Hr Tech Location United States Suitcase Full-Time Chevron-Right,,,Other,Senior/Lead,[]
-MongoDB,Senior Technical Services Engineer,https://www.mongodb.com/careers/job/?gh_jid=7368213,,,,Engineering,Senior/Lead,[]
-MongoDB,Site Reliability Engineer,https://www.mongodb.com/careers/job/?gh_jid=6987333,"Fabric Location Austin, Boston, Los Angeles, New York City, Raleigh, San Francisco, United States Suitcase Full-Time Chevron-Right",,,Engineering,Unknown,[]
-MongoDB,Site Reliability Engineer (Senior or Staff),https://www.mongodb.com/careers/job/?gh_jid=6864997,,,,Engineering,Senior/Lead,[]
-MongoDB,Site Reliability Engineer (Senior or Staff),https://www.mongodb.com/careers/job/?gh_jid=6865004,,,,Engineering,Senior/Lead,[]
-MongoDB,Site Reliability Engineer (Senior or Staff),https://www.mongodb.com/careers/job/?gh_jid=7192648,,,,Engineering,Senior/Lead,[]
-MongoDB,"Site Reliability Engineer (Senior or Staff), Atlas Austin; Boston; Chicago; New York City; Pittsburgh; United States",https://www.mongodb.com/careers/job/?gh_jid=6984809,"Atlas Location Austin, Boston, Chicago, New York City, Pittsburgh, United States Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,"[""go""]"
-MongoDB,"Site Reliability Engineer (Senior or Staff), Deployments Boston; New York City; Pittsburgh; United States; Washington DC",https://www.mongodb.com/careers/job/?gh_jid=6932221,"Deployments Location Boston, New York City, Pittsburgh, United States, Washington Dc Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,[]
-MongoDB,"Site Reliability Engineer (Senior or Staff), Fabric Alberta; British Columbia; Manitoba; Ontario; Quebec",https://www.mongodb.com/careers/job/?gh_jid=6987335,,,,Engineering,Senior/Lead,[]
-MongoDB,"Site Reliability Engineer (Senior or Staff), Infrastructure Security Austin; Chicago; New York City; San Francisco; United States",https://www.mongodb.com/careers/job/?gh_jid=6601882,"Infrastructure Security Location Austin, Chicago, New York City, San Francisco, United States Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,"[""go""]"
-MongoDB,"Site Reliability Engineer (Senior or Staff), Observability Austin; Boston; Chicago; New York City; Pittsburgh; United States; Washington DC",https://www.mongodb.com/careers/job/?gh_jid=6711349,"Observability Location Austin, Boston, Chicago, New York City, Pittsburgh, United States, Washington Dc Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,"[""go""]"
-MongoDB,Site Reliability Engineer 3 New York City,https://www.mongodb.com/careers/job/?gh_jid=7145126,New York City Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,[]
-MongoDB,Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6677731,Catalog And Routing Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,[]
-MongoDB,Software Engineer 3,https://www.mongodb.com/careers/job/?gh_jid=7137848,Atlas Dedicated Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,[]
-MongoDB,Software Engineer 3,https://www.mongodb.com/careers/job/?gh_jid=7156025,Atlas Clusters Automation Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,[]
-MongoDB,Software Engineer 3,https://www.mongodb.com/careers/job/?gh_jid=7193367,Query Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,[]
-MongoDB,Software Engineer 3,https://www.mongodb.com/careers/job/?gh_jid=7253772,,,,Engineering,Unknown,[]
-MongoDB,Software Engineer 3,https://www.mongodb.com/careers/job/?gh_jid=7386438,Atlas Dedicated Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,[]
-MongoDB,Software Engineer 3,https://www.mongodb.com/careers/job/?gh_jid=7397285,,,,Engineering,Unknown,[]
-MongoDB,Software Engineer 3 location Gurugram suitcase Full-time chevron-right,https://www.mongodb.com/careers/job/?gh_jid=6815693,,,,Engineering,Unknown,[]
-MongoDB,"Software Engineer 3, Identity and Access Management New York City",https://www.mongodb.com/careers/job/?gh_jid=7373899,Identity And Access Management Location New York City Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,[]
-MongoDB,"Software Engineer 3, Search Systems Replication & Routing San Francisco",https://www.mongodb.com/careers/job/?gh_jid=7235322,,,,Engineering,Unknown,[]
-MongoDB,"Software Engineer 3, Search Web Platform Alberta; British Columbia; Ontario; Quebec; Toronto; Vancouver",https://www.mongodb.com/careers/job/?gh_jid=7355902,"Search Web Platform Location Alberta, British Columbia, Ontario, Quebec, Toronto, Vancouver Suitcase Full-Time Chevron-Right",,,Engineering,Unknown,[]
-MongoDB,"Software Engineer, Diagnostics San Francisco; United States",https://www.mongodb.com/careers/job/?gh_jid=7389031,"Diagnostics Location San Francisco, United States Suitcase Full-Time Chevron-Right",,,Engineering,Unknown,[]
-MongoDB,Staff Engineer,https://www.mongodb.com/careers/job/?gh_jid=7079365,Apix Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Staff Engineer,https://www.mongodb.com/careers/job/?gh_jid=7094786,Search Systems Location Toronto Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Staff NetSuite Engineer Palo Alto,https://www.mongodb.com/careers/job/?gh_jid=7274598,,,,Engineering,Senior/Lead,[]
-MongoDB,Staff Research Scientist Palo Alto; United States,https://www.mongodb.com/careers/job/?gh_jid=7280132,United States Suitcase Full-Time Chevron-Right,,,Other,Senior/Lead,[]
-MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6352684,Server Security Location Canada Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6515209,Server Security Location United States Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7092947,,,,Engineering,Senior/Lead,[]
-MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7097165,,,,Engineering,Senior/Lead,[]
-MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7100842,,,,Engineering,Senior/Lead,[]
-MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7100856,,,,Engineering,Senior/Lead,[]
-MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7100859,Query Execution Location Germany Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7100860,Query Execution Location France Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7364866,,,,Engineering,Senior/Lead,[]
-MongoDB,"Staff Software Engineer, Atlas Growth New York City",https://www.mongodb.com/careers/job/?gh_jid=6658398,Atlas Growth Location New York City Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,"Staff Software Engineer, Networking & Observability Alberta; British Columbia; Manitoba; Nova Scotia; Ontario; Quebec",https://www.mongodb.com/careers/job/?gh_jid=7264738,,,,Engineering,Senior/Lead,[]
-MongoDB,"Staff Software Engineer, Networking & Observability Seattle; United States",https://www.mongodb.com/careers/job/?gh_jid=7264736,"Networking & Observability Location Seattle, United States Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,[]
-MongoDB,"Staff Software Engineer, Query Calgary; Edmonton; Montreal; Ontario; Toronto; Vancouver",https://www.mongodb.com/careers/job/?gh_jid=7221904,"Query Location Calgary, Edmonton, Montreal, Ontario, Toronto, Vancouver Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,[]
-MongoDB,"Staff Software Engineer, Query Execution location Netherlands suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7100825,,,,Engineering,Senior/Lead,[]
-MongoDB,"Staff Software Engineer, Query New York City; United States",https://www.mongodb.com/careers/job/?gh_jid=7221902,"Query Location New York City, United States Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,[]
-MongoDB,"Staff Software Engineer, Server Security New York City",https://www.mongodb.com/careers/job/?gh_jid=6352682,Server Security Location New York City Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,[]
-MongoDB,Staff Technical Program Manager Dublin,https://www.mongodb.com/careers/job/?gh_jid=6765245,Dublin Suitcase Full-Time Chevron-Right,,,Other,Senior/Lead,[]
-MongoDB,Staff Technical Program Manager New York City; San Francisco; United States,https://www.mongodb.com/careers/job/?gh_jid=6771131,"New York City, San Francisco, United States Suitcase Full-Time Chevron-Right",,,Other,Senior/Lead,[]
-MongoDB,Staff Technical Program Manager location,https://www.mongodb.com/careers/job/?gh_jid=7391474,Dublin Suitcase Full-Time Chevron-Right,,,Other,Senior/Lead,[]
-MongoDB,Technical Services Engineer Dublin,https://www.mongodb.com/careers/job/?gh_jid=7077137,Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,[]
-MongoDB,Turkish Speaking Enterprise Account Executive Dubai,https://www.mongodb.com/careers/job/?gh_jid=7113254,,,,Sales,Unknown,"[""ai""]"
-Monte Carlo,Director Strategic Sales,https://jobs.ashbyhq.com/montecarlodata/57d1f0c4-1bda-43b1-831c-d89b8da26d4e,New York,2025-09-24,56,Sales,Director+,[]
-Monte Carlo,Enterprise Account Executive,https://jobs.ashbyhq.com/montecarlodata/189915df-b1bf-4a05-a808-6221efa704f0,"London, United Kingdom",2025-08-14,97,Sales,Unknown,[]
-Monte Carlo,Enterprise Sales Development Representative,https://jobs.ashbyhq.com/montecarlodata/20df6344-4bac-48cb-8538-b51775b99455,"London, United Kingdom",2025-10-15,35,Product,Unknown,[]
-Monte Carlo,Enterprise Sales Development Representative,https://jobs.ashbyhq.com/montecarlodata/6ab744ab-41fe-4605-a33c-93ec69437256,"San Francisco, Ca",2025-10-14,36,Product,Unknown,[]
-Monte Carlo,Join us on a mission to make data + AI reliable,https://www.montecarlodata.com/careers-at-monte-carlo/,,2025-10-06,44,Other,Unknown,"[""ai""]"
-Monte Carlo,Strategic Account Executive,https://jobs.ashbyhq.com/montecarlodata/4a57ba0f-3be5-4138-b863-f8c7a575c3e0,"San Francisco, Ca",2025-09-05,75,Sales,Unknown,[]
-Monte Carlo,Strategic Account Executive,https://jobs.ashbyhq.com/montecarlodata/796226cd-6ca7-4696-a3e2-a9fc8c1a64aa,New York,2025-09-05,75,Sales,Unknown,[]
-Monte Carlo,Strategic Sales Development Representative,https://jobs.ashbyhq.com/montecarlodata/130934c6-a06f-4155-b4cb-12e99a1835de,United States,2025-11-04,15,Product,Unknown,[]
-Monte Carlo,Strategic Sales Development Representative,https://jobs.ashbyhq.com/montecarlodata/b9c9fdbc-cf70-4d40-9bb9-34a36811f3be,"London, United Kingdom",2025-10-14,36,Product,Unknown,[]
-Monte Carlo,Strategic Sales Engineer,https://jobs.ashbyhq.com/montecarlodata/6c437531-0259-41f3-b4e1-c92cce529cca,"San Francisco, Ca",2025-09-11,69,Engineering,Unknown,[]
-Monte Carlo,Strategic Sales Engineer East,https://jobs.ashbyhq.com/montecarlodata/c00e4520-2ffc-47a1-8548-f8d8859a36d1,"Boston, Massachusetts, United States",2025-05-20,183,Engineering,Unknown,[]
-Monte Carlo,Technical Account Manager,https://jobs.ashbyhq.com/montecarlodata/3f8074a7-3b4c-4659-ae2d-aea43604e124,"San Francisco, Ca",2025-10-15,35,Sales,Unknown,[]
-Monte Carlo,Technical Account Manager,https://jobs.ashbyhq.com/montecarlodata/e51770bc-6883-4662-8ae9-785bd87b8574,"London, United Kingdom",2025-10-15,35,Sales,Unknown,[]
+MongoDB,"Account Executive ( Bahasa, Thai or Vietnamese Speaker) Singapore",https://www.mongodb.com/careers/job/?gh_jid=7211619,Thai Or Vietnamese Speaker) Location Singapore Suitcase Full-Time Chevron-Right,,,Sales,Unknown,"[""AI"", ""R""]"
+MongoDB,"Account Executive, Acquisition location Hong Kong suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7154017,,,,Sales,Unknown,"[""R""]"
+MongoDB,"Account Executive, Enterprise (Egypt) location Dubai suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7383653,"Remote, Australia",,,Sales,Unknown,"[""EGYPT"", ""AI"", ""R""]"
+MongoDB,"Associate Account Executive, Strategic Accounts location Seoul suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7372303,"Remote, Australia",,,Sales,Unknown,"[""R""]"
+MongoDB,Commercial Growth,https://www.mongodb.com/careers/job/?gh_jid=6826191,Uki Market Location Dublin Suitcase Full-Time Chevron-Right,,,Marketing,Unknown,"[""R""]"
+MongoDB,Commercial Growth Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7276216,Native German Speaking Location Dublin Suitcase Full-Time Chevron-Right,,,Sales,Unknown,"[""R""]"
+MongoDB,Director,https://www.mongodb.com/careers/job/?gh_jid=7298154,"Brand & Creative Marketing Location Austin, New York City, San Francisco Suitcase Full-Time Chevron-Right",,,Other,Director+,"[""R""]"
+MongoDB,Director,https://www.mongodb.com/careers/job/?gh_jid=7301901,"Escalation Management Location Bengaluru, Gurugram Suitcase Full-Time Chevron-Right",,,Other,Director+,"[""R""]"
+MongoDB,Director,https://www.mongodb.com/careers/job/?gh_jid=7355907,,,,Other,Director+,"[""R""]"
+MongoDB,Director,https://www.mongodb.com/careers/job/?gh_jid=7380930,Engineering C2C Location Dublin Suitcase Full-Time Chevron-Right,,,Other,Director+,"[""R""]"
+MongoDB,"Director, IT New York City; San Francisco",https://www.mongodb.com/careers/job/?gh_jid=7103182,"It Location New York City, San Francisco Suitcase Full-Time Chevron-Right",,,Other,Director+,"[""R""]"
+MongoDB,EMEA PMO Manager Dublin,https://www.mongodb.com/careers/job/?gh_jid=6527524,Dublin Suitcase Full-Time Chevron-Right,,,Product,Unknown,"[""R""]"
+MongoDB,Engineering Manager,https://www.mongodb.com/careers/job/?gh_jid=7201364,,,,Engineering,Unknown,"[""R""]"
+MongoDB,Engineering Manager,https://www.mongodb.com/careers/job/?gh_jid=7229699,Query Location United States Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,"[""R""]"
+MongoDB,Engineering Manager,https://www.mongodb.com/careers/job/?gh_jid=7229701,"Query Location Toronto, Vancouver Suitcase Full-Time Chevron-Right",,,Engineering,Unknown,"[""R""]"
+MongoDB,"Engineering Manager, Stream Processing New York City; United States",https://www.mongodb.com/careers/job/?gh_jid=7336498,"Stream Processing Location New York City, United States Suitcase Full-Time Chevron-Right",,,Engineering,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=5607962,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=5615484,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6122476,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6275509,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6380607,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6603246,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6688075,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6740470,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6848268,Growth Location Frankfurt Suitcase Full-Time Chevron-Right,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6987968,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7027846,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7032023,Growth Location New York City Suitcase Full-Time Chevron-Right,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7211805,Acquisition (Thai Speaking) Location Singapore Suitcase Full-Time Chevron-Right,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7217805,Growth Location Zurich Suitcase Full-Time Chevron-Right,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7256796,Growth Location Paris Suitcase Full-Time Chevron-Right,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7257122,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7306003,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7362411,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7403891,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive Amsterdam,https://www.mongodb.com/careers/job/?gh_jid=7215596,Amsterdam Suitcase Full-Time Chevron-Right,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive Frankfurt,https://www.mongodb.com/careers/job/?gh_jid=7160353,Frankfurt Suitcase Full-Time Chevron-Right,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive London,https://www.mongodb.com/careers/job/?gh_jid=7026136,London Suitcase Full-Time Chevron-Right,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive London,https://www.mongodb.com/careers/job/?gh_jid=7219459,London Suitcase Full-Time Chevron-Right,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive London,https://www.mongodb.com/careers/job/?gh_jid=7227824,London Suitcase Full-Time Chevron-Right,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive Los Angeles,https://www.mongodb.com/careers/job/?gh_jid=6587328,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive Madrid,https://www.mongodb.com/careers/job/?gh_jid=7256756,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive Madrid,https://www.mongodb.com/careers/job/?gh_jid=7257330,,,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Executive location Tel Aviv suitcase Full-time chevron-right,https://www.mongodb.com/careers/job/?gh_jid=6640101,,,,Sales,Unknown,"[""R""]"
+MongoDB,"Enterprise Account Executive, Growth (Defence & MHA) location Gurugram suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7363143,"Remote, Australia",,,Sales,Unknown,"[""R""]"
+MongoDB,"Enterprise Account Executive, Growth Atlanta; Florida; North Carolina; South Carolina",https://www.mongodb.com/careers/job/?gh_jid=7031396,,,,Sales,Unknown,"[""R""]"
+MongoDB,"Enterprise Account Executive, Growth location Tel Aviv suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7326631,"Remote, Australia",,,Sales,Unknown,"[""R""]"
+MongoDB,Enterprise Account Manager,https://www.mongodb.com/careers/job/?gh_jid=6829771,"Oem Beijing, Shanghai, Shenzhen",,,Sales,Unknown,"[""R""]"
+MongoDB,Escalation Engineer Alberta; British Columbia; Manitoba; Nova Scotia; Ontario; Quebec; Toronto,https://www.mongodb.com/careers/job/?gh_jid=7209918,Toronto Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,"[""SCALA"", ""R""]"
+MongoDB,Escalation Engineer New York City; United States,https://www.mongodb.com/careers/job/?gh_jid=7209916,"New York City, United States Suitcase Full-Time Chevron-Right",,,Engineering,Unknown,"[""SCALA"", ""R""]"
+MongoDB,InfoSec Engineer II Dublin,https://www.mongodb.com/careers/job/?gh_jid=7248114,Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Mid,"[""R""]"
+MongoDB,Lead Engineer,https://www.mongodb.com/careers/job/?gh_jid=7195895,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Lead Engineer,https://www.mongodb.com/careers/job/?gh_jid=7201997,Server Programmability Location United States Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Lead Engineer,https://www.mongodb.com/careers/job/?gh_jid=7259791,Atlas Dedicated Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Lead Engineer, Atlas Clusters New York City",https://www.mongodb.com/careers/job/?gh_jid=7271659,Atlas Clusters Location New York City Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Lead Engineer, Identity and Access Management Toronto",https://www.mongodb.com/careers/job/?gh_jid=7069039,Identity And Access Management Location Toronto Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Lead Engineer, Online Archive Storage Systems New York City; San Francisco; Seattle",https://www.mongodb.com/careers/job/?gh_jid=7316445,"Online Archive Storage Systems Location New York City, San Francisco, Seattle Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,"[""HIVE"", ""R""]"
+MongoDB,"Lead Engineer, Server Programmability Alberta; British Columbia; Manitoba; Nova Scotia; Ontario; Quebec",https://www.mongodb.com/careers/job/?gh_jid=7201999,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Lead Software Engineer, Modernisation Platform location Gurugram suitcase Full-time chevron-right",https://www.mongodb.com/careers/job/?gh_jid=7310369,"Remote, Australia",,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Manager,https://www.mongodb.com/careers/job/?gh_jid=7250833,,,,Other,Unknown,"[""R""]"
+MongoDB,Manager of Crisis Management and IT Disaster Recovery United States,https://www.mongodb.com/careers/job/?gh_jid=7365604,United States Suitcase Full-Time Chevron-Right,,,Other,Unknown,"[""R""]"
+MongoDB,Market Intelligence Senior Consultant Dublin,https://www.mongodb.com/careers/job/?gh_jid=7344380,Dublin Suitcase Full-Time Chevron-Right,,,Other,Senior/Lead,"[""R""]"
+MongoDB,Marketing Operations Manager Dublin,https://www.mongodb.com/careers/job/?gh_jid=7346475,Dublin Suitcase Full-Time Chevron-Right,,,Marketing,Unknown,"[""R""]"
+MongoDB,Marketing Operations Specialist India,https://www.mongodb.com/careers/job/?gh_jid=7361598,India Suitcase Full-Time Chevron-Right,,,Marketing,Unknown,"[""R""]"
+MongoDB,MongoDB for Students Take advantage of student benefits,https://www.mongodb.com/students,,2023-01-08,1046,Other,Unknown,"[""GO"", ""R""]"
+MongoDB,Partner Marketing Manager,https://www.mongodb.com/careers/job/?gh_jid=7388978,Aws Location United States Suitcase Full-Time Chevron-Right,,,Marketing,Unknown,"[""R""]"
+MongoDB,Principal Cloud Sales Specialist Frankfurt,https://www.mongodb.com/careers/job/?gh_jid=6848317,Frankfurt Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,"[""R""]"
+MongoDB,Principal Cloud Sales Specialist Munich,https://www.mongodb.com/careers/job/?gh_jid=6848316,Munich Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,"[""R""]"
+MongoDB,Principal Cloud Sales Specialist location,https://www.mongodb.com/careers/job/?gh_jid=6848318,London Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,"[""R""]"
+MongoDB,"Principal Research Scientist, Database Systems New York City; Palo Alto",https://www.mongodb.com/careers/job/?gh_jid=6819978,"Database Systems Location New York City, Palo Alto Suitcase Full-Time Chevron-Right",,,Other,Senior/Lead,"[""R""]"
+MongoDB,Principal Sales Operations Analyst Dublin,https://www.mongodb.com/careers/job/?gh_jid=7397516,Dublin Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,"[""R""]"
+MongoDB,Public Sector Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6630142,,,,Sales,Unknown,"[""R""]"
+MongoDB,Public Sector Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6633264,Growth Location Amsterdam Suitcase Full-Time Chevron-Right,,,Sales,Unknown,"[""R""]"
+MongoDB,Public Sector Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6635587,Growth Location Germany Suitcase Full-Time Chevron-Right,,,Sales,Unknown,"[""R""]"
+MongoDB,Regional Director,https://www.mongodb.com/careers/job/?gh_jid=7096399,,,,Other,Director+,"[""R""]"
+MongoDB,Regional Director,https://www.mongodb.com/careers/job/?gh_jid=7231309,,,,Other,Director+,"[""R""]"
+MongoDB,Regional Director,https://www.mongodb.com/careers/job/?gh_jid=7255293,,,,Other,Director+,"[""R""]"
+MongoDB,Regional Director,https://www.mongodb.com/careers/job/?gh_jid=7360817,Enterprise Growth Location United States Suitcase Full-Time Chevron-Right,,,Other,Director+,"[""R""]"
+MongoDB,Regional Director Enterprise,https://www.mongodb.com/careers/job/?gh_jid=7259560,,,,Other,Director+,"[""R""]"
+MongoDB,Regional Director Enterprise,https://www.mongodb.com/careers/job/?gh_jid=7261528,Growth Location Singapore Suitcase Full-Time Chevron-Right,,,Other,Director+,"[""R""]"
+MongoDB,Research Engineer Palo Alto,https://www.mongodb.com/careers/job/?gh_jid=7275322,,,,Engineering,Unknown,"[""R""]"
+MongoDB,Sales Associate Gurugram,https://www.mongodb.com/careers/job/?gh_jid=7110155,,,,Sales,Unknown,"[""R""]"
+MongoDB,Sales Associate Gurugram,https://www.mongodb.com/careers/job/?gh_jid=7128878,,,,Sales,Unknown,"[""R""]"
+MongoDB,Sales Development Representative Beijing; Shanghai; Shenzhen,https://www.mongodb.com/careers/job/?gh_jid=7380221,,,,Product,Unknown,"[""AI"", ""R""]"
+MongoDB,Sales Development Representative Dublin,https://www.mongodb.com/careers/job/?gh_jid=6753948,Dublin Suitcase Full-Time Chevron-Right,,,Product,Unknown,"[""R""]"
+MongoDB,Sales Development Representative Gurugram,https://www.mongodb.com/careers/job/?gh_jid=7318036,,,,Product,Unknown,"[""R""]"
+MongoDB,Sales Development Representative Hong Kong,https://www.mongodb.com/careers/job/?gh_jid=7318091,,,,Product,Unknown,"[""R""]"
+MongoDB,Sales Development Representative Seoul,https://www.mongodb.com/careers/job/?gh_jid=7317788,,,,Product,Unknown,"[""R""]"
+MongoDB,"Senior Business Analyst, Technical Services New York City",https://www.mongodb.com/careers/job/?gh_jid=6841436,Technical Services Location New York City Suitcase Full-Time Chevron-Right,,,Other,Senior/Lead,"[""R""]"
+MongoDB,Senior Developer Advocate Gurugram,https://www.mongodb.com/careers/job/?gh_jid=7242158,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Senior Developer Advocate Ireland,https://www.mongodb.com/careers/job/?gh_jid=7241758,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Senior Engineer,https://www.mongodb.com/careers/job/?gh_jid=6484467,Storage Layer Services Location Canada Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Senior Engineer,https://www.mongodb.com/careers/job/?gh_jid=7257748,"Coupa & P2P Processes Location Bengaluru, Gurugram Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Senior Engineer, Storage Layer Services United States",https://www.mongodb.com/careers/job/?gh_jid=6477783,Storage Layer Services Location United States Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Senior Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6582052,Growth Location Stockholm Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,"[""R""]"
+MongoDB,Senior Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=6955099,,,,Sales,Senior/Lead,"[""R""]"
+MongoDB,Senior Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7165267,Growth Location Amsterdam Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,"[""R""]"
+MongoDB,Senior Enterprise Account Executive,https://www.mongodb.com/careers/job/?gh_jid=7177654,Growth Location London Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,"[""R""]"
+MongoDB,Senior Enterprise Account Executive London,https://www.mongodb.com/careers/job/?gh_jid=7227836,London Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,"[""R""]"
+MongoDB,Senior Enterprise Account Executive Toronto,https://www.mongodb.com/careers/job/?gh_jid=7141759,Toronto Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,"[""R""]"
+MongoDB,Senior Enterprise Account Executive location,https://www.mongodb.com/careers/job/?gh_jid=7228531,London Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,"[""R""]"
+MongoDB,Senior Industry Consultant,https://www.mongodb.com/careers/job/?gh_jid=7388643,,,,Other,Senior/Lead,"[""R""]"
+MongoDB,Senior Industry Consultant location,https://www.mongodb.com/careers/job/?gh_jid=7216777,"Dublin, Ireland Suitcase Full-Time Chevron-Right",,,Other,Senior/Lead,"[""R""]"
+MongoDB,Senior Java Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7194687,"Database Location Toronto, Vancouver Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,"[""JAVA"", ""R""]"
+MongoDB,Senior Manager,https://www.mongodb.com/careers/job/?gh_jid=7349101,Sales Operations Location Singapore Suitcase Full-Time Chevron-Right,,,Other,Senior/Lead,"[""R""]"
+MongoDB,Senior Partner Marketing Manager Dublin,https://www.mongodb.com/careers/job/?gh_jid=7261916,Dublin Suitcase Full-Time Chevron-Right,,,Marketing,Senior/Lead,"[""R""]"
+MongoDB,Senior Regional Marketing Manager Chicago,https://www.mongodb.com/careers/job/?gh_jid=7267154,,,,Marketing,Senior/Lead,"[""GO"", ""R""]"
+MongoDB,Senior Research Scientist Palo Alto,https://www.mongodb.com/careers/job/?gh_jid=7365646,,,,Other,Senior/Lead,"[""R""]"
+MongoDB,Senior Sales Operations Analyst Dublin,https://www.mongodb.com/careers/job/?gh_jid=7312488,Dublin Suitcase Full-Time Chevron-Right,,,Sales,Senior/Lead,"[""R""]"
+MongoDB,Senior Software Development Engineer Dublin,https://www.mongodb.com/careers/job/?gh_jid=7243860,Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6683531,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6720794,Cloud Payments Location United States Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6866771,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7111375,Observability Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7156016,Atlas Clusters Automation Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7283432,Frontend Platform Location New York City Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7345260,Search Systems Location Toronto Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7346405,Developer Tools Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7392427,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Senior Software Engineer Dublin,https://www.mongodb.com/careers/job/?gh_jid=7391511,Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Senior Software Engineer, Atlas Search Query San Francisco",https://www.mongodb.com/careers/job/?gh_jid=7263533,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Senior Software Engineer, Deployments Boston; New York City; Pittsburgh; United States; Washington DC",https://www.mongodb.com/careers/job/?gh_jid=7364854,"Deployments Location Boston, New York City, Pittsburgh, United States, Washington Dc Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Senior Software Engineer, Frontend and AI New York City",https://www.mongodb.com/careers/job/?gh_jid=7304325,Frontend And Ai Location New York City Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""AI"", ""R""]"
+MongoDB,"Senior Software Engineer, Identity and Access Management Toronto",https://www.mongodb.com/careers/job/?gh_jid=7059646,Identity And Access Management Location Toronto Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Senior Software Engineer, MongoDB Server Clusters and Interfaces Toronto",https://www.mongodb.com/careers/job/?gh_jid=6749360,Mongodb Server Clusters And Interfaces Location Toronto Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""GO"", ""R""]"
+MongoDB,"Senior Software Engineer, MongoDB Server Clusters and Interfaces United States",https://www.mongodb.com/careers/job/?gh_jid=6749138,Mongodb Server Clusters And Interfaces Location United States Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""GO"", ""R""]"
+MongoDB,Senior Staff Engineer,https://www.mongodb.com/careers/job/?gh_jid=6394590,Cluster Scalability Location United States Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Senior Staff Engineer, Cluster Scalability Montreal; Quebec; Toronto; Vancouver",https://www.mongodb.com/careers/job/?gh_jid=6394601,"Cluster Scalability Location Montreal, Quebec, Toronto, Vancouver Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,"[""SCALA"", ""R""]"
+MongoDB,"Senior Staff Engineer, Server Networking & Observability New York City",https://www.mongodb.com/careers/job/?gh_jid=6659380,Server Networking & Observability Location New York City Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Senior Staff Engineer, Server Networking & Observability Palo Alto",https://www.mongodb.com/careers/job/?gh_jid=6661887,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Senior Staff Engineer, Server Networking & Observability Seattle",https://www.mongodb.com/careers/job/?gh_jid=6661893,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Senior Staff Engineer, Server Networking & Observability Toronto",https://www.mongodb.com/careers/job/?gh_jid=6659382,Server Networking & Observability Location Toronto Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Senior Staff Engineer, Server Networking & Observability United States",https://www.mongodb.com/careers/job/?gh_jid=6713492,Server Networking & Observability Location United States Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Senior Staff Technical Program Manager Dublin,https://www.mongodb.com/careers/job/?gh_jid=7340968,Dublin Suitcase Full-Time Chevron-Right,,,Other,Senior/Lead,"[""R""]"
+MongoDB,Senior Technical Program Manager,https://www.mongodb.com/careers/job/?gh_jid=7287421,Hr Tech Location United States Suitcase Full-Time Chevron-Right,,,Other,Senior/Lead,"[""R""]"
+MongoDB,Senior Technical Services Engineer,https://www.mongodb.com/careers/job/?gh_jid=7368213,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Site Reliability Engineer,https://www.mongodb.com/careers/job/?gh_jid=6987333,"Fabric Location Austin, Boston, Los Angeles, New York City, Raleigh, San Francisco, United States Suitcase Full-Time Chevron-Right",,,Engineering,Unknown,"[""R""]"
+MongoDB,Site Reliability Engineer (Senior or Staff),https://www.mongodb.com/careers/job/?gh_jid=7192648,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Site Reliability Engineer (Senior or Staff), Atlas Austin; Boston; Chicago; New York City; Pittsburgh; United States",https://www.mongodb.com/careers/job/?gh_jid=6984809,"Atlas Location Austin, Boston, Chicago, New York City, Pittsburgh, United States Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,"[""GO"", ""R""]"
+MongoDB,"Site Reliability Engineer (Senior or Staff), Deployments Boston; New York City; Pittsburgh; United States; Washington DC",https://www.mongodb.com/careers/job/?gh_jid=6932221,"Deployments Location Boston, New York City, Pittsburgh, United States, Washington Dc Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Site Reliability Engineer (Senior or Staff), Fabric Alberta; British Columbia; Manitoba; Ontario; Quebec",https://www.mongodb.com/careers/job/?gh_jid=6987335,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Site Reliability Engineer (Senior or Staff), Observability Austin; Boston; Chicago; New York City; Pittsburgh; United States; Washington DC",https://www.mongodb.com/careers/job/?gh_jid=6711349,"Observability Location Austin, Boston, Chicago, New York City, Pittsburgh, United States, Washington Dc Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,"[""GO"", ""R""]"
+MongoDB,Site Reliability Engineer 3 New York City,https://www.mongodb.com/careers/job/?gh_jid=7145126,New York City Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,"[""R""]"
+MongoDB,Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6677731,Catalog And Routing Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,"[""R""]"
+MongoDB,Software Engineer 3,https://www.mongodb.com/careers/job/?gh_jid=7137848,Atlas Dedicated Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,"[""R""]"
+MongoDB,Software Engineer 3,https://www.mongodb.com/careers/job/?gh_jid=7156025,Atlas Clusters Automation Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,"[""R""]"
+MongoDB,Software Engineer 3,https://www.mongodb.com/careers/job/?gh_jid=7193367,Query Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,"[""R""]"
+MongoDB,Software Engineer 3,https://www.mongodb.com/careers/job/?gh_jid=7253772,,,,Engineering,Unknown,"[""R""]"
+MongoDB,Software Engineer 3,https://www.mongodb.com/careers/job/?gh_jid=7386438,Atlas Dedicated Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,"[""R""]"
+MongoDB,Software Engineer 3,https://www.mongodb.com/careers/job/?gh_jid=7397285,,,,Engineering,Unknown,"[""R""]"
+MongoDB,Software Engineer 3 Gurugram,https://www.mongodb.com/careers/job/?gh_jid=6815693,,,,Engineering,Unknown,"[""R""]"
+MongoDB,"Software Engineer 3, Identity and Access Management New York City",https://www.mongodb.com/careers/job/?gh_jid=7373899,Identity And Access Management Location New York City Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,"[""R""]"
+MongoDB,"Software Engineer 3, Search Systems Replication & Routing San Francisco",https://www.mongodb.com/careers/job/?gh_jid=7235322,,,,Engineering,Unknown,"[""R""]"
+MongoDB,"Software Engineer 3, Search Web Platform Alberta; British Columbia; Ontario; Quebec; Toronto; Vancouver",https://www.mongodb.com/careers/job/?gh_jid=7355902,"Search Web Platform Location Alberta, British Columbia, Ontario, Quebec, Toronto, Vancouver Suitcase Full-Time Chevron-Right",,,Engineering,Unknown,"[""R""]"
+MongoDB,"Software Engineer, Diagnostics San Francisco; United States",https://www.mongodb.com/careers/job/?gh_jid=7389031,"Diagnostics Location San Francisco, United States Suitcase Full-Time Chevron-Right",,,Engineering,Unknown,"[""R""]"
+MongoDB,Staff Engineer,https://www.mongodb.com/careers/job/?gh_jid=7079365,Apix Location Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Staff Engineer,https://www.mongodb.com/careers/job/?gh_jid=7094786,Search Systems Location Toronto Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Staff NetSuite Engineer Palo Alto,https://www.mongodb.com/careers/job/?gh_jid=7274598,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Staff Research Scientist Palo Alto; United States,https://www.mongodb.com/careers/job/?gh_jid=7280132,United States Suitcase Full-Time Chevron-Right,,,Other,Senior/Lead,"[""R""]"
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7092947,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7097165,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7100825,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7100842,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7100856,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7100859,Query Execution Location Germany Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7100860,Query Execution Location France Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7364866,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Staff Software Engineer, Atlas Growth New York City",https://www.mongodb.com/careers/job/?gh_jid=6658398,Atlas Growth Location New York City Suitcase Full-Time Chevron-Right,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Staff Software Engineer, Networking & Observability Alberta; British Columbia; Manitoba; Nova Scotia; Ontario; Quebec",https://www.mongodb.com/careers/job/?gh_jid=7264738,,,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Staff Software Engineer, Networking & Observability Seattle; United States",https://www.mongodb.com/careers/job/?gh_jid=7264736,"Networking & Observability Location Seattle, United States Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Staff Software Engineer, Query Calgary; Edmonton; Montreal; Ontario; Toronto; Vancouver",https://www.mongodb.com/careers/job/?gh_jid=7221904,"Query Location Calgary, Edmonton, Montreal, Ontario, Toronto, Vancouver Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,"Staff Software Engineer, Query New York City; United States",https://www.mongodb.com/careers/job/?gh_jid=7221902,"Query Location New York City, United States Suitcase Full-Time Chevron-Right",,,Engineering,Senior/Lead,"[""R""]"
+MongoDB,Staff Technical Program Manager Dublin,https://www.mongodb.com/careers/job/?gh_jid=6765245,Dublin Suitcase Full-Time Chevron-Right,,,Other,Senior/Lead,"[""R""]"
+MongoDB,Staff Technical Program Manager Dublin,https://www.mongodb.com/careers/job/?gh_jid=7391474,Dublin Suitcase Full-Time Chevron-Right,,,Other,Senior/Lead,"[""R""]"
+MongoDB,Staff Technical Program Manager New York City; San Francisco; United States,https://www.mongodb.com/careers/job/?gh_jid=6771131,"New York City, San Francisco, United States Suitcase Full-Time Chevron-Right",,,Other,Senior/Lead,"[""R""]"
+MongoDB,Technical Services Engineer Dublin,https://www.mongodb.com/careers/job/?gh_jid=7077137,Dublin Suitcase Full-Time Chevron-Right,,,Engineering,Unknown,"[""R""]"
+MongoDB,Turkish Speaking Enterprise Account Executive location Dubai suitcase Full-time chevron-right,https://www.mongodb.com/careers/job/?gh_jid=7113254,"Remote, Australia",,,Sales,Unknown,"[""AI"", ""R""]"
+Monte Carlo,Data + AI Trust You Can Scale,http://montecarlodata.com,,2025-10-27,23,Other,Unknown,"[""AI"", ""RUST"", ""R""]"
+Monte Carlo,Director Strategic Sales,https://jobs.ashbyhq.com/montecarlodata/57d1f0c4-1bda-43b1-831c-d89b8da26d4e,New York,2025-09-24,56,Sales,Director+,"[""R""]"
+Monte Carlo,Enterprise Account Executive,https://jobs.ashbyhq.com/montecarlodata/189915df-b1bf-4a05-a808-6221efa704f0,"London, United Kingdom",2025-08-14,97,Sales,Unknown,"[""R""]"
+Monte Carlo,Enterprise Sales Development Representative,https://jobs.ashbyhq.com/montecarlodata/20df6344-4bac-48cb-8538-b51775b99455,"London, United Kingdom",2025-10-15,35,Product,Unknown,"[""R""]"
+Monte Carlo,Enterprise Sales Development Representative,https://jobs.ashbyhq.com/montecarlodata/6ab744ab-41fe-4605-a33c-93ec69437256,"San Francisco, Ca",2025-10-14,36,Product,Unknown,"[""R""]"
+Monte Carlo,Strategic Account Executive,https://jobs.ashbyhq.com/montecarlodata/4a57ba0f-3be5-4138-b863-f8c7a575c3e0,"San Francisco, Ca",2025-09-05,75,Sales,Unknown,"[""R""]"
+Monte Carlo,Strategic Account Executive,https://jobs.ashbyhq.com/montecarlodata/796226cd-6ca7-4696-a3e2-a9fc8c1a64aa,New York,2025-09-05,75,Sales,Unknown,"[""R""]"
+Monte Carlo,Strategic Sales Development Representative,https://jobs.ashbyhq.com/montecarlodata/130934c6-a06f-4155-b4cb-12e99a1835de,United States,2025-11-04,15,Product,Unknown,"[""R""]"
+Monte Carlo,Strategic Sales Development Representative,https://jobs.ashbyhq.com/montecarlodata/b9c9fdbc-cf70-4d40-9bb9-34a36811f3be,"London, United Kingdom",2025-10-14,36,Product,Unknown,"[""R""]"
+Monte Carlo,Strategic Sales Engineer,https://jobs.ashbyhq.com/montecarlodata/6c437531-0259-41f3-b4e1-c92cce529cca,"San Francisco, Ca",2025-09-11,69,Engineering,Unknown,"[""R""]"
+Monte Carlo,Strategic Sales Engineer East,https://jobs.ashbyhq.com/montecarlodata/c00e4520-2ffc-47a1-8548-f8d8859a36d1,"Boston, Massachusetts, United States",2025-05-20,183,Engineering,Unknown,"[""R""]"
+Monte Carlo,Technical Account Manager,https://jobs.ashbyhq.com/montecarlodata/3f8074a7-3b4c-4659-ae2d-aea43604e124,"San Francisco, Ca",2025-10-15,35,Sales,Unknown,"[""R""]"
+Monte Carlo,Technical Account Manager,https://jobs.ashbyhq.com/montecarlodata/e51770bc-6883-4662-8ae9-785bd87b8574,"London, United Kingdom",2025-10-15,35,Sales,Unknown,"[""R""]"
+Monte Carlo,Technical Engineer,https://jobs.ashbyhq.com/montecarlodata/077735fe-e026-401d-99f9-d53b08123dc3,United States,2025-11-03,16,Engineering,Unknown,"[""R""]"
 OneTrust,Account Executive,https://www.onetrust.com/careers/account-executive-enterprise-6348012/,New York Learn More & Apply,2025-11-17,2,Sales,Unknown,[]
 OneTrust,Account Executive,https://www.onetrust.com/careers/account-executive-enterprise-7307034/,New York Learn More & Apply,2025-11-17,2,Sales,Unknown,[]
 OneTrust,Account Executive,https://www.onetrust.com/careers/account-executive-mid-market-7085319/,"Atlanta, Us",2025-11-17,2,Sales,Unknown,[]
-OneTrust,Account Executive Enterprise Denver,https://www.onetrust.com/careers/account-executive-enterprise-denver-co-7120834/,"Atlanta, Us",2025-11-17,2,Sales,Unknown,[]
-OneTrust,Deliver AI-ready data and increase the effectiveness of your data governance programs,https://www.onetrust.com/content/onetrust/us/en/solutions/data-use-governance,"Atlanta, Us",2025-11-17,2,Other,Unknown,"[""ai"", ""go""]"
-OneTrust,Enterprise Account Executive,https://www.onetrust.com/careers/enterprise-account-executive-east-6907692/,New York Learn More & Apply,2025-11-17,2,Sales,Unknown,[]
-OneTrust,General Data Protection Regulation,https://www.onetrust.com/glossary/gdpr/,Gdpr,2025-11-17,2,Other,Unknown,[]
-OneTrust,Regional Sales Director,https://www.onetrust.com/careers/regional-sales-director-south-mid-atlantic-region-7281901/,United States,2025-11-17,2,Sales,Director+,[]
+OneTrust,Account Executive Enterprise Denver,https://www.onetrust.com/careers/account-executive-enterprise-denver-co-7120834/,"Atlanta, Us",2025-11-17,2,Sales,Unknown,"[""R""]"
+OneTrust,Enterprise Account Executive,https://www.onetrust.com/careers/enterprise-account-executive-east-6907692/,New York Learn More & Apply,2025-11-17,2,Sales,Unknown,"[""R""]"
+OneTrust,General Data Protection Regulation,https://www.onetrust.com/glossary/gdpr/,Gdpr,2025-11-17,2,Other,Unknown,"[""R""]"
+OneTrust,Regional Sales Director,https://www.onetrust.com/careers/regional-sales-director-south-mid-atlantic-region-7281901/,United States,2025-11-17,2,Sales,Director+,"[""R""]"
 OneTrust,Sales Development,https://www.onetrust.com/careers/sales-development-manager-7196129/,"Atlanta, Us",2025-11-17,2,Product,Unknown,[]
-Panoply (Sqream),Connect and analyze ALL of your data,https://panoply.io/,,,,Other,Unknown,[]
-Panoply (Sqream),Office Manager,https://sqream.com/careers/co/hr/72.B4D/office-manager/all,"Ramat Gan, Tel Aviv District, {'@Type': 'Country', 'Name': 'Il'}",2025-11-11,8,Other,Unknown,[]
-Panoply (Sqream),Security Policy,https://sqream.com/security-policy/,,2025-01-21,302,Other,Unknown,[]
-Panoply (Sqream),Transforming Financial Data Challenges into Strategic Opportunities with SQream,https://sqream.com/sqream-for-finance/,,2025-09-30,50,Other,Unknown,[]
-Pentaho,Data Governance & Regulatory Compliance,https://www.hitachivantara.com/en-us/solutions/data-governance,,2024-03-06,623,Other,Unknown,"[""go""]"
-Pentaho,Data Management,https://www.hitachivantara.com/en-us/products/data-management,,2024-03-06,623,Other,Unknown,[]
-Pentaho,Data Protection,https://www.hitachivantara.com/en-us/solutions/data-protection-cyber-resiliency/backup-recovery,,2024-10-17,398,Other,Unknown,[]
-Pentaho,Data Protection and Cyber Resiliency,https://www.hitachivantara.com/en-us/solutions/data-protection-cyber-resiliency,,2024-10-17,398,Other,Unknown,[]
-Pentaho,Hitachi EverFlex Infrastructure as a Service,https://www.hitachivantara.com/en-us/services/infrastructure-as-a-service,Hybrid Cloud Services,2024-03-06,623,Engineering,Unknown,[]
-Pentaho,Hitachi Vantara Security Advisories,https://www.hitachivantara.com/en-us/security,,2024-03-06,623,Other,Unknown,[]
-Precisely,Data Self Service,https://www.precisely.com/solution/data-self-service/,,2025-10-28,22,Other,Unknown,[]
-Precisely,Precisely Data Experience,https://www.precisely.com/product/precisely-data-experience/precisely-data-experience/,,2025-08-18,93,Other,Unknown,[]
-Precisely,Precisely Data Integrity Suite,https://www.precisely.com/product/data-integrity/precisely-data-integrity-suite/,Menu,2025-11-18,1,Other,Unknown,[]
-Precisely,Precisely Data Strategy Consulting,https://www.precisely.com/solution/data-strategy-consulting,,2025-10-20,30,Other,Unknown,[]
-SnapLogic,Bring Automation to Finance and Accounting,https://www.snaplogic.com/use-cases/finance-accounting,,2025-09-30,50,Sales,Unknown,[]
-SnapLogic,Bring Automation to Marketing,https://www.snaplogic.com/use-cases/marketing,,2025-09-30,50,Marketing,Unknown,[]
-SnapLogic,Bring Automation to Sales Processes,https://www.snaplogic.com/use-cases/sales,,2025-09-30,50,Sales,Unknown,[]
-SnapLogic,Data Integration and Management,https://www.snaplogic.com/products/data-automation-integration,,2025-10-27,23,Other,Unknown,[]
-SnapLogic,FP&A Manager GTM,https://www.snaplogic.com/company/careers/job-listings/job?jobid=ab3026d0-3dcc-49d6-b57b-12eef37c7ee3,"San Mateo, Ca, Us",2025-10-31,19,Other,Unknown,[]
-SnapLogic,Get more from your cloud data warehouse,https://www.snaplogic.com/use-cases/cloud-data-warehouse,,2025-09-25,55,Other,Unknown,[]
-SnapLogic,Head of OEM Sales,https://www.snaplogic.com/company/careers/job-listings/job?jobid=04cc9762-09d3-4b79-b06a-d3c1fb79652d,United States,2025-11-12,7,Sales,Director+,[]
-SnapLogic,Program Manager,https://www.snaplogic.com/company/careers/job-listings/job?jobid=809645e9-88b2-4ae9-a17e-394b535247da,United States,2025-11-06,13,Other,Unknown,[]
-SnapLogic,Security Standards,https://www.snaplogic.com/security-standards,,2025-04-02,231,Other,Unknown,[]
-SnapLogic,Senior Manager,https://www.snaplogic.com/company/careers/job-listings/job?jobid=fc01ea4a-4a3b-4cf4-bc1b-cb67b7a9e6e5,"San Mateo, Ca, Us",2025-10-23,27,Other,Senior/Lead,[]
-SnapLogic,SnapLogic Special Edition: Enterprise Data Orchestration For Dummies,https://www.snaplogic.com/resources/ebooks/enterprise-data-orchestration-for-dummies,,2025-04-22,211,Other,Unknown,[]
-SnapLogic,What Is Data Integration? The Ultimate,https://www.snaplogic.com/blog/the-ultimate-guide-to-data-integration,,2024-04-29,569,Other,Unknown,[]
+Panoply (Sqream),Connect and analyze ALL of your data,https://panoply.io/,,,,Other,Unknown,"[""R""]"
+Panoply (Sqream),Office Manager,https://sqream.com/careers/co/hr/72.B4D/office-manager/all,"Ramat Gan, Tel Aviv District, {'@Type': 'Country', 'Name': 'Il'}",2025-11-11,8,Other,Unknown,"[""R""]"
+Precisely,Data,https://www.precisely.com/data-guide/,,2025-07-08,134,Other,Unknown,[]
+Precisely,Data Self Service,https://www.precisely.com/solution/data-self-service/,,2025-10-28,22,Other,Unknown,"[""R""]"
+Precisely,PRECISELY Accelerate success with trusted data and expertise,https://www.precisely.com/support/,,2025-10-15,35,Other,Unknown,"[""RUST"", ""R""]"
+Precisely,Precisely Data Strategy Consulting,https://www.precisely.com/solution/data-strategy-consulting,,2025-10-20,30,Other,Unknown,"[""R""]"
+SnapLogic,Bring Automation to Finance and Accounting,https://www.snaplogic.com/use-cases/finance-accounting,,2025-09-30,50,Sales,Unknown,"[""R""]"
+SnapLogic,Bring Automation to Sales Processes,https://www.snaplogic.com/use-cases/sales,,2025-09-30,50,Sales,Unknown,"[""R""]"
+SnapLogic,Get more from your cloud data warehouse,https://www.snaplogic.com/use-cases/cloud-data-warehouse,,2025-09-25,55,Other,Unknown,"[""R""]"
 Syniti,Associate Account Executive,https://careers.syniti.com/job/Remote-Associate-Account-Executive/1334799200/,"Location Remote, Us",,,Sales,Unknown,[]
 Syniti,Client Account Executive,https://careers.syniti.com/job/Farnborough-Client-Account-Executive/1173973000/,"Location Farnborough, Gb",,,Sales,Unknown,[]
 Syniti,Consultant,https://careers.syniti.com/job/Remote-Consultant-MDG/1241201600/,Mdg,,,Other,Unknown,[]
-Syniti,Engineer II,https://careers.syniti.com/job/Remote-Engineer-II%2C-Software-Remo/1307445100/,Software,,,Engineering,Mid,[]
+Syniti,Engineer II,https://careers.syniti.com/job/Remote-Engineer-II%2C-Software-Remo/1307445100/,Software,,,Engineering,Mid,"[""R""]"
 Syniti,Global Lead,https://careers.syniti.com/job/Remote-Global-Lead%2C-Sales-Operations/1335162400/,Sales Operations,,,Other,Senior/Lead,[]
 Syniti,Lead Consultant,https://careers.syniti.com/job/Remote-Lead-Consultant-MDG/1226454800/,Mdg,,,Other,Senior/Lead,[]
-Syniti,Manager,https://careers.syniti.com/job/Remote-Manager%2C-Network-Information-Security/1318079800/,Network Information Security,,,Other,Unknown,[]
-Syniti,Manager,https://careers.syniti.com/job/Remote-Manager%2C-Technical-Program/1325932800/,Technical Program,,,Other,Unknown,[]
-Syniti,Manager I,https://careers.syniti.com/job/Remote-Manager-I%2C-Software-Engineering/1319146900/,Software Engineering,,,Other,Unknown,[]
+Syniti,Manager,https://careers.syniti.com/job/Remote-Manager%2C-Technical-Program/1325932800/,Technical Program,,,Other,Unknown,"[""R""]"
+Syniti,Manager I,https://careers.syniti.com/job/Remote-Manager-I%2C-Software-Engineering/1319146900/,Software Engineering,,,Other,Unknown,"[""R""]"
 Syniti,Managing consultant,https://careers.syniti.com/job/Remote-Managing-consultant-Data-Migration/1205657600/,Data Migration,,,Other,Unknown,[]
-Syniti,Principal Engineer,https://careers.syniti.com/job/Remote-Principal-Engineer%2C-Infrastructure/1318080500/,Infrastructure,,,Engineering,Senior/Lead,[]
-Syniti,Principal Engineer,https://careers.syniti.com/job/Remote-Principal-Engineer%2C-Infrastructure/1319018100/,Infrastructure,,,Engineering,Senior/Lead,[]
-Syniti,Principal SRE,https://careers.syniti.com/job/Remote-Principal-SRE/1318507600/,"Location Remote, Us",,,Engineering,Senior/Lead,[]
-Syniti,Principal SRE,https://careers.syniti.com/job/Remote-Principal-SRE/1319018600/,"Location Remote, Gb",,,Engineering,Senior/Lead,[]
-Syniti,Principal Software Engineer,https://careers.syniti.com/job/Hyderabad-Principal-Software-Engineer/1318071400/,"Location Hyderabad, In",,,Engineering,Senior/Lead,[]
-Syniti,QA Automation Engineer,https://careers.syniti.com/job/Hyderabad-QA-Automation-Engineer/1319146000/,"Location Hyderabad, In",,,Engineering,Unknown,[]
-Syniti,Senior Manager,https://careers.syniti.com/job/Remote-Senior-Manager%2C-Site-Reliability-Engineering/1318182400/,Site Reliability Engineering,,,Other,Senior/Lead,[]
-Syniti,Solution Architect,https://careers.syniti.com/job/Remote-Solution-Architect-MDG/1226454700/,Mdg,,,Other,Senior/Lead,[]
-Syniti,Sr. Engineer,https://careers.syniti.com/job/Remote-Sr_-Engineer%2C-Cloud-Operations-Infrastructure/1318080300/,Cloud Operations Infrastructure,,,Engineering,Senior/Lead,[]
-Syniti,Sr. Engineer,https://careers.syniti.com/job/Remote-Sr_-Engineer%2C-DevOps/1318081200/,Devops,,,Engineering,Senior/Lead,[]
-Syniti,Sr. Engineer,https://careers.syniti.com/job/Remote-Sr_-Engineer%2C-Site-Reliability-NB/1318079900/,Site Reliability,,,Engineering,Senior/Lead,[]
-Syniti,Sr. Engineer,https://careers.syniti.com/job/Remote-Sr_-Engineer%2C-Site-Reliability/1318080200/,Site Reliability,,,Engineering,Senior/Lead,[]
-Syniti,Sr. Engineer,https://careers.syniti.com/job/Remote-Sr_-Engineer%2C-Software/1318180200/,Software,,,Engineering,Senior/Lead,[]
-Syniti,Sr. Engineer,https://careers.syniti.com/job/Remote-Sr_-Engineer%2C-Software/1332858300/,Software,,,Engineering,Senior/Lead,[]
-Syniti,Sr. Manager,https://careers.syniti.com/job/Remote-Sr_-Manager%2C-SRE/1318081400/,Sre,,,Other,Senior/Lead,[]
-Syniti,Sr. Manager Engineering,https://careers.syniti.com/job/Remote-Sr_-Manager-Engineering/1327456400/,"Location Remote, In",,,Engineering,Senior/Lead,[]
-Teradata,Principal Technical Program Manager,https://careers.teradata.com/jobs/219575/principal-technical-program-manager?j_idx=9,"San Diego, California, United States",2025-11-14,5,Other,Senior/Lead,[]
-Teradata,Senior Full Stack Engineer AI Platform,https://careers.teradata.com/jobs/219568/senior-full-stack-engineer-ai-platform?j_idx=8,"Hyderabad, Telangana, India",2025-11-17,2,Engineering,Senior/Lead,"[""ai""]"
-Teradata,Senior Fullstack Engineer AI Platform,https://careers.teradata.com/jobs/219566/senior-fullstack-engineer-ai-platform?j_idx=1,"Hyderabad, Telangana, India",2025-11-18,1,Engineering,Senior/Lead,"[""ai""]"
-Teradata,"Senior Manager, UI/UX and Full Stack Engineering AI Platforms",https://careers.teradata.com/jobs/219578/senior-manager-uiux-and-full-stack-engineering-ai-platforms?j_idx=0,"San Diego, California, United States",2025-11-18,1,Engineering,Senior/Lead,"[""ai""]"
-Teradata,Senior Software Engineer,https://careers.teradata.com/jobs/219579/senior-software-engineer-automation?j_idx=6,"Hyderabad, Telangana, India",2025-11-17,2,Engineering,Senior/Lead,[]
-Teradata,Service Experience Manager,https://careers.teradata.com/jobs/219587/service-experience-manager?j_idx=5,"Prague, Czechia",2025-11-17,2,Other,Unknown,[]
-Teradata,Software Engineer,https://careers.teradata.com/jobs/219572/software-engineer?j_idx=7,"Hyderabad, Telangana, India",2025-11-17,2,Engineering,Unknown,[]
-Teradata,Staff Full Stack Engineer AI Platform,https://careers.teradata.com/jobs/219569/staff-full-stack-engineer-ai-platform?j_idx=2,"Hyderabad, Telangana, India",2025-11-18,1,Engineering,Senior/Lead,"[""ai""]"
-Vertica,"Lorem Ipsum IT & Cloud Operations Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book",https://careers.opentext.com/us/en/c/it-cloud-operations-jobs,,2025-10-22,28,Other,Unknown,[]
-Vertica,"Lorem Ipsum Marketing & Communications Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book",https://careers.opentext.com/us/en/c/marketing-communications-jobs,"Virtual, Usa",2025-11-13,6,Marketing,Unknown,[]
-Vertica,"Lorem Ipsum Sales Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book",https://careers.opentext.com/us/en/c/sales-jobs,"Virtual, Usa",2025-10-16,34,Sales,Unknown,[]
-Yellowbrick,Come Shape the Future of Data Management,https://yellowbrick.com/careers/,,2024-10-04,411,Other,Unknown,[]
-Yellowbrick,Come Shape the Future of Data Management,https://yellowbrick.com/careers/#content,,2024-10-04,411,Other,Unknown,[]
-Yellowbrick,Come Shape the Future of Data Management,https://yellowbrick.com/careers/#elementor-action%3Aaction%3Dpopup%3Aopen%26settings%3DeyJpZCI6IjYwNDYiLCJ0b2dnbGUiOmZhbHNlfQ%3D%3D,,2024-10-04,411,Other,Unknown,[]
-Yellowbrick,Data Residency,https://yellowbrick.com/product/solutions/data-residency/,,2025-02-19,273,Other,Unknown,[]
-Yellowbrick,Enterprise Data Warehouse,https://yellowbrick.com/product/solutions/enterprise-data-warehouse/,,2025-02-19,273,Other,Unknown,[]
-Yellowbrick,sales@yellowbrick.com,mailto:sales@yellowbrick.com,,,,Sales,Unknown,[]
+Syniti,Principal Engineer,https://careers.syniti.com/job/Remote-Principal-Engineer%2C-Infrastructure/1318080500/,Infrastructure,,,Engineering,Senior/Lead,"[""R""]"
+Syniti,Principal Engineer,https://careers.syniti.com/job/Remote-Principal-Engineer%2C-Infrastructure/1319018100/,Infrastructure,,,Engineering,Senior/Lead,"[""R""]"
+Syniti,Principal SRE,https://careers.syniti.com/job/Remote-Principal-SRE/1318507600/,"Location Remote, Us",,,Engineering,Senior/Lead,"[""R""]"
+Syniti,Principal SRE,https://careers.syniti.com/job/Remote-Principal-SRE/1319018600/,"Location Remote, Gb",,,Engineering,Senior/Lead,"[""R""]"
+Syniti,Principal Software Engineer,https://careers.syniti.com/job/Hyderabad-Principal-Software-Engineer/1318071400/,"Location Hyderabad, In",,,Engineering,Senior/Lead,"[""R""]"
+Syniti,QA Automation Engineer,https://careers.syniti.com/job/Hyderabad-QA-Automation-Engineer/1319146000/,"Location Hyderabad, In",,,Engineering,Unknown,"[""R""]"
+Syniti,Senior Manager,https://careers.syniti.com/job/Remote-Senior-Manager%2C-Site-Reliability-Engineering/1318182400/,Site Reliability Engineering,,,Other,Senior/Lead,"[""R""]"
+Syniti,Solution Architect,https://careers.syniti.com/job/Remote-Solution-Architect-MDG/1226454700/,Mdg,,,Other,Senior/Lead,"[""R""]"
+Syniti,Sr. Engineer,https://careers.syniti.com/job/Remote-Sr_-Engineer%2C-Cloud-Operations-Infrastructure/1318080300/,Cloud Operations Infrastructure,,,Engineering,Senior/Lead,"[""R""]"
+Syniti,Sr. Engineer,https://careers.syniti.com/job/Remote-Sr_-Engineer%2C-DevOps/1318081200/,Devops,,,Engineering,Senior/Lead,"[""R""]"
+Syniti,Sr. Engineer,https://careers.syniti.com/job/Remote-Sr_-Engineer%2C-Site-Reliability-NB/1318079900/,Site Reliability,,,Engineering,Senior/Lead,"[""R""]"
+Syniti,Sr. Engineer,https://careers.syniti.com/job/Remote-Sr_-Engineer%2C-Site-Reliability/1318080200/,Site Reliability,,,Engineering,Senior/Lead,"[""R""]"
+Syniti,Sr. Engineer,https://careers.syniti.com/job/Remote-Sr_-Engineer%2C-Software/1318180200/,Software,,,Engineering,Senior/Lead,"[""R""]"
+Syniti,Sr. Engineer,https://careers.syniti.com/job/Remote-Sr_-Engineer%2C-Software/1332858300/,Software,,,Engineering,Senior/Lead,"[""R""]"
+Syniti,Sr. Manager,https://careers.syniti.com/job/Remote-Sr_-Manager%2C-SRE/1318081400/,Sre,,,Other,Senior/Lead,"[""R""]"
+Syniti,Sr. Manager Engineering,https://careers.syniti.com/job/Remote-Sr_-Manager-Engineering/1327456400/,"Location Remote, In",,,Engineering,Senior/Lead,"[""R""]"
+Vertica,"Lorem Ipsum Sales Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book",https://careers.opentext.com/us/en/c/sales-jobs,"Virtual, Usa",2025-10-16,34,Sales,Unknown,"[""R""]"
+Yellowbrick,sales@yellowbrick.com,mailto:sales@yellowbrick.com,,,,Sales,Unknown,"[""R""]"
