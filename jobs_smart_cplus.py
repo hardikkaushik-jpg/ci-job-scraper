@@ -1,4 +1,4 @@
-# jobs_smart_cplus.py
+# jobs_smart_cplus_final_full_mod.py
 # Playwright + BeautifulSoup hybrid scraper, ATS-aware, enhanced cleaning and classification.
 # Run with: python3 jobs_smart_cplus_final_full_mod.py
 # Requires: playwright, beautifulsoup4, lxml
@@ -889,3 +889,4 @@ if __name__ == "__main__":
         print(f"An unexpected error occurred during execution: {e}")
         sys.exit(1)
 
+when i ran this Fivetran came out just fine.
