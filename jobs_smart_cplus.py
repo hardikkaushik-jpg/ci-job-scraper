@@ -1,12 +1,12 @@
-# jobs_smart_cplus_final_full.py
+# jobs_smart_cplus_final_full_mod.py
 # Playwright + BeautifulSoup hybrid scraper, ATS-aware, enhanced cleaning and classification.
-# Run with: python3 jobs_smart_cplus_final_full.py
+# Run with: python3 jobs_smart_cplus_final_full_mod.py
 # Requires: playwright, beautifulsoup4, lxml
 
 from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
-import re, csv, time, sys, json
+import re, csv, time, sys, json, os # <-- Added 'os' here
 from datetime import datetime, date, timedelta
 
 # ---------- CONFIG ----------
@@ -73,6 +73,7 @@ MAX_DETAIL_PAGES = 12000
 # Patterns and tokens
 IMAGE_EXT = re.compile(r"\.(jpg|jpeg|png|gif|svg|webp)$", re.I)
 
+# FORBIDDEN_WORDS and FORBIDDEN_RE are kept as they are used by clean_title and should_drop_by_title
 FORBIDDEN_WORDS = [
     "privacy","privacy policy","about","legal","terms","cookie","cookies",
     "press","blog","partners","pricing","docs","documentation","support",
@@ -89,12 +90,14 @@ LOC_TOKENS = [
 ]
 LOC_RE = re.compile(r'\b(?:' + '|'.join(re.escape(x) for x in LOC_TOKENS) + r')\b', re.I)
 
+# ROLE_WORDS and ROLE_WORDS_RE are kept as they are used by the should_drop_by_title function.
 ROLE_WORDS = [
     "engineer","developer","manager","director","architect","scientist","analyst","product","designer",
     "sales","account","consultant","sre","qa","support","finance","marketing","operations","intern","student",
     "data","devops","infrastructure","research","security"
 ]
 ROLE_WORDS_RE = re.compile(r'\b(?:' + '|'.join(re.escape(x) for x in ROLE_WORDS) + r')\b', re.I)
+
 
 COMPANY_SKIP_RULES = {
     "Ataccama": [r'one-team', r'blog', r'about'],
@@ -243,27 +246,55 @@ def extract_date_from_html(html_text):
         return mm2.group(1)
     return ""
 
+# ----------------------------------------------------------------------
+# UPDATED FUNCTION is_likely_job_anchor
+# ----------------------------------------------------------------------
 def is_likely_job_anchor(href, text):
-    if not href and not text:
+    if not href:
         return False
-    if href and IMAGE_EXT.search(href):
-        return False
-    low = (text or href or "").lower()
-    if FORBIDDEN_RE.search(low):
-        return False
-    positives = [
-        "jobs","/job/","/jobs/","careers","open-positions","openings","greenhouse",
-        "lever.co","myworkdayjobs","bamboohr","ashby","comeet","gr8people","boards.greenhouse",
-        "jobs.lever","jobvite","smartrecruiters","icims","brassring"
+    
+    h = href.lower()
+    t = (text or "").lower()
+
+    # Reject clearly non-job sections
+    BAD = [
+        "about", "privacy", "security", "press", 
+        "events", "culture", "life-at", "team", 
+        "leadership", "story", "product", "solutions", 
+        "resources", "download", "company", "blog"
     ]
-    if href and any(p in href.lower() for p in positives):
+    if any(b in h for b in BAD):
+        return False
+    if any(b in t for b in BAD):
+        return False
+
+    # Accept only REAL ATS links
+    ATS = [
+        "lever.co",
+        "greenhouse",
+        "myworkdayjobs",
+        "ashbyhq",
+        "bamboohr",
+        "smartrecruiters",
+        "jobvite",
+        "/jobs/",
+        "/job/"
+    ]
+    if any(a in h for a in ATS):
         return True
-    if any(p in low for p in positives):
+
+    # Role keyword requirement
+    ROLE = [
+        "engineer","developer","manager","director","architect",
+        "scientist","analyst","product","designer","sales",
+        "account","consultant","sre","qa","support",
+        "data","devops","intern","student"
+    ]
+    if any(r in t for r in ROLE):
         return True
-    # anchors with role words and not too long
-    if text and ROLE_WORDS_RE.search(text) and len(text) < 240:
-        return True
+
     return False
+# ----------------------------------------------------------------------
 
 def extract_location_from_text(txt):
     if not txt:
@@ -394,7 +425,7 @@ def should_drop_by_title(title):
     if not title or len(title.strip()) == 0:
         return True
     low = title.lower()
-    if ROLE_WORDS_RE.search(low):
+    if ROLE_WORDS_RE.search(low): 
         return False
     # allow short 'intern' etc
     if re.search(r'\bintern\b', low):
@@ -701,7 +732,7 @@ def scrape():
                                 print(f"[WARN] detail parse fail {link} -> {e}")
                     # final normalization
                     title_final = clean_title(title_clean) if title_clean else clean_title(anchor_text or "")
-                    location_final = normalize_location(location_candidate)
+                    location_candidate = normalize_location(location_candidate)
                     posting_date_final = posting_date or ""
                     # deep location extraction if still empty
                     if not location_candidate and detail_html:
@@ -799,7 +830,11 @@ if __name__ == "__main__":
             dedup[lk] = r
         out = list(dedup.values())
         out_sorted = sorted(out, key=lambda x: (x.get("Company","").lower(), x.get("Job Title","").lower()))
-        outfile = "jobs_final_hard.csv"
+        
+        # PATCH (GEMINI-ready): Always write to repo root
+        repo_root = os.path.dirname(os.path.abspath(__file__))
+        outfile = os.path.join(repo_root, "jobs_final_hard.csv")
+        
         fieldnames=["Company","Job Title","Job Link","Location","Posting Date","Days Since Posted","Seniority"]
         with open(outfile, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
