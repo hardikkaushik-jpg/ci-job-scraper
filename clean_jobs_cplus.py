@@ -1,4 +1,4 @@
-# clean_jobs_cplus.py  (ENTERPRISE C+ CLEANER — FINAL)
+# clean_jobs_cplus.py  (ENTERPRISE C+ CLEANER — FINAL FINAL)
 import pandas as pd
 import re, json
 from datetime import datetime, date
@@ -40,14 +40,12 @@ SKIP_TITLE_PATTERNS = [
 ]
 SKIP_TITLE_RE = re.compile('|'.join(SKIP_TITLE_PATTERNS), re.I)
 
-
-
 # ---------- HELPERS ----------
 def clean_text(s):
     if not isinstance(s, str): return ""
     s = re.sub(r'\s+', ' ', s).strip()
     s = re.sub(r'[^\x00-\x7F]+',' ', s)
-    return s.strip(" -:,.")   
+    return s.strip(" -:,.")
 
 
 def normalize_company(name):
@@ -63,20 +61,14 @@ def normalize_company(name):
 
 def strip_location_from_title(title):
     t = title
-
-    # remove "(London)" etc
     t = re.sub(r'\(([^)]+)\)\s*$', '', t).strip()
-
-    # remove " - Berlin"
     t = re.sub(r'\s+[-|]\s*[A-Za-z0-9 ,\-()\/]+$', '', t).strip()
 
-    # remove tail ", Berlin"
     parts = re.split(r'\s{2,}| - | \| | — | – |,', title)
     if len(parts) > 1:
         tail = parts[-1]
         if len(tail.split()) <= 4 and re.search(r'[A-Za-z]', tail):
             t = " ".join(parts[:-1]).strip()
-
     return t
 
 
@@ -132,25 +124,18 @@ def extract_skills(title):
     return list({s for s in SKILL_WORDS if s in tl})
 
 
-
 # ---------- MAIN ----------
 def main():
     df = pd.read_csv("jobs_final_hard.csv", dtype=str).fillna("")
 
-    # -------------------------
     # BASIC NORMALIZATION
-    # -------------------------
     df["Company"] = df["Company"].apply(normalize_company)
     df["Job Title"] = df["Job Title"].apply(clean_text)
     df["Job Link"] = df["Job Link"].str.strip()
 
-    # skip garbage titles
     df = df[~df["Job Title"].str.match(SKIP_TITLE_RE)]
 
-
-    # -------------------------
-    # FIX DUPLICates — keep row WITH posting date
-    # -------------------------
+    # FIX DUPLICATES
     def best_row(group):
         with_date = group[group["Posting Date"].str.len() > 0]
         if len(with_date) > 0:
@@ -159,37 +144,22 @@ def main():
 
     df = df.groupby("Job Link", as_index=False).apply(best_row).reset_index(drop=True)
 
-
-    # -------------------------
-    # FILL LOCATION (scraper misses some)
-    # -------------------------
+    # LOCATION FIXING
     df["Location"] = df.apply(lambda r: extract_location_field(r["Job Title"], r["Location"]), axis=1)
     df["Location"] = df["Location"].apply(normalize_location_cell)
 
-
-    # -------------------------
-    # CLEAN TITLES AFTER LOCATION EXTRACTION (IMPORTANT)
-    # -------------------------
+    # TITLE CLEAN AFTER LOCATION EXTRACTION
     df["Job Title"] = df["Job Title"].apply(strip_location_from_title)
     df["Job Title"] = df["Job Title"].apply(lambda t: re.sub(r'\s{2,}', ' ', t).strip(" -,."))
     
-
-    # -------------------------
-    # CLASSIFY FUNCTION / SENIORITY / SKILLS
-    # -------------------------
+    # CLASSIFICATIONS
     df["Function"] = df["Job Title"].apply(classify_function)
     df["Seniority"] = df.apply(lambda r: classify_seniority(r["Job Title"], r["Location"]), axis=1)
     df["Skills_in_Title"] = df["Job Title"].apply(extract_skills)
 
-
-    # -------------------------
     # NORMALIZE SENIORITY
-    # -------------------------
     def normalize_sen(s):
         s = s or ""
-        if not s:
-            return "Unknown"
-        s = re.sub(r'\bsr[\.\s]?\b', 'Senior', s, flags=re.I)
         if re.search(r'\b(principal|staff|architect)\b', s, re.I):
             return "Senior/Lead"
         if re.search(r'\b(director|vp|head|chief)\b', s, re.I):
@@ -198,17 +168,15 @@ def main():
             return "Entry"
         if re.search(r'\b(mid|intermediate|level ii)\b', s, re.I):
             return "Mid"
-        return s
+        if re.search(r'\bsenior\b', s, re.I):
+            return "Senior/Lead"
+        return s or "Unknown"
 
     df["Seniority"] = df["Seniority"].apply(normalize_sen)
 
-
-    # -------------------------
-    # RECOMPUTE DAYS SINCE POSTED
-    # -------------------------
+    # DAYS SINCE POSTED
     def compute_days(pd_str):
-        if not pd_str:
-            return ""
+        if not pd_str: return ""
         try:
             d = datetime.fromisoformat(pd_str).date()
             return (date.today() - d).days
@@ -217,10 +185,8 @@ def main():
 
     df["Days Since Posted"] = df["Posting Date"].apply(compute_days)
 
-
-    # -------------------------
-    # OUTPUT
-    # -------------------------
+    # FINAL CLEANUP
+    df = df.fillna("")   # <<< FIX ADDED HERE
     df = df.sort_values(by=["Company", "Job Title"])
     df["Skills_in_Title"] = df["Skills_in_Title"].apply(lambda x: json.dumps(x))
 
