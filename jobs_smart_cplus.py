@@ -1,12 +1,12 @@
-# jobs_smart_cplus_final_full_mod.py
+# jobs_smart_cplus.py
 # Playwright + BeautifulSoup hybrid scraper, ATS-aware, enhanced cleaning and classification.
-# Run with: python3 jobs_smart_cplus_final_full_mod.py
+# Run with: python3 jobs_smart_cplus.py
 # Requires: playwright, beautifulsoup4, lxml
 
 from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
-import re, csv, time, sys, json, os # <-- Added 'os' here
+import re, csv, time, sys, json, os 
 from datetime import datetime, date, timedelta
 
 # ---------- CONFIG ----------
@@ -67,7 +67,7 @@ COMPANIES = {
 
 PAGE_NAV_TIMEOUT = 40000
 PAGE_DOM_TIMEOUT = 15000
-SLEEP_BETWEEN_REQUESTS = 0.18
+SLEEP_BETWEEN_REQUESTS = 0.25 # Increased for stability (Optional Improvement)
 MAX_DETAIL_PAGES = 12000
 
 # Patterns and tokens
@@ -218,13 +218,15 @@ def _try_parse_posted_on_month_day_year(text):
                 return ""
     return ""
 
+# PATCH A — Robust extract_date_from_html (replace existing function)
 def extract_date_from_html(html_text):
     if not html_text:
         return ""
-    # structured JSON-LD datePosted
+    # 1) JSON-LD datePosted
     m = re.search(r'"datePosted"\s*:\s*"([^"]+)"', html_text)
     if m:
         return _iso_only_date(m.group(1))
+    # 2) common meta tags / time
     m2 = re.search(r'"postedOn"\s*:\s*"([^"]+)"', html_text)
     if m2:
         return _iso_only_date(m2.group(1))
@@ -234,18 +236,70 @@ def extract_date_from_html(html_text):
     m4 = re.search(r'<time[^>]+datetime=["\']([^"\']+)["\']', html_text, re.I)
     if m4:
         return _iso_only_date(m4.group(1))
+
+    # 3) Relative "X days ago"
     mm = re.search(r'posted\s+(\d+)\s+days?\s+ago', html_text, re.I)
     if mm:
         days = int(mm.group(1))
         return (date.today() - timedelta(days=days)).isoformat()
+
+    # 4) "Posted: Month Day, Year" styles
     parsed = _try_parse_posted_on_month_day_year(html_text)
     if parsed:
         return parsed
+
+    # 5) Greenhouse / GraphQL / Next.js / window payloads
+    # Greenhouse: window.__INITIAL_STATE__ or window._initialData or window._graphqlData
+    for key in (r'window\.__INITIAL_STATE__\s*=\s*({.+?});',
+                r'window\.__INITIAL_STATE__\s*=\s*\[({.+?})\];',
+                r'window\._graphqlData\s*=\s*({.+?});',
+                r'window\.__DATA__\s*=\s*({.+?});',
+                r'window\._initialData\s*=\s*({.+?});',
+                r'<script id="__NEXT_DATA__" type="application/json">(.+?)</script>'): # Added NEXT_DATA
+        m = re.search(key, html_text, re.S)
+        if m:
+            try:
+                blob = m.group(1)
+                payload = json.loads(blob)
+                def find_date(o):
+                    if isinstance(o, dict):
+                        for k,v in o.items():
+                            if isinstance(v, str) and re.match(r'\d{4}-\d{2}-\d{2}', v):
+                                return v
+                            # check for date-related keys and string values that look like a date
+                            if isinstance(v, str) and re.search(r'posted|published|created|date', k, re.I) and re.search(r'\d{4}', str(v)):
+                                return v
+                            res = find_date(v)
+                            if res: return res
+                    if isinstance(o, list):
+                        for it in o:
+                            res = find_date(it)
+                            if res: return res
+                    return None
+                res = find_date(payload)
+                if res:
+                    return _iso_only_date(res)
+            except:
+                pass
+
+    # 6) direct JSON keys common to ATS
+    for key in (r'"postedAt"\s*:\s*"([^"]+)"',
+                r'"posted_at"\s*:\s*"([^"]+)"',
+                r'"published_at"\s*:\s*"([^"]+)"',
+                r'"createdAt"\s*:\s*"([^"]+)"',
+                r'"created_at"\s*:\s*"([^"]+)"',
+                r'"date_published"\s*:\s*"([^"]+)"',
+                r'"datePosted"\s*:\s*"([^"]+)"'):
+        m = re.search(key, html_text, re.I)
+        if m:
+            return _iso_only_date(m.group(1))
+
+    # 7) ISO anywhere
     mm2 = re.search(r'(\d{4}-\d{2}-\d{2})', html_text)
     if mm2:
         return mm2.group(1)
-    return ""
 
+    return ""
 # ----------------------------------------------------------------------
 # UPDATED FUNCTION is_likely_job_anchor
 # ----------------------------------------------------------------------
@@ -278,7 +332,9 @@ def is_likely_job_anchor(href, text):
         "smartrecruiters",
         "jobvite",
         "/jobs/",
-        "/job/"
+        "/job/",
+        "fivetran.com",   # ensure fivetran anchors accepted (Patch 2)
+        "fivetran"        # ensure fivetran anchors accepted (Patch 2)
     ]
     if any(a in h for a in ATS):
         return True
@@ -381,27 +437,44 @@ def try_extract_location_from_card(el):
         pass
     return ""
 
-# ---------- SENIORITY DETECTION ----------
+# PATCH F (REPLACED by Patch 1) - Robust detect_seniority with normalized labels
 def detect_seniority(title):
     if not title:
         return "Unknown"
     t = title.lower()
     # Director / Exec
-    if any(x in t for x in ["chief ", "cxo", "cto", "ceo", "cfo", "coo", "vp ", "vice president", "svp", "evp", "executive director", "head of", "director", "managing director"]):
+    if any(x in t for x in ["chief ", "cxo", "cto", "ceo", "cfo", "coo", "vp ", "vice president", "svp", "evp", "executive director", "head of", "managing director", "director"]):
         return "Director+"
     if any(x in t for x in ["principal", "distinguished", "fellow"]):
-        return "Principal/Staff"
-    if any(x in t for x in ["senior", "sr.", "sr ", "lead ", "lead-", "team lead", "senior engineer", "senior manager"]):
-        return "Senior"
+        return "Senior/Lead"
+    if any(x in t for x in ["senior", "sr.", "sr ", "lead ", "team lead", "senior engineer", "senior manager"]):
+        return "Senior/Lead"
     if any(x in t for x in ["manager", "mgr", "management", "people manager", "engineering manager"]):
         return "Manager"
-    if any(x in t for x in ["mid ", "mid-", "intermediate", "experience", "level ii", "ii ", "2 ", "associate", "regular", "software engineer ii", "engineer ii"]):
+    if any(x in t for x in ["mid ", "mid-", "intermediate", "experience", "level ii", "ii ", "associate", "iii"]):
         return "Mid"
     if any(x in t for x in ["junior", "jr.", "jr ", "entry", "graduate", "fresher"]):
         return "Entry"
     if any(x in t for x in ["intern", "internship", "working student", "werkstudent"]):
         return "Intern"
+    # Roman numerals / numeric indications
+    if re.search(r'\b(ii|iii|iv|2|3)\b', t):
+        return "Mid"
     return "Unknown"
+
+# Patch G — Skills normalization guard (cleaner) — final polish
+def normalize_skill(token):
+    if not isinstance(token, str):
+        return ""
+    token = re.sub(r'[\[\]\(\)\{\}]', '', token).strip()
+    token = token.replace("python3","python").replace("python-3","python")
+    token = token.replace("javascript","javascript").replace("js/ts","javascript")
+    token = token.replace(".", "")
+    token = token.strip().upper()
+    # short 'R' detect
+    if token.lower() == "r" or token == "R":
+        return "R"
+    return token
 
 # ---------- SCRAPE ----------
 def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=PAGE_DOM_TIMEOUT):
@@ -420,17 +493,21 @@ def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=PAGE
         print(f"[WARN] fetch failed: {url} -> {e}")
         return ""
 
+# Patch E - Tighten anchor filter and final pre-filter (scraper)
 def should_drop_by_title(title):
-    # after cleaning, if title lacks role words, drop it
     if not title or len(title.strip()) == 0:
         return True
     low = title.lower()
-    if ROLE_WORDS_RE.search(low): 
-        return False
-    # allow short 'intern' etc
-    if re.search(r'\bintern\b', low):
-        return False
-    return True
+    # if title doesn't contain an explicit role token, likely not a job
+    if not ROLE_WORDS_RE.search(low) and not re.search(r'\b(intern|associate|engineer|manager|director|sales|analyst|product)\b', low):
+        # allow short intern strings
+        if re.search(r'\bintern\b', low):
+            return False
+        return True
+    # reject marketing pages explicitly
+    if re.search(r'\b(create alert|learn more|read more|download|our story|diversity|press|blog|apply now)\b', low):
+        return True
+    return False
 
 def scrape():
     rows = []
@@ -462,6 +539,30 @@ def scrape():
                     href = normalize_link(main_url, a.get("href")) if a else ""
                     if is_likely_job_anchor(href, text):
                         candidates.append((href, text, el))
+                # PATCH D — scan for in-page job cards (fallback for pages like fivetran)
+                try:
+                    # common job card selectors (company-specific augment)
+                    extra_card_selectors = [
+                        ".careers__list", ".jobs-list", ".open-positions", ".role-listing",
+                        ".job-list", ".job-card", ".posting", ".opening", "[data-careers-list]"
+                    ]
+                    for sel in extra_card_selectors:
+                        for card in soup.select(sel):
+                            # look for anchors inside card
+                            for a in card.find_all("a", href=True):
+                                href = normalize_link(main_url, a.get("href"))
+                                text = a.get_text(" ", strip=True) or ""
+                                if is_likely_job_anchor(href, text):
+                                    candidates.append((href, text, a))
+                            # also check data attributes that might contain JSON or hrefs
+                            data_href = card.get("data-href") or card.get("data-url") or card.get("data-job-url")
+                            if data_href:
+                                href = normalize_link(main_url, data_href)
+                                text = card.get_text(" ", strip=True) or ""
+                                if is_likely_job_anchor(href, text):
+                                    candidates.append((href, text, card))
+                except Exception as e:
+                    print(f"[WARN] extra in-page card scan failed: {e}")
                 # try iframe to ATS if none
                 if not candidates:
                     for iframe in soup.find_all("iframe", src=True):
@@ -481,8 +582,17 @@ def scrape():
                 seen = set()
                 filtered = []
                 for href, text, el in candidates:
-                    if not href or href.rstrip("/") == main_url.rstrip("/"):
+                    if not href:
                         continue
+                    # PATCH C - Allow fragment / same-page anchors (scraper)
+                    # Allow same-page fragments that look like job anchors (e.g., "#jobs", "#open-positions", "#job-123")
+                    if href.rstrip("/") == main_url.rstrip("/"):
+                        # exact same page - skip unless the anchor has a fragment or role words
+                        # if it's a fragment (contains '#') and contains job-like token -> keep
+                        if "#" in (href or "") and re.search(r'(job|jobs|open|position|role|career)', href, re.I):
+                            pass
+                        else:
+                            continue
                     if href in seen:
                         continue
                     seen.add(href)
@@ -699,6 +809,79 @@ def scrape():
                                                 posting_date = parsed; print(f"[DETAIL_AUX_DATE] PostedOnMonth -> {posting_date}")
                                     except Exception as e:
                                         print(f"[WARN] extended-ats-date extractor failed: {e}")
+                                # PATCH B — ATS-specific detail parsing (insert inside DETAIL_FETCH after extended-ATS block)
+                                # Greenhouse: sometimes posts embed job metadata in a JSON blob or inside data attributes
+                                try:
+                                    # Greenhouse: window.__INITIAL_STATE__ or embedded JSON with job posting
+                                    m_gh = re.search(r'window\.__INITIAL_STATE__\s*=\s*({.+?});', detail_html, re.S) or \
+                                        re.search(r'window\._graphqlData\s*=\s*({.+?});', detail_html, re.S)
+                                    if m_gh:
+                                        try:
+                                            gh = json.loads(m_gh.group(1))
+                                            # deep scan for postedAt / posted_at / createdAt keys
+                                            def gh_find_date(o):
+                                                if isinstance(o, dict):
+                                                    for k,v in o.items():
+                                                        if isinstance(v,str) and re.search(r'\d{4}-\d{2}-\d{2}', v):
+                                                            return v
+                                                        res = gh_find_date(v)
+                                                        if res: return res
+                                                if isinstance(o, list):
+                                                    for it in o:
+                                                        res = gh_find_date(it)
+                                                        if res: return res
+                                                return None
+                                            res = gh_find_date(gh)
+                                            if res and not posting_date:
+                                                posting_date = _iso_only_date(res); print(f"[DETAIL_AUX_DATE] Greenhouse-embedded -> {posting_date}")
+                                        except:
+                                            pass
+
+                                    # Lever: look for "jobPosting" objects or createdAt fields inside window payloads
+                                    m_lv = re.search(r'({[^}]*"jobPosting"[^}]*})', detail_html, re.S)
+                                    if m_lv:
+                                        try:
+                                            payload = json.loads(m_lv.group(1))
+                                            def find_lever_date(o):
+                                                if isinstance(o, dict):
+                                                    for k,v in o.items():
+                                                        if k.lower() in ("createdat","postingdate","postedat","post_date") and isinstance(v,str):
+                                                            return v
+                                                        res = find_lever_date(v)
+                                                        if res: return res
+                                                if isinstance(o, list):
+                                                    for it in o:
+                                                        res = find_lever_date(it)
+                                                        if res: return res
+                                                return None
+                                            res = find_lever_date(payload)
+                                            if res and not posting_date:
+                                                posting_date = _iso_only_date(res); print(f"[DETAIL_AUX_DATE] Lever-> {posting_date}")
+                                        except:
+                                            pass
+
+                                    # Ashby / BambooHR: check for rich JSON objects in scripts
+                                    for script in s.find_all("script"):
+                                        txt = script.string or script.text or ""
+                                        if not txt: continue
+                                        if "posted_at" in txt.lower() or '"postedAt"' in txt:
+                                            mpost = re.search(r'(?i)("posted_at"|"postedAt"|"posted_at")\s*:\s*"([^"]+)"', txt)
+                                            if mpost and not posting_date:
+                                                posting_date = _iso_only_date(mpost.group(2)); print(f"[DETAIL_AUX_DATE] script-key -> {posting_date}")
+                                                break
+
+                                    # If location_candidate looks like "Department — City" or "Dept | City", split intelligently
+                                    if location_candidate and isinstance(location_candidate, str):
+                                        # patterns: "Commercial Accounts Austin" or "Commercial Accounts — Austin"
+                                        # attempt to extract the trailing token if it matches a city/country token
+                                        parts = re.split(r'[\u2013\u2014\-\|•·,]+', location_candidate)
+                                        if len(parts) > 1:
+                                            tail = parts[-1].strip()
+                                            if LOC_RE.search(tail) or len(tail.split()) <= 3:
+                                                location_candidate = tail
+                                                print(f"[DETAIL_LOC_PATCH] refined -> {location_candidate}")
+                                except Exception as e:
+                                    print(f"[WARN] ATS-specific detail patch failed: {e}")
                                 # DATE NEAR TITLE heuristic
                                 if not posting_date and s:
                                     try:
@@ -717,12 +900,12 @@ def scrape():
                                                     posting_date = d.isoformat(); print(f"[TITLE_DATE] days-ago near title -> {posting_date}")
                                     except Exception as e:
                                         print(f"[WARN] title-date-extractor error: {e}")
-                                # STRICT ISO near keywords (Patch 1)
+                                # STRICT ISO near keywords (Patch 2)
                                 if not posting_date:
                                     snippet = detail_html[:50000]
                                     m = re.search(r'(?i)(posted|created|updated|date|time)[^0-9]{0,80}(\d{4}-\d{2}-\d{2})', snippet)
                                     if m:
-                                        posting_date = _iso_only_date(m.group(2)); print(f"[STRICT_ISO_PATCH1] -> {posting_date}")
+                                        posting_date = _iso_only_date(m.group(2)); print(f"[STRICT_ISO_PATCH2] -> {posting_date}")
                                 # final fallback helper
                                 if not posting_date:
                                     found_date = extract_date_from_html(detail_html)
