@@ -2,13 +2,27 @@
 import pandas as pd
 import re, json
 from datetime import datetime, date
+import os
 
 # ---------- CONFIG ----------
 SKILL_WORDS = [
     "python","sql","java","aws","azure","gcp","etl","spark","snowflake","dbt",
     "docker","kubernetes","airflow","ml","ai","tableau","lookml","hadoop","scala",
-    "nosql","redshift","bigquery","hive","react","node","javascript","go","rust"
+    "nosql","redshift","bigquery","hive","react","node","javascript","go","rust",
+    "r"
 ]
+
+# All skills will be uppercase without brackets.
+def normalize_skill(token):
+    if not isinstance(token, str):
+        return ""
+
+    # Remove brackets like [java], (python), {r}
+    token = re.sub(r"[\[\]\(\)\{\}]", "", token).strip()
+
+    # Convert to uppercase
+    return token.upper()
+
 
 FUNCTION_KEYWORDS = {
     "Engineering": ["engineer","developer","sre","site reliability","platform","backend","frontend","devops","software","infrastructure"],
@@ -42,7 +56,8 @@ SKIP_TITLE_RE = re.compile('|'.join(SKIP_TITLE_PATTERNS), re.I)
 
 # ---------- HELPERS ----------
 def clean_text(s):
-    if not isinstance(s, str): return ""
+    if not isinstance(s, str): 
+        return ""
     s = re.sub(r'\s+', ' ', s).strip()
     s = re.sub(r'[^\x00-\x7F]+',' ', s)
     return s.strip(" -:,.")
@@ -119,20 +134,34 @@ def classify_seniority(title, location=""):
     return "Unknown"
 
 
+# ---------- SKILLS EXTRACTION (NEW PATCH) ----------
 def extract_skills(title):
     tl = (title or "").lower()
-    return list({s for s in SKILL_WORDS if s in tl})
 
+    extracted = set()
+
+    for skill in SKILL_WORDS:
+        if skill in tl:
+            extracted.add(normalize_skill(skill))
+
+    # Extract bracketed skills like [r], (java)
+    bracketed = re.findall(r"[\[\(\{]([a-zA-Z0-9\+]+)[\]\)\}]", title)
+    for b in bracketed:
+        extracted.add(normalize_skill(b))
+
+    return list(extracted)
 
 # ---------- MAIN ----------
 def main():
-    df = pd.read_csv("jobs_final_hard.csv", dtype=str).fillna("")
+    # Locate input CSV reliably
+    repo_root = os.path.dirname(os.path.abspath(__file__))
+    input_path = os.path.join(repo_root, "jobs_final_hard.csv")
+    df = pd.read_csv(input_path, dtype=str).fillna("")
 
     # BASIC NORMALIZATION
     df["Company"] = df["Company"].apply(normalize_company)
     df["Job Title"] = df["Job Title"].apply(clean_text)
     df["Job Link"] = df["Job Link"].str.strip()
-
     df = df[~df["Job Title"].str.match(SKIP_TITLE_RE)]
 
     # FIX DUPLICATES
@@ -157,7 +186,7 @@ def main():
     df["Seniority"] = df.apply(lambda r: classify_seniority(r["Job Title"], r["Location"]), axis=1)
     df["Skills_in_Title"] = df["Job Title"].apply(extract_skills)
 
-    # NORMALIZE SENIORITY
+    # SENIORITY NORMALIZATION
     def normalize_sen(s):
         s = s or ""
         if re.search(r'\b(principal|staff|architect)\b', s, re.I):
@@ -186,8 +215,8 @@ def main():
     df["Days Since Posted"] = df["Posting Date"].apply(compute_days)
 
     # FINAL CLEANUP
-    df = df.fillna("")   # <<< FIX ADDED HERE
-    df = df.sort_values(by=["Company", "Job Title"])
+    df = df.fillna("")
+    df = df.sort_values(by=["Company","Job Title"])
     df["Skills_in_Title"] = df["Skills_in_Title"].apply(lambda x: json.dumps(x))
 
     out_cols = [
@@ -196,7 +225,10 @@ def main():
         "Function","Seniority","Skills_in_Title"
     ]
 
-    df[out_cols].to_csv("jobs_cleaned_final_enriched.csv", index=False)
+    # Write final output to repo root
+    out_path = os.path.join(repo_root, "jobs_cleaned_final_enriched.csv")
+    df[out_cols].to_csv(out_path, index=False)
+
     print("[OK] wrote jobs_cleaned_final_enriched.csv with", len(df), "rows")
 
 
