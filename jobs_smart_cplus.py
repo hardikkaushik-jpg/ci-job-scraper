@@ -888,5 +888,3 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"An unexpected error occurred during execution: {e}")
         sys.exit(1)
-
-when i ran this Fivetran came out just fine.
