@@ -63,12 +63,11 @@ COMPANIES = {
     "Teradata": ["https://careers.teradata.com/jobs"],
     "Yellowbrick": ["https://yellowbrick.com/careers/#positions"],
     "Vertica": ["https://careers.opentext.com/us/en/home"],
-    # Added large noisy portals you asked to include
+    # large noisy portals
     "Salesforce": ["https://careers.salesforce.com/en/jobs/"],
-    "Amazon": ["https://www.amazon.jobs/en/"],  # broad; internal allowlist used
+    "Amazon": ["https://www.amazon.jobs/en/"],
     "IBM": ["https://www.ibm.com/careers/search"],
     "SAP": ["https://jobs.sap.com/"],
-    # keep the rest as-is
 }
 
 PAGE_NAV_TIMEOUT = 40000
@@ -117,13 +116,6 @@ COMPANY_SKIP_RULES = {
 CRITICAL_COMPANIES = ["fivetran","ataccama","datadog","snowflake","matillion","oracle","mongodb","databricks"]
 
 # ---------- RELEVANCY LAYER (Option C: Hybrid) ----------
-# Points:
-# +3 hard-match data/etl/ml/cloud/observability/governance/warehouse
-# +2 engineering/platform/devops/sre/back-end
-# +1 product/solutions/ai terms/company-allowlist
-# -5 strong irrelevance (HR/legal/finance)
-# -3 support/customer-success/account-management
-
 RELEVANCE_HARD = [
     r'\bdata engineer\b', r'\bdata-engineer\b', r'\bdata engineering\b',
     r'\bdata platform\b', r'\betl\b', r'\belt\b', r'\belt/elt\b', r'\belt/etl\b',
@@ -177,33 +169,24 @@ def _match_any(patterns, text):
     return False
 
 def score_title_desc(title, desc, company=""):
-    """
-    Return a numeric score based on title and desc (both strings). Company is used for allowlist token.
-    """
     t = (title or "") + " " + (desc or "")
     t = t.lower()
     score = 0
-    # hard matches
     for p in RELEVANCE_HARD:
         if re.search(p, t):
             score += 3
-    # engineering
     for p in RELEVANCE_ENGINEERING:
         if re.search(p, t):
             score += 2
-    # soft matches
     for p in RELEVANCE_SOFT:
         if re.search(p, t):
             score += 1
-    # negative strong
     for p in IRRELEVANT_STRONG:
         if re.search(p, t):
             score -= 5
-    # negative soft
     for p in IRRELEVANT_SOFT:
         if re.search(p, t):
             score -= 3
-    # company allowlist
     if company:
         lowc = company.lower()
         for key, tokens in COMPANY_ALLOWLIST.items():
@@ -214,7 +197,256 @@ def score_title_desc(title, desc, company=""):
                         break
     return score
 
-# ---------- END RELEVANCY LAYER ----------
+# ---------- SPECIAL EXTRACTOR MODULE ----------
+# Each extractor returns a list of (link, text, element_like) tuples to be added to candidates.
+def extract_collibra_jobs(soup, page, base_url):
+    out = []
+    # Collibra careers usually have embedded JSON or Greenhouse/Lever
+    # Look for anchors to greenhouse/lever/myworkday or job-card containers
+    for a in soup.find_all("a", href=True):
+        href = a.get("href")
+        if not href: continue
+        if any(k in href for k in ("greenhouse", "lever", "myworkdayjobs", "/careers/job", "/job/")):
+            out.append((normalize_link(base_url, href), a.get_text(" ", strip=True), a))
+    # JSON-LD
+    for script in soup.find_all("script", type="application/ld+json"):
+        txt = script.string or ""
+        try:
+            payload = json.loads(txt)
+            items = payload if isinstance(payload, list) else [payload]
+            for it in items:
+                if isinstance(it, dict) and it.get("title") and it.get("url"):
+                    out.append((normalize_link(base_url, it.get("url")), it.get("title"), script))
+        except:
+            continue
+    return out
+
+def extract_cloudera_jobs(soup, page, base_url):
+    out = []
+    # Cloudera uses Workday JSON sometimes under window.__WD_DATA__ or /external_career
+    for a in soup.find_all("a", href=True):
+        href = a.get("href")
+        text = a.get_text(" ", strip=True) or ""
+        if "workday" in (href or "").lower() or "/job/" in (href or "") or "jobs.cloudera" in (href or ""):
+            out.append((normalize_link(base_url, href), text, a))
+    # attempt to find job IDs in scripts
+    scripts = soup.find_all("script")
+    for s in scripts:
+        txt = s.string or s.text or ""
+        for m in re.finditer(r'jobId["\']?\s*:\s*["\']?([A-Za-z0-9\-]+)["\']?', txt):
+            jid = m.group(1)
+            link = f"https://cloudera.wd5.myworkdayjobs.com/External_Career/job/{jid}"
+            out.append((link, f"Cloudera job {jid}", s))
+    return out
+
+def extract_pentaho_jobs(soup, page, base_url):
+    out = []
+    # Hitachi Vantara uses hitachivantara.com career pages - check for job search links and job-card anchors
+    for a in soup.find_all("a", href=True):
+        href = a.get("href")
+        text = a.get_text(" ", strip=True) or ""
+        if any(k in (href or "").lower() for k in ("/careers", "/job-search", "/en-us/careers", "hitachivantara")):
+            # filter out corporate nav links
+            if re.search(r'careers|job|position|opening', href, re.I) or re.search(r'job|opening|career', text, re.I):
+                out.append((normalize_link(base_url, href), text, a))
+    # Look for JSON-LD
+    for script in soup.find_all("script", type="application/ld+json"):
+        txt = script.string or ""
+        try:
+            payload = json.loads(txt)
+            items = payload if isinstance(payload, list) else [payload]
+            for it in items:
+                if isinstance(it, dict) and it.get("title") and it.get("url"):
+                    out.append((normalize_link(base_url, it.get("url")), it.get("title"), script))
+        except:
+            continue
+    return out
+
+def extract_atlan_jobs(soup, page, base_url):
+    out = []
+    # Atlan often hides jobs behind /careers or has ashby/greenhouse embeds.
+    for a in soup.find_all("a", href=True):
+        href = a.get("href")
+        text = a.get_text(" ", strip=True) or ""
+        if any(k in (href or "").lower() for k in ("careers", "jobs", "greenhouse", "lever", "workday")) or re.search(r'\bdata\b|\betl\b|\bengineer\b', text, re.I):
+            out.append((normalize_link(base_url, href), text, a))
+    # try to parse job cards
+    for card in soup.select(".job-card, .careers-listing, [data-job]"):
+        link = None
+        a = card.find("a", href=True)
+        if a:
+            link = normalize_link(base_url, a.get("href"))
+            out.append((link, a.get_text(" ", strip=True), card))
+    return out
+
+def extract_alation_jobs(soup, page, base_url):
+    out = []
+    # Alation runs on Workday — pick up workday/myworkdayjobs links and job cards
+    for a in soup.find_all("a", href=True):
+        href = a.get("href")
+        text = a.get_text(" ", strip=True) or ""
+        if "myworkdayjobs" in (href or "").lower() or "alation" in (href or "").lower() or re.search(r'\bdata\b|\bengineer\b', text, re.I):
+            out.append((normalize_link(base_url, href), text, a))
+    # JSON-LD entries
+    for script in soup.find_all("script", type="application/ld+json"):
+        txt = script.string or ""
+        try:
+            payload = json.loads(txt)
+            items = payload if isinstance(payload, list) else [payload]
+            for it in items:
+                if isinstance(it, dict) and it.get("datePosted") and it.get("title"):
+                    url = it.get("url") or ""
+                    out.append((normalize_link(base_url, url), it.get("title"), script))
+        except:
+            continue
+    return out
+
+def extract_informatica_jobs(soup, page, base_url):
+    out = []
+    # Informatica sometimes uses gr8people + Workday — capture both
+    for a in soup.find_all("a", href=True):
+        href = a.get("href")
+        text = a.get_text(" ", strip=True) or ""
+        if any(k in (href or "").lower() for k in ("gr8people", "workday", "informatica", "/job/")):
+            out.append((normalize_link(base_url, href), text, a))
+    # gr8people job listing may use data-job attributes
+    for card in soup.select("[data-job], .job, .job-card, .position"):
+        a = card.find("a", href=True)
+        if a:
+            out.append((normalize_link(base_url, a.get("href")), a.get_text(" ", strip=True), card))
+    return out
+
+def extract_couchbase_jobs(soup, page, base_url):
+    out = []
+    # Couchbase careers often use NextJS and have job cards; check anchors and JSON-LD
+    for a in soup.find_all("a", href=True):
+        href = a.get("href")
+        text = a.get_text(" ", strip=True) or ""
+        if "couchbase" in (href or "").lower() or re.search(r'\bengineer\b|\bdata\b|\bdeveloper\b', text, re.I):
+            out.append((normalize_link(base_url, href), text, a))
+    # JSON-LD parse
+    for s in soup.find_all("script", type="application/ld+json"):
+        txt = s.string or ""
+        try:
+            payload = json.loads(txt)
+            items = payload if isinstance(payload, list) else [payload]
+            for item in items:
+                if isinstance(item, dict) and item.get("title") and item.get("url"):
+                    out.append((normalize_link(base_url, item.get("url")), item.get("title"), s))
+        except:
+            continue
+    return out
+
+def extract_dataworld_jobs(soup, page, base_url):
+    out = []
+    # data.world uses custom job components; look for dw-job-card or anchors to /careers or /jobs
+    for tag in soup.find_all(True):
+        if tag.name == "dw-job-card" or tag.get("data-job"):
+            # try to extract inner anchor or data-url
+            a = tag.find("a", href=True)
+            if a:
+                out.append((normalize_link(base_url, a.get("href")), a.get_text(" ", strip=True), tag))
+            else:
+                url = tag.get("data-url") or tag.get("href")
+                if url:
+                    out.append((normalize_link(base_url, url), tag.get_text(" ", strip=True), tag))
+    for a in soup.find_all("a", href=True):
+        href = a.get("href")
+        if "/careers" in (href or "") or "jobs" in (href or ""):
+            out.append((normalize_link(base_url, href), a.get_text(" ", strip=True), a))
+    return out
+
+def extract_exasol_jobs(soup, page, base_url):
+    out = []
+    # Exasol usually lists jobs in simple anchors or uses a job-board embed
+    for a in soup.find_all("a", href=True):
+        href = a.get("href")
+        text = a.get_text(" ", strip=True) or ""
+        if any(k in (href or "").lower() for k in ("careers", "/job/", "jobs/")) or re.search(r'\bdata\b|\bengineer\b', text, re.I):
+            out.append((normalize_link(base_url, href), text, a))
+    return out
+
+def extract_sifflet_jobs(soup, page, base_url):
+    out = []
+    # Sifflet on 'welcometothejungle' has jobs in JSON or list anchors
+    for a in soup.find_all("a", href=True):
+        href = a.get("href")
+        text = a.get_text(" ", strip=True) or ""
+        if "welcometothejungle" in (href or "") or "/jobs/" in (href or "") or re.search(r'\bdata\b|\bengineer\b', text, re.I):
+            out.append((normalize_link(base_url, href), text, a))
+    # sometimes job list available as JSON in script tag
+    for s in soup.find_all("script"):
+        txt = s.string or s.text or ""
+        for m in re.finditer(r'\"url\":\"([^\"]+)\",\s*\"title\":\"([^\"]+)\"', txt):
+            out.append((normalize_link(base_url, m.group(1)), m.group(2), s))
+    return out
+
+def extract_syniti_jobs(soup, page, base_url):
+    out = []
+    # Syniti uses Workday / custom boards; capture job anchors
+    for a in soup.find_all("a", href=True):
+        href = a.get("href")
+        txt = a.get_text(" ", strip=True) or ""
+        if any(k in (href or "").lower() for k in ("workday", "syniti", "/careers", "/job/")) or re.search(r'\bdata\b|\bengineer\b', txt, re.I):
+            out.append((normalize_link(base_url, href), txt, a))
+    return out
+
+def extract_teradata_jobs(soup, page, base_url):
+    out = []
+    # Teradata uses its careers portal; pick anchors and job-card containers
+    for a in soup.find_all("a", href=True):
+        href = a.get("href")
+        txt = a.get_text(" ", strip=True) or ""
+        if any(k in (href or "").lower() for k in ("careers", "teradata", "/job/")) or re.search(r'\bdata\b|\bengineer\b', txt, re.I):
+            out.append((normalize_link(base_url, href), txt, a))
+    for div in soup.select(".job, .job-listing, .job-card, [data-job]"):
+        a = div.find("a", href=True)
+        if a:
+            out.append((normalize_link(base_url, a.get("href")), a.get_text(" ", strip=True), div))
+    return out
+
+def extract_qlik_jobs(soup, page, base_url):
+    out = []
+    # Qlik uses a career hub; grab links to careerhub or job cards
+    for a in soup.find_all("a", href=True):
+        href = a.get("href")
+        txt = a.get_text(" ", strip=True) or ""
+        if "careerhub" in (href or "").lower() or re.search(r'\bdata\b|\bengineer\b|\bqlik\b', txt, re.I):
+            out.append((normalize_link(base_url, href), txt, a))
+    return out
+
+def extract_castordoc_jobs(soup, page, base_url):
+    out = []
+    # CastorDoc (Coalesce) uses ashbyhq — look for ashby anchors and data-job attributes
+    for a in soup.find_all("a", href=True):
+        href = a.get("href")
+        txt = a.get_text(" ", strip=True) or ""
+        if "ashby" in (href or "").lower() or "coalesce" in (href or "").lower() or re.search(r'\bdata\b|\bengineer\b', txt, re.I):
+            out.append((normalize_link(base_url, href), txt, a))
+    for card in soup.select("[data-job], .job-card"):
+        a = card.find("a", href=True)
+        if a:
+            out.append((normalize_link(base_url, a.get("href")), a.get_text(" ", strip=True), card))
+    return out
+
+SPECIAL_EXTRACTORS = {
+    "Collibra": extract_collibra_jobs,
+    "Cloudera": extract_cloudera_jobs,
+    "Pentaho": extract_pentaho_jobs,
+    "Atlan": extract_atlan_jobs,
+    "Alation": extract_alation_jobs,
+    "Informatica": extract_informatica_jobs,
+    "Couchbase": extract_couchbase_jobs,
+    "Data.World": extract_dataworld_jobs,
+    "Exasol": extract_exasol_jobs,
+    "Sifflet": extract_sifflet_jobs,
+    "Syniti": extract_syniti_jobs,
+    "Teradata": extract_teradata_jobs,
+    "Qlik": extract_qlik_jobs,
+    "CastorDoc (Coalesce)": extract_castordoc_jobs,
+}
+
+# ---------- END SPECIAL EXTRACTOR MODULE ----------
 
 # month map for text date parsing
 _MONTH_MAP = {
@@ -267,7 +499,6 @@ def clean_title(raw):
     t = re.sub(r'^[\-\•\*]\s*', '', t)
     t = re.sub(r'^\d+\.\s*', '', t)
     t = re.sub(r'\s{2,}', ' ', t).strip(" -:,.|")
-    # reduce weird long titles by limiting to 200 chars
     if len(t) > 240:
         t = t[:240] + "..."
     return t
@@ -310,7 +541,6 @@ def _try_parse_posted_on_month_day_year(text):
                 return date(year, mm, day).isoformat()
             except:
                 return ""
-    # other pattern: "Posted: Jan 2nd, 2024" or "Posted 2 Jan 2024"
     m2 = re.search(r'posted[:\s]*\s*(\d{1,2})\s*([A-Za-z]+)\s*,?\s*(\d{4})', text, re.I)
     if m2:
         day = int(m2.group(1))
@@ -327,7 +557,6 @@ def _try_parse_posted_on_month_day_year(text):
 def extract_date_from_html(html_text):
     if not html_text:
         return ""
-    # structured JSON-LD datePosted
     m = re.search(r'"datePosted"\s*:\s*"([^"]+)"', html_text)
     if m:
         return _iso_only_date(m.group(1))
@@ -362,7 +591,6 @@ def is_likely_job_anchor(href, text):
     h = href.lower()
     t = (text or "").lower()
 
-    # Reject clearly non-job sections
     BAD = [
         "about", "privacy", "security", "press",
         "events", "culture", "life-at", "team",
@@ -374,7 +602,6 @@ def is_likely_job_anchor(href, text):
     if any(b in t for b in BAD):
         return False
 
-    # Accept only REAL ATS links
     ATS = [
         "lever.co",
         "greenhouse",
@@ -391,7 +618,6 @@ def is_likely_job_anchor(href, text):
     if any(a in h for a in ATS):
         return True
 
-    # Role keyword requirement
     ROLE = [
         "engineer","developer","manager","director","architect",
         "scientist","analyst","product","designer","sales",
@@ -408,13 +634,11 @@ def extract_location_from_text(txt):
     if not txt:
         return "", ""
     s = txt.replace("\r", " ").replace("\n", " ").strip()
-    # parenthetical location at end
     paren = re.search(r"\(([^)]+)\)\s*$", s)
     if paren:
         loc = paren.group(1)
         title = s[: paren.start()].strip(" -:,")
         return title, normalize_location(loc)
-    # split on separators, if last looks like location
     parts = re.split(r"\s{2,}| - | — | – | \| |·|•| — |,", s)
     parts = [p.strip() for p in parts if p.strip()]
     if len(parts) >= 2:
@@ -494,7 +718,6 @@ def detect_seniority(title):
     if not title:
         return "Unknown"
     t = title.lower()
-    # Director / Exec
     if any(x in t for x in ["chief ", "cxo", "cto", "ceo", "cfo", "coo", "vp ", "vice president", "svp", "evp", "executive director", "head of", "director", "managing director"]):
         return "Director+"
     if any(x in t for x in ["principal", "distinguished", "fellow"]):
@@ -512,17 +735,14 @@ def detect_seniority(title):
     return "Unknown"
 
 # ---------- SCRAPE ----------
-# PATCH 1: Replace fetch_page_content with SPA-aware version
 def fetch_page_content(page, url, nav_timeout=45000, dom_timeout=15000):
     try:
-        # Load full SPA content (React)
         page.goto(url, timeout=nav_timeout, wait_until="networkidle")
         page.wait_for_load_state("networkidle")
-        page.wait_for_timeout(1200)  # Let React hydrate
+        page.wait_for_timeout(1200)
         return page.content()
     except Exception as e:
         print(f"[WARN] SPA load failed {url}: {e}")
-        # fallback: domcontentloaded
         try:
             page.goto(url, timeout=nav_timeout, wait_until="domcontentloaded")
             page.wait_for_timeout(1200)
@@ -532,13 +752,11 @@ def fetch_page_content(page, url, nav_timeout=45000, dom_timeout=15000):
             return ""
 
 def should_drop_by_title(title):
-    # after cleaning, if title lacks role words, drop it
     if not title or len(title.strip()) == 0:
         return True
     low = title.lower()
     if ROLE_WORDS_RE.search(low):
         return False
-    # allow short 'intern' etc
     if re.search(r'\bintern\b', low):
         return False
     return True
@@ -559,6 +777,25 @@ def scrape():
                     continue
                 soup = BeautifulSoup(listing_html, "lxml")
                 candidates = []
+
+                # --- SPECIAL EXTRACTOR HOOK ---
+                try:
+                    if company in SPECIAL_EXTRACTORS:
+                        try:
+                            special_candidates = SPECIAL_EXTRACTORS[company](soup, page, main_url)
+                            for cand in special_candidates:
+                                # normalize tuple shape
+                                if isinstance(cand, (list, tuple)) and len(cand) >= 2:
+                                    href = normalize_link(main_url, cand[0])
+                                    txt = cand[1] or ""
+                                    el = cand[2] if len(cand) > 2 else None
+                                    if href and (href, txt) not in [(c[0], c[1]) for c in candidates]:
+                                        candidates.append((href, txt, el))
+                        except Exception as e:
+                            print(f"[WARN] special extractor {company} failed: {e}")
+                except Exception:
+                    pass
+
                 # anchors
                 for a in soup.find_all("a", href=True):
                     href = a.get("href")
@@ -567,32 +804,19 @@ def scrape():
                     if is_likely_job_anchor(href_abs, text):
                         candidates.append((href_abs, text, a))
 
-                # PATCH 2: FIVETRAN SPECIAL JOB EXTRACTOR
+                # Fivetran special extractor kept
                 if "fivetran.com" in main_url:
                     print("[FIVETRAN] Running React job-card extractor")
-
-                    # Find React job cards
                     for job in soup.select("div[data-job-id], div.job-card, a[data-job-id]"):
                         text = job.get_text(" ", strip=True)
-
-                        # Extract job link
-                        link = (
-                            job.get("href")
-                            or job.get("data-url")
-                            or job.get("data-job-url")
-                        )
-
-                        # If only job-id exists
+                        link = (job.get("href") or job.get("data-url") or job.get("data-job-url"))
                         if not link:
                             jid = job.get("data-job-id")
                             if jid:
                                 link = f"https://www.fivetran.com/careers/job/{jid}"
-
                         if not link:
                             continue
-
                         link = normalize_link(main_url, link)
-
                         if text.strip():
                             candidates.append((link, text, job))
                             print(f"[FIVETRAN] Found job: {text} -> {link}")
@@ -604,6 +828,7 @@ def scrape():
                     href = normalize_link(main_url, a.get("href")) if a else ""
                     if is_likely_job_anchor(href, text):
                         candidates.append((href, text, el))
+
                 # try iframe to ATS if none
                 if not candidates:
                     for iframe in soup.find_all("iframe", src=True):
@@ -619,6 +844,7 @@ def scrape():
                                     href_abs = normalize_link(src_full, href)
                                     if is_likely_job_anchor(href_abs, text):
                                         candidates.append((href_abs, text, a))
+
                 # dedupe + company skip rules
                 seen = set()
                 filtered = []
@@ -640,7 +866,8 @@ def scrape():
                     if skip:
                         continue
                     filtered.append((href, text, el))
-                # parse filtered candidates
+
+                # parse filtered candidates (rest of your logic unchanged)
                 for link, anchor_text, el in filtered:
                     time.sleep(SLEEP_BETWEEN_REQUESTS)
                     title_candidate = anchor_text or ""
@@ -656,18 +883,10 @@ def scrape():
                         location_candidate = card_loc
 
                     # --- RELEVANCY: Option C hybrid flow ---
-                    # 1) light score on anchor/title
                     light_score = score_title_desc(title_candidate, "", company)
-                    # Decide whether to fetch detail:
-                    # - If must_detail is True (original reasons) we will still fetch detail; else
-                    # - If light_score >= threshold => accept without fetching detail
-                    # - If 0 < light_score < threshold => ambiguous => fetch detail and rescore
-                    # - If light_score <= 0 => drop early (unless forced to detail by existing must_detail rules)
                     posting_date = ""
                     must_detail = False
                     must_reasons = []
-
-                    # original must_detail logic kept
                     if company.lower() in CRITICAL_COMPANIES:
                         must_detail = True; must_reasons.append("critical_company")
                     if not location_candidate:
@@ -681,7 +900,6 @@ def scrape():
                     if any(x in (link or "").lower() for x in ["/job/","/jobs/","greenhouse","lever.co","ashbyhq","bamboohr","myworkdayjobs","gr8people","welcometothejungle","career","jobvite","smartrecruiters"]):
                         must_detail = True; must_reasons.append("link_looks_like_ats")
 
-                    # Logging decision
                     if must_detail:
                         print(f"[DETAIL_DECISION] (forced) company={company} link={link} reasons={','.join(must_reasons)} detail_count={detail_count}")
                     else:
@@ -691,18 +909,13 @@ def scrape():
                     s = None
                     final_score = light_score
 
-                    # If light_score >= threshold and not forced, skip detail fetch
                     if light_score >= RELEVANCY_THRESHOLD and not must_detail:
-                        # Accept based on light score; final_score remains light_score
                         keep_reason = f"light_score_ok({light_score})"
                         print(f"[KEEP-LIGHT] {company} | {title_candidate} | score={light_score}")
                     else:
-                        # If light_score <= 0 and not forced: drop early
                         if light_score <= 0 and not must_detail:
-                            # Drop early
                             print(f"[DROP-LIGHT] Dropping by light_score <=0 -> company={company} title='{title_candidate}' score={light_score}")
                             continue
-                        # Otherwise fetch detail and compute final score
                         if detail_count < MAX_DETAIL_PAGES:
                             detail_count += 1
                             print(f"[DETAIL_FETCH] #{detail_count} -> {company} -> {link}")
@@ -710,14 +923,12 @@ def scrape():
                             if detail_html:
                                 try:
                                     s = BeautifulSoup(detail_html, "lxml")
-                                    # H1/title fallback
                                     header = s.find("h1")
                                     if header:
                                         old_title = title_clean
                                         title_clean = clean_title(header.get_text(" ", strip=True))
                                         if title_clean != old_title:
                                             print(f"[DETAIL_TITLE] replaced '{old_title}' -> '{title_clean}'")
-                                    # location selectors
                                     found_loc = None
                                     for sel in ["span.location", ".job-location", ".location", "[data-test='job-location']", ".posting-location", ".job_meta_location", ".location--name", ".opening__meta", ".job-card__location", ".posting__location"]:
                                         eloc = s.select_one(sel)
@@ -725,7 +936,6 @@ def scrape():
                                             found_loc = normalize_location(eloc.get_text(" ", strip=True)); break
                                     if found_loc:
                                         location_candidate = found_loc; print(f"[DETAIL_LOC] found -> {location_candidate}")
-                                    # JSON-LD robust parsing (jobLocation / datePosted)
                                     for script in s.find_all("script", type="application/ld+json"):
                                         text = script.string
                                         if not text: continue
@@ -743,7 +953,6 @@ def scrape():
                                         items = payload if isinstance(payload, list) else [payload]
                                         for item in items:
                                             if not isinstance(item, dict): continue
-                                            # jobLocation parsing
                                             jl = item.get("jobLocation") or item.get("jobLocations")
                                             if jl:
                                                 jl_entry = jl[0] if isinstance(jl, list) else jl
@@ -760,10 +969,8 @@ def scrape():
                                                         location_candidate = normalize_location(str(jl_entry.get("name"))); print(f"[DETAIL_JSON_LOC] found -> {location_candidate}"); break
                                                 elif isinstance(jl_entry, str):
                                                     location_candidate = normalize_location(jl_entry); print(f"[DETAIL_JSON_LOC] found -> {location_candidate}"); break
-                                            # datePosted parsing
                                             if isinstance(item.get("datePosted"), str) and not posting_date:
                                                 posting_date = _iso_only_date(item.get("datePosted")); print(f"[DETAIL_DATE] found -> {posting_date}")
-                                    # EXTENDED ATS-specific parsing (kept identical to previous)
                                     if not posting_date:
                                         try:
                                             text_blob = detail_html
@@ -863,7 +1070,6 @@ def scrape():
                                                     posting_date = parsed; print(f"[DETAIL_AUX_DATE] PostedOnMonth -> {posting_date}")
                                         except Exception as e:
                                             print(f"[WARN] extended-ats-date extractor failed: {e}")
-                                    # DATE NEAR TITLE heuristic
                                     if not posting_date and s:
                                         try:
                                             h1 = s.find("h1")
@@ -881,13 +1087,11 @@ def scrape():
                                                         posting_date = d.isoformat(); print(f"[TITLE_DATE] days-ago near title -> {posting_date}")
                                         except Exception as e:
                                             print(f"[WARN] title-date-extractor error: {e}")
-                                    # STRICT ISO near keywords (Patch 1)
                                     if not posting_date:
                                         snippet = detail_html[:50000]
                                         m = re.search(r'(?i)(posted|created|updated|date|time)[^0-9]{0,80}(\d{4}-\d{2}-\d{2})', snippet)
                                         if m:
                                             posting_date = _iso_only_date(m.group(2)); print(f"[STRICT_ISO_PATCH1] -> {posting_date}")
-                                    # final fallback helper
                                     if not posting_date:
                                         found_date = extract_date_from_html(detail_html)
                                         if found_date:
@@ -897,7 +1101,6 @@ def scrape():
                             else:
                                 print(f"[WARN] empty detail_html for {link}")
 
-                        # Recompute final_score using title_clean and detail_html
                         final_score = score_title_desc(title_clean or title_candidate, detail_html or "", company)
                         print(f"[FINAL_SCORE] company={company} link={link} final_score={final_score} (light={light_score})")
 
@@ -908,11 +1111,9 @@ def scrape():
                             print(f"[DROP-FINAL] Dropping after detail fetch -> score={final_score} | company={company} | title='{title_clean or title_candidate}'")
                             continue
 
-                    # final normalization (unchanged)
                     title_final = clean_title(title_clean) if title_clean else clean_title(anchor_text or "")
                     location_candidate = normalize_location(location_candidate)
                     posting_date_final = posting_date or ""
-                    # deep location extraction if still empty
                     if not location_candidate and detail_html:
                         try:
                             m = re.search(r'"addressLocality"\s*:\s*"([^"]+)"', detail_html)
@@ -946,25 +1147,21 @@ def scrape():
                                         location_candidate = normalize_location(", ".join(parts)); print(f"[DEEP_LOC] Ashby -> {location_candidate}")
                         except Exception as e:
                             print(f"[WARN] deep-loc extractor error: {e}")
-                    # ULTRA_LOC regex (Patch 2)
                     if not location_candidate and detail_html:
                         snippet = detail_html[:40000]
                         mm = re.search(r'([A-Z][a-zA-Z]+)[,\s\-–]+(USA|United States|UK|Germany|France|India|Singapore|Canada|Australia)', snippet)
                         if mm:
                             location_candidate = normalize_location(mm.group(0)); print(f"[ULTRA_LOC_PATCH2] -> {location_candidate}")
                     location_final = normalize_location(location_candidate)
-                    # fallback location from link path
                     if not location_final:
                         mloc = re.search(r'/(remote|new[-_]york|london|berlin|singapore|bengaluru|chennai|munich|frankfurt)[/\-]?', link or "", re.I)
                         if mloc:
                             location_final = mloc.group(1).replace('-', ' ').title()
-                    # fallback posting date from anchor
                     if not posting_date_final:
                         posted_from_anchor = re.search(r'posted\s+(\d+)\s+days?\s+ago', anchor_text or "", re.I)
                         if posted_from_anchor:
                             d = date.today() - timedelta(days=int(posted_from_anchor.group(1)))
                             posting_date_final = d.isoformat()
-                    # final pre-filter: drop obvious marketing / product / non-job titles
                     if not should_drop_by_title(title_final):
                         rows.append({
                             "Company": company,
@@ -983,15 +1180,12 @@ def scrape():
 if __name__ == "__main__":
     try:
         all_rows = scrape()
-        # inject seniority into rows BEFORE dedupe sorting
         for r in all_rows:
             r["Seniority"] = detect_seniority(r.get("Job Title",""))
-        # dedupe by Job Link and compute Days Since Posted
         dedup = {}
         for r in all_rows:
             lk = r.get("Job Link") or ""
             if lk in dedup:
-                # prefer row with posting date if duplicate
                 existing = dedup[lk]
                 if not existing.get("Posting Date") and r.get("Posting Date"):
                     dedup[lk] = r
@@ -1008,11 +1202,8 @@ if __name__ == "__main__":
             dedup[lk] = r
         out = list(dedup.values())
         out_sorted = sorted(out, key=lambda x: (x.get("Company","").lower(), x.get("Job Title","").lower()))
-
-        # PATCH (GEMINI-ready): Always write to repo root
         repo_root = os.path.dirname(os.path.abspath(__file__))
         outfile = os.path.join(repo_root, "jobs_final_hard.csv")
-
         fieldnames=["Company","Job Title","Job Link","Location","Posting Date","Days Since Posted","Seniority"]
         with open(outfile, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
