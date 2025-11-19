@@ -361,18 +361,52 @@ def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=PAGE
 
 # --- SENIORITY CLASSIFIER (Helper moved outside scrape) ---
 def detect_seniority(title):
+    if not title:
+        return "Unknown"
+
     t = title.lower()
 
-    if any(x in t for x in ("senior", "sr ", "sr.", "lead", "staff", "principal")):
-        return "Senior"
-    if any(x in t for x in ("director", "head of", "vp", "vice president")):
+    # DIRECTOR / EXECUTIVE / LEADERSHIP
+    if any(x in t for x in [
+        "chief ", "cxo", "cto", "ceo", "cfo", "coo",
+        "vp", "vice president", "svp", "evp",
+        "executive director", "executive", "head of",
+        "director", "global director", "managing director"
+    ]):
         return "Director+"
-    if any(x in t for x in ("manager", "mgr", "management")):
-        return "Manager"
-    if any(x in t for x in ("intern", "internship", "graduate", "entry")):
-        return "Entry"
-    if any(x in t for x in ("associate", "mid", "middle", "ii", "2")):
+
+    # PRINCIPAL / STAFF
+    if any(x in t for x in [
+        "staff ", "principal", "distinguished", "fellow"
+    ]):
+        return "Principal/Staff"
+
+    # SENIOR
+    if any(x in t for x in [
+        "senior", "sr.", "sr ", "lead ", "lead-", "team lead",
+        "senior engineer", "senior manager"
+    ]):
+        return "Senior"
+
+    # MID
+    if any(x in t for x in [
+        "mid ", "mid-", "intermediate", "experience", "level ii",
+        "ii ", "2 ", "associate", "regular"
+    ]):
         return "Mid"
+
+    # ENTRY / JUNIOR
+    if any(x in t for x in [
+        "junior", "jr.", "jr ", "entry", "graduate", "fresher"
+    ]):
+        return "Entry"
+
+    # INTERN
+    if any(x in t for x in [
+        "intern", "internship", "working student", "werkstudent"
+    ]):
+        return "Intern"
+
     return "Unknown"
 
 
@@ -798,23 +832,23 @@ def scrape():
                                     except Exception as e:
                                         print(f"[WARN] ultra-date extractor failed: {e}")
 
-                                # --- STRICT ISO NEAR KEYWORDS (clean) ---
+                                # --- STRICT ISO NEAR KEYWORDS (Patch #1)
                                 if not posting_date:
-                                    snippet = detail_html[:30000]
+                                    snippet = detail_html[:50000]
                                     m = re.search(
-                                        r'(?i)(posted|created|updated|date|time)[^0-9]{0,40}(\d{4}-\d{2}-\d{2})',
+                                        r'(?i)(posted|created|updated|date|time)[^0-9]{0,80}(\d{4}-\d{2}-\d{2})',
                                         snippet
                                     )
                                     if m:
                                         posting_date = _iso_only_date(m.group(2))
-                                        print(f"[STRICT_ISO] -> {posting_date}")
+                                        print(f"[STRICT_ISO_PATCH1] -> {posting_date}")
 
                                 # final fallback using existing helper
                                 if not posting_date:
                                     found_date = extract_date_from_html(detail_html)
                                     if found_date:
                                         posting_date = found_date
-                                        print(f"[DETAIL_DATE_FALLBACK] parsed -> {posting_date}")
+                                        print(f"[DETAIL_DATE_FALLBACK_PATCH1] -> {posting_date}")
 
                             except Exception as e:
                                 print(f"[WARN] detail parse fail {link} -> {e}")
@@ -881,16 +915,16 @@ def scrape():
                         except Exception as e:
                             print(f"[WARN] deep-loc extractor error: {e}")
                             
-                    # --- ULTRA_LOC regex ---
+                    # --- ULTRA_LOC regex (Patch #2) ---
                     if not location_candidate and detail_html:
-                        snippet = detail_html[:20000]
+                        snippet = detail_html[:40000]
                         mm = re.search(
                             r'([A-Z][a-zA-Z]+)[,\s\-–]+(USA|United States|UK|Germany|France|India|Singapore|Canada|Australia)',
                             snippet
                         )
                         if mm:
                             location_candidate = normalize_location(mm.group(0))
-                            print(f"[ULTRA_LOC] regex -> {location_candidate}")
+                            print(f"[ULTRA_LOC_PATCH2] -> {location_candidate}")
                             
                     location_final = normalize_location(location_candidate) # Re-normalize after deep extraction
 
