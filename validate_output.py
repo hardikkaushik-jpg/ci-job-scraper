@@ -1,7 +1,8 @@
-# validate_output.py  (Enterprise C+ Validator — FINAL)
+# validate_output.py  (Enterprise C+ Validator — FINAL)
 import pandas as pd
 import re
 import sys
+import os # NEW: Import os for path manipulation
 
 REQUIRED_COLUMNS = [
     "Company",
@@ -54,16 +55,21 @@ def fail(msg):
     sys.exit(1)
 
 def warn(msg):
-    print(f"⚠️  WARNING: {msg}")
+    print(f"⚠️  WARNING: {msg}")
 
 def ok(msg):
     print(f"✅ {msg}")
 
 def main():
+    # --- REPLACED FILE READING SECTION ---
+    repo_root = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(repo_root, "jobs_cleaned_final_enriched.csv")
+    
     try:
-        df = pd.read_csv("jobs_cleaned_final_enriched.csv", dtype=str).fillna("")
+        df = pd.read_csv(csv_path, dtype=str).fillna("")
     except Exception as e:
-        fail(f"Could not read output CSV: {e}")
+        fail(f"Could not read output CSV at '{csv_path}': {e}")
+    # -------------------------------------
 
     print("======== ENTERPRISE VALIDATOR ========")
     print(f"Total rows: {len(df)}")
