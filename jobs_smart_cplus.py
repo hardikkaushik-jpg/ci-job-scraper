@@ -1,7 +1,7 @@
 # jobs_smart_cplus.py
 # Cleaned + compact Playwright + BeautifulSoup hybrid scraper
 # ATS-aware, special extractors, enriched relevancy flow.
-# Run: python3 jobs_smart_cplus_final_compact.py
+# Run: python3 jobs_smart_cplus.py
 # Requires: playwright, beautifulsoup4, lxml
 
 from playwright.sync_api import sync_playwright
@@ -14,7 +14,8 @@ from datetime import datetime, date, timedelta
 from special_extractors_deep import SPECIAL_EXTRACTORS_DEEP
 
 # ---------- CONFIG ----------
-# Still restricted to Cloudera for debugging
+# For now, still restricted to Cloudera for debugging
+# Later you can restore the full COMPANIES dict.
 COMPANIES = {
     "Cloudera": ["https://cloudera.wd5.myworkdayjobs.com/External_Career"]
 }
@@ -26,12 +27,19 @@ MAX_DETAIL_PAGES = 12000
 
 # ---------- PATTERNS ----------
 FORBIDDEN_RE = re.compile(
-    r'\b(?:privacy|about|press|blog|partners|pricing|docs|support|events|resources|login|apply now|read more)\b', re.I
+    r'\b(?:privacy|about|press|blog|partners|pricing|docs|support|events|resources|login|apply now|read more)\b',
+    re.I
 )
 
-LOC_RE = re.compile(r'\b(?:remote|hybrid|usa|united states|uk|germany|india|london|new york|singapore|berlin|bengaluru)\b', re.I)
+LOC_RE = re.compile(
+    r'\b(?:remote|hybrid|usa|united states|uk|germany|india|london|new york|singapore|berlin|bengaluru)\b',
+    re.I
+)
 
-ROLE_WORDS_RE = re.compile(r'\b(?:engineer|developer|manager|director|architect|scientist|analyst|product|sre|intern)\b', re.I)
+ROLE_WORDS_RE = re.compile(
+    r'\b(?:engineer|developer|manager|director|architect|scientist|analyst|product|sre|intern)\b',
+    re.I
+)
 
 COMPANY_SKIP_RULES = {
     "Ataccama": [r'one-team', r'blog', r'about'],
@@ -40,90 +48,146 @@ COMPANY_SKIP_RULES = {
     "BigEye": [r'product', r'resources'],
 }
 
-CRITICAL_COMPANIES = {"fivetran","ataccama","datadog","snowflake","matillion","oracle","mongodb","databricks"}
+CRITICAL_COMPANIES = {"fivetran", "ataccama", "datadog", "snowflake",
+                      "matillion", "oracle", "mongodb", "databricks"}
 
-RELEVANCE_HARD = [r'\bdata engineer\b', r'\betl\b', r'\bintegrat', r'\bconnector', r'\bpipeline\b', r'\bsnowflake\b', r'\bdatabricks\b', r'\bobs ervab']
+RELEVANCE_HARD = [
+    r'\bdata engineer\b',
+    r'\betl\b',
+    r'\bintegrat',
+    r'\bconnector',
+    r'\bpipeline\b',
+    r'\bsnowflake\b',
+    r'\bdatabricks\b',
+    r'\bobs ervab'
+]
 RELEVANCY_THRESHOLD = 2
+
 
 def score_title_desc(title, desc, company=""):
     t = ((title or "") + " " + (desc or "")).lower()
     score = 0
     for p in RELEVANCE_HARD:
-        if re.search(p, t): score += 3
+        if re.search(p, t):
+            score += 3
     if company and "oracle" in company.lower() and "autonomous" in t:
         score += 1
     return score
 
+
 # helpers
 def normalize_link(base, href):
-    if not href: return ""
+    if not href:
+        return ""
     href = href.strip()
-    if href.startswith("//"): href = "https:" + href
+    if href.startswith("//"):
+        href = "https:" + href
     parsed = urlparse(href)
-    if parsed.netloc: return href
-    try: return urljoin(base, href)
-    except: return href
+    if parsed.netloc:
+        return href
+    try:
+        return urljoin(base, href)
+    except Exception:
+        return href
+
 
 def clean_title(raw):
-    if not raw: return ""
+    if not raw:
+        return ""
     t = re.sub(r'\s+', ' ', raw).strip()
     t = FORBIDDEN_RE.sub('', t)
     t = re.sub(r'\((?:remote|hybrid)[^)]+\)\s*$', '', t, flags=re.I).strip()
     t = re.sub(r'^[\-•\*]\s*', '', t)
     return t.strip(" -:,.|")[:240]
 
+
 def extract_location_from_text(txt):
-    if not txt: return "", ""
-    s = txt.replace("\r"," ").replace("\n"," ").strip()
+    if not txt:
+        return "", ""
+    s = txt.replace("\r", " ").replace("\n", " ").strip()
     paren = re.search(r'\(([^)]+)\)\s*$', s)
-    if paren: return s[:paren.start()].strip(" -:,"), paren.group(1)
+    if paren:
+        return s[:paren.start()].strip(" -:,"), paren.group(1)
     parts = re.split(r'\s{2,}| - | — | – | \| |·|•|,', s)
     parts = [p.strip() for p in parts if p.strip()]
-    if len(parts) >= 2 and (LOC_RE.search(parts[-1]) or len(parts[-1].split())<=4):
+    if len(parts) >= 2 and (LOC_RE.search(parts[-1]) or len(parts[-1].split()) <= 4):
         return " ".join(parts[:-1]), parts[-1]
     m = LOC_RE.search(s)
     if m:
-        idx = m.start(); candidate = s[idx:].strip(" -,:;")
-        title = s.replace(candidate,"").strip(" -:,")
+        idx = m.start()
+        candidate = s[idx:].strip(" -,:;")
+        title = s.replace(candidate, "").strip(" -:,")
         return title, candidate
     return s, ""
 
+
 def try_extract_location_from_card(el):
-    if not el: return ""
+    if not el:
+        return ""
     selectors = [".location", ".job-location", ".posting-location", ".job_meta_location"]
     for sel in selectors:
         try:
             found = el.select_one(sel)
-        except: found = None
+        except Exception:
+            found = None
         if found and found.get_text(strip=True):
             return found.get_text(" ", strip=True)
     # attribute fallback
-    for attr in ("data-location","data-geo","aria-label","title"):
+    for attr in ("data-location", "data-geo", "aria-label", "title"):
         v = el.get(attr)
-        if v and isinstance(v,str): return v
+        if v and isinstance(v, str):
+            return v
     return ""
 
+
 def detect_seniority(title):
-    if not title: return "Unknown"
+    if not title:
+        return "Unknown"
     t = title.lower()
-    if any(x in t for x in ["chief ","cto","vp ","director","head of"]): return "Director+"
-    if any(x in t for x in ["principal","distinguished"]): return "Principal/Staff"
-    if any(x in t for x in ["senior","sr.","lead "]): return "Senior"
-    if any(x in t for x in ["manager","mgr"]): return "Manager"
-    if any(x in t for x in ["mid ","associate","ii"]): return "Mid"
-    if any(x in t for x in ["junior","jr.","entry"]): return "Entry"
-    if any(x in t for x in ["intern","internship","werkstudent"]): return "Intern"
+    if any(x in t for x in ["chief ", "cto", "vp ", "director", "head of"]):
+        return "Director+"
+    if any(x in t for x in ["principal", "distinguished"]):
+        return "Principal/Staff"
+    if any(x in t for x in ["senior", "sr.", "lead "]):
+        return "Senior"
+    if any(x in t for x in ["manager", "mgr"]):
+        return "Manager"
+    if any(x in t for x in ["mid ", "associate", "ii"]):
+        return "Mid"
+    if any(x in t for x in ["junior", "jr.", "entry"]):
+        return "Entry"
+    if any(x in t for x in ["intern", "internship", "werkstudent"]):
+        return "Intern"
     return "Unknown"
 
+
 def is_likely_job_anchor(href, text):
-    if not href: return False
-    h = (href or "").lower(); t = (text or "").lower()
-    BAD = ["about","privacy","press","events","product","resources","download","company","blog"]
-    if any(b in h for b in BAD) or any(b in t for b in BAD): return False
-    ATS = ["lever.co","greenhouse","myworkdayjobs","ashby","bamboohr","smartrecruiters","jobvite","/jobs/","/job/","fivetran.com"]
-    if any(a in h for a in ATS): return True
-    if ROLE_WORDS_RE.search(t): return True
+    if not href:
+        return False
+    h = (href or "").lower()
+    t = (text or "").lower()
+    BAD = ["about", "privacy", "press", "events", "product",
+           "resources", "download", "company", "blog"]
+    if any(b in h for b in BAD) or any(b in t for b in BAD):
+        return False
+    ATS = [
+        "lever.co",
+        "greenhouse",
+        "myworkdayjobs",
+        "ashby",
+        "bamboohr",
+        "smartrecruiters",
+        "jobvite",
+        "/jobs/",
+        "/job/",
+        "fivetran.com"
+    ]
+    if any(a in h for a in ATS):
+        return True
+    if ROLE_WORDS_RE.search(t):
+        return True
     return False
+
 
 def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=PAGE_DOM_TIMEOUT):
     try:
@@ -139,64 +203,78 @@ def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=PAGE
         except Exception:
             return ""
 
+
 def should_drop_by_title(title):
-    if not title or title.strip()=="":
+    if not title or title.strip() == "":
         return True
-    if ROLE_WORDS_RE.search((title or "").lower()): return False
-    if re.search(r'\bintern\b', (title or "").lower()): return False
+    if ROLE_WORDS_RE.search((title or "").lower()):
+        return False
+    if re.search(r'\bintern\b', (title or "").lower()):
+        return False
     return True
+
+
 def _iso_only_date(raw):
     if not raw:
         return ""
     raw = raw.strip()
     try:
         return datetime.fromisoformat(raw.replace("Z", "")).date().isoformat()
-    except:
+    except Exception:
         pass
     try:
         m = re.search(r"(\d{4}-\d{2}-\d{2})", raw)
         if m:
             return m.group(1)
-    except:
+    except Exception:
         pass
     return ""
+
 
 def extract_date_from_html(html_text):
     if not html_text:
         return ""
+
     m = re.search(r'"datePosted"\s*:\s*"([^"]+)"', html_text)
     if m:
         raw = m.group(1)
         try:
             return datetime.fromisoformat(raw.split("T")[0]).date().isoformat()
-        except:
+        except Exception:
             pass
+
     m2 = re.search(r'<time[^>]+datetime=["\']([^"\']+)["\']', html_text, re.I)
     if m2:
         raw = m2.group(1)
         try:
             return datetime.fromisoformat(raw.split("T")[0]).date().isoformat()
-        except:
+        except Exception:
             pass
+
     mm = re.search(r'posted\s+(\d+)\s+days?\s+ago', html_text, re.I)
     if mm:
         try:
             days = int(mm.group(1))
             return (date.today() - timedelta(days=days)).isoformat()
-        except:
+        except Exception:
             pass
+
     mm2 = re.search(r'(\d{4}-\d{2}-\d{2})', html_text)
     if mm2:
         return mm2.group(1)
+
     return ""
+
 
 def scrape():
     rows = []
     detail_count = 0
+
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
         context = browser.new_context()
         page = context.new_page()
+
         for company, url_list in COMPANIES.items():
             for main_url in url_list:
                 print(f"[SCRAPING] {company} -> {main_url}")
@@ -204,28 +282,135 @@ def scrape():
                 if not listing_html:
                     print(f"[WARN] no html for {company} ({main_url}) - skipping")
                     continue
+
                 soup = BeautifulSoup(listing_html, "lxml")
                 candidates = []
 
-                # --- SPECIAL EXTRACTORS ---
+                # ====================================================
+                # 1) SPECIAL EXTRACTORS -> DIRECT ROWS (TRUSTED PATH)
+                # ====================================================
                 if company in SPECIAL_EXTRACTORS_DEEP:
                     print(f"[DEBUG] Running special extractor for {company}")
                     try:
                         special = SPECIAL_EXTRACTORS_DEEP[company](soup, page, main_url)
                         print(f"[DEBUG] SPECIAL RETURNED FOR {company}: {len(special)} items")
 
-                        # ⬇️ CRITICAL LINE — ADD SPECIAL ITEMS TO CANDIDATES
-                        for link, text, el in special:
-                            candidates.append((link, text, el))
+                        for item in special:
+                            # item can be (link, title) or (link, title, el)
+                            if not item:
+                                continue
+                            if len(item) == 3:
+                                link, text, el = item
+                            elif len(item) == 2:
+                                link, text = item
+                                el = None
+                            else:
+                                # Fallback if extractor shape is odd
+                                link = item[0]
+                                text = item[1] if len(item) > 1 else ""
+                                el = None
+
+                            link = normalize_link(main_url, link)
+                            if not link:
+                                continue
+
+                            # Derive a clean title & possible location from the text
+                            raw_text = text or ""
+                            t_candidate, loc_candidate = extract_location_from_text(raw_text)
+                            title_final = clean_title(t_candidate or raw_text)
+
+                            if should_drop_by_title(title_final):
+                                # still prevent obvious garbage
+                                print(f"[DROP-SPECIAL] Filtered non-job from {company} | {title_final} | {link}")
+                                continue
+
+                            posting_date = ""
+                            location_final = (loc_candidate or "").strip()
+
+                            # Optional detail fetch to enrich ONLY location/date
+                            if detail_count < MAX_DETAIL_PAGES:
+                                detail_count += 1
+                                detail_html = fetch_page_content(page, link)
+                                if detail_html:
+                                    try:
+                                        s_detail = BeautifulSoup(detail_html, "lxml")
+
+                                        # DO NOT override title from detail page – Workday H1 is "XYZ Careers"
+                                        # Only try to improve location
+                                        for sel in [
+                                            "span.location",
+                                            ".job-location",
+                                            ".location",
+                                            "[data-test='job-location']",
+                                            ".posting-location",
+                                            ".job_meta_location",
+                                            ".location--name"
+                                        ]:
+                                            eloc = s_detail.select_one(sel)
+                                            if eloc and eloc.get_text(strip=True):
+                                                location_final = eloc.get_text(" ", strip=True)
+                                                break
+
+                                        # JSON-LD date + location
+                                        for script in s_detail.find_all("script", type="application/ld+json"):
+                                            text_json = script.string or ""
+                                            if not text_json:
+                                                continue
+                                            try:
+                                                payload = json.loads(text_json)
+                                            except Exception:
+                                                continue
+
+                                            items = payload if isinstance(payload, list) else [payload]
+                                            for obj in items:
+                                                if isinstance(obj, dict):
+                                                    if isinstance(obj.get("datePosted"), str) and not posting_date:
+                                                        posting_date = _iso_only_date(obj["datePosted"])
+
+                                                    jl = obj.get("jobLocation") or obj.get("jobLocations")
+                                                    if jl and not location_final:
+                                                        jl_entry = jl[0] if isinstance(jl, list) else jl
+                                                        if isinstance(jl_entry, dict):
+                                                            addr = jl_entry.get("address") or jl_entry
+                                                            if isinstance(addr, dict):
+                                                                parts = []
+                                                                for k in ("addressLocality", "addressRegion", "addressCountry", "postalCode"):
+                                                                    v = addr.get(k)
+                                                                    if v:
+                                                                        parts.append(str(v))
+                                                                if parts:
+                                                                    location_final = ", ".join(parts)
+                                                                    break
+
+                                        if not posting_date:
+                                            posting_date = extract_date_from_html(detail_html)
+
+                                    except Exception as e:
+                                        print(f"[WARN-SPECIAL] detail parse fail {link} -> {e}")
+
+                            rows.append({
+                                "Company": company,
+                                "Job Title": title_final,
+                                "Job Link": link,
+                                "Location": location_final,
+                                "Posting Date": posting_date,
+                                "Days Since Posted": ""
+                            })
+                            print(f"[KEEP-SPECIAL] {company} | {title_final} | {link}")
 
                     except Exception as e:
-                        print(f"[DEBUG] SPECIAL EXTRACTOR ERROR for {company} ->", e)
+                        print(f"[DEBUG] SPECIAL EXTRACTOR ERROR for {company} -> {e}")
                 else:
                     print(f"[DEBUG] Special extractor NOT found for {company}")
 
+                # ====================================================
+                # 2) GENERIC PIPELINE (UNCHANGED)
+                # ====================================================
+
                 # generic anchors
                 for a in soup.find_all("a", href=True):
-                    href = a.get("href"); text = a.get_text(" ", strip=True) or ""
+                    href = a.get("href")
+                    text = a.get_text(" ", strip=True) or ""
                     href_abs = normalize_link(main_url, href)
                     if is_likely_job_anchor(href_abs, text):
                         candidates.append((href_abs, text, a))
@@ -234,11 +419,17 @@ def scrape():
                 if "fivetran.com" in main_url:
                     for job in soup.select("div[data-job-id], div.job-card, a[data-job-id]"):
                         text = job.get_text(" ", strip=True)
-                        link = job.get("href") or job.get("data-url") or job.get("data-job-url") or job.get("data-job-id")
+                        link = (
+                            job.get("href")
+                            or job.get("data-url")
+                            or job.get("data-job-url")
+                            or job.get("data-job-id")
+                        )
                         if link and not link.startswith("http") and job.get("data-job-id"):
                             link = f"https://www.fivetran.com/careers/job/{job.get('data-job-id')}"
                         link = normalize_link(main_url, link)
-                        if text.strip(): candidates.append((link, text, job))
+                        if text.strip():
+                            candidates.append((link, text, job))
 
                 # job-card containers
                 for el in soup.select("[data-job], .job, .job-listing, .job-card, .opening, .position, .posting, .role, .job-row"):
@@ -252,22 +443,26 @@ def scrape():
                 if not candidates:
                     for iframe in soup.find_all("iframe", src=True):
                         src = iframe.get("src")
-                        if src and any(k in src for k in ("greenhouse","lever","myworkday","bamboohr","ashby","jobs.lever","jobvite")):
+                        if src and any(k in src for k in ("greenhouse", "lever", "myworkday", "bamboohr", "ashby", "jobs.lever", "jobvite")):
                             src_full = normalize_link(main_url, src)
                             iframe_html = fetch_page_content(page, src_full)
                             if iframe_html:
                                 f_soup = BeautifulSoup(iframe_html, "lxml")
                                 for a in f_soup.find_all("a", href=True):
-                                    href = a.get("href"); text = a.get_text(" ", strip=True) or ""
+                                    href = a.get("href")
+                                    text = a.get_text(" ", strip=True) or ""
                                     href_abs = normalize_link(src_full, href)
                                     if is_likely_job_anchor(href_abs, text):
                                         candidates.append((href_abs, text, a))
 
                 # dedupe + company skip rules
-                seen = set(); filtered = []
+                seen = set()
+                filtered = []
                 for href, text, el in candidates:
-                    if not href or href.rstrip("/") == main_url.rstrip("/"): continue
-                    if href in seen: continue
+                    if not href or href.rstrip("/") == main_url.rstrip("/"):
+                        continue
+                    if href in seen:
+                        continue
                     seen.add(href)
                     skip = False
                     low_text = (text or "").lower()
@@ -275,12 +470,15 @@ def scrape():
                         if c.lower() == company.lower():
                             for r in rules:
                                 if re.search(r, low_text) or (href and re.search(r, href, re.I)):
-                                    skip = True; break
-                        if skip: break
-                    if skip: continue
+                                    skip = True
+                                    break
+                        if skip:
+                            break
+                    if skip:
+                        continue
                     filtered.append((href, text, el))
 
-                # parse filtered candidates
+                # parse filtered candidates (unchanged generic logic)
                 for link, anchor_text, el in filtered:
                     time.sleep(SLEEP_BETWEEN_REQUESTS)
                     title_candidate = re.sub(r'\s+', ' ', (anchor_text or "")).strip()
@@ -294,12 +492,25 @@ def scrape():
                     posting_date = ""
                     must_detail = False
                     must_reasons = []
-                    if company.lower() in CRITICAL_COMPANIES: must_detail = True; must_reasons.append("critical_company")
-                    if not location_candidate: must_detail = True; must_reasons.append("no_location")
-                    if len((title_clean or "").split()) < 2: must_detail = True; must_reasons.append("short_title")
-                    if LOC_RE.search(title_candidate): must_detail = True; must_reasons.append("title_contains_loc")
-                    if any(x in (link or "").lower() for x in ["/job/","/jobs/","greenhouse","lever.co","ashby","bamboohr","myworkdayjobs","gr8people","welcometothejungle","jobvite","smartrecruiters"]):
-                        must_detail = True; must_reasons.append("link_looks_like_ats")
+
+                    if company.lower() in CRITICAL_COMPANIES:
+                        must_detail = True
+                        must_reasons.append("critical_company")
+                    if not location_candidate:
+                        must_detail = True
+                        must_reasons.append("no_location")
+                    if len((title_clean or "").split()) < 2:
+                        must_detail = True
+                        must_reasons.append("short_title")
+                    if LOC_RE.search(title_candidate):
+                        must_detail = True
+                        must_reasons.append("title_contains_loc")
+                    if any(x in (link or "").lower() for x in [
+                        "/job/", "/jobs/", "greenhouse", "lever.co", "ashby", "bamboohr",
+                        "myworkdayjobs", "gr8people", "welcometothejungle", "jobvite", "smartrecruiters"
+                    ]):
+                        must_detail = True
+                        must_reasons.append("link_looks_like_ats")
 
                     if must_detail:
                         print(f"[DETAIL_DECISION] (forced) {company} {link} reasons={','.join(must_reasons)}")
@@ -320,22 +531,36 @@ def scrape():
                             detail_html = fetch_page_content(page, link)
                             if detail_html:
                                 try:
-                                    s = BeautifulSoup(detail_html, "lxml")
-                                    header = s.find("h1")
+                                    s_detail = BeautifulSoup(detail_html, "lxml")
+
+                                    # (Generic) title override – this is fine for non-special jobs.
+                                    header = s_detail.find("h1")
                                     if header:
                                         newt = clean_title(header.get_text(" ", strip=True))
                                         if newt and newt != title_clean:
                                             title_clean = newt
-                                    for sel in ["span.location", ".job-location", ".location", "[data-test='job-location']", ".posting-location", ".job_meta_location", ".location--name"]:
-                                        eloc = s.select_one(sel)
+
+                                    for sel in [
+                                        "span.location",
+                                        ".job-location",
+                                        ".location",
+                                        "[data-test='job-location']",
+                                        ".posting-location",
+                                        ".job_meta_location",
+                                        ".location--name"
+                                    ]:
+                                        eloc = s_detail.select_one(sel)
                                         if eloc and eloc.get_text(strip=True):
-                                            location_candidate = eloc.get_text(" ", strip=True); break
-                                    for script in s.find_all("script", type="application/ld+json"):
-                                        text = script.string or ""
-                                        if not text: continue
+                                            location_candidate = eloc.get_text(" ", strip=True)
+                                            break
+
+                                    for script in s_detail.find_all("script", type="application/ld+json"):
+                                        text_json = script.string or ""
+                                        if not text_json:
+                                            continue
                                         try:
-                                            payload = json.loads(text)
-                                        except:
+                                            payload = json.loads(text_json)
+                                        except Exception:
                                             continue
                                         items = payload if isinstance(payload, list) else [payload]
                                         for item in items:
@@ -349,13 +574,17 @@ def scrape():
                                                         addr = jl_entry.get("address") or jl_entry
                                                         if isinstance(addr, dict):
                                                             parts = []
-                                                            for k in ("addressLocality","addressRegion","addressCountry","postalCode"):
+                                                            for k in ("addressLocality", "addressRegion", "addressCountry", "postalCode"):
                                                                 v = addr.get(k)
-                                                                if v: parts.append(str(v))
+                                                                if v:
+                                                                    parts.append(str(v))
                                                             if parts:
-                                                                location_candidate = ", ".join(parts); break
+                                                                location_candidate = ", ".join(parts)
+                                                                break
+
                                     if not posting_date:
                                         posting_date = extract_date_from_html(detail_html)
+
                                 except Exception as e:
                                     print(f"[WARN] detail parse fail {link} -> {e}")
 
@@ -368,6 +597,7 @@ def scrape():
                     title_final = clean_title(title_clean or anchor_text or "")
                     location_candidate = location_candidate or ""
                     posting_date_final = posting_date or ""
+
                     if not location_candidate and detail_html:
                         m = re.search(r'"addressLocality"\s*:\s*"([^"]+)"', detail_html)
                         if m:
@@ -375,15 +605,21 @@ def scrape():
                             m2 = re.search(r'"addressCountry"\s*:\s*"([^"]+)"', detail_html)
                             country = m2.group(1) if m2 else ""
                             loc = f"{city}, {country}".strip(", ")
-                            if loc: location_candidate = loc
+                            if loc:
+                                location_candidate = loc
                         if not location_candidate:
                             mm = re.search(r'"additionalLocations"\s*:\s*\[(.+?)\]', detail_html, re.S)
                             if mm:
-                                locs_raw = mm.group(1); locs = re.findall(r'\"([^"]+)\"', locs_raw)
-                                if locs: location_candidate = locs[0]
+                                locs_raw = mm.group(1)
+                                locs = re.findall(r'\"([^"]+)\"', locs_raw)
+                                if locs:
+                                    location_candidate = locs[0]
+
                     if not location_candidate:
                         mloc = re.search(r'/(remote|new[-_]york|london|berlin|singapore|bengaluru)[/\-]?', link or "", re.I)
-                        if mloc: location_candidate = mloc.group(1).replace('-', ' ').title()
+                        if mloc:
+                            location_candidate = mloc.group(1).replace('-', ' ').title()
+
                     if not posting_date_final:
                         posted_from_anchor = re.search(r'posted\s+(\d+)\s+days?\s+ago', anchor_text or "", re.I)
                         if posted_from_anchor:
@@ -403,14 +639,19 @@ def scrape():
                         print(f"[DROP] Dropping non-job row -> {company} | {title_final} | {link}")
 
         browser.close()
-        return rows
+    return rows
+
 
 # --- MAIN ---
 if __name__ == "__main__":
     try:
         all_rows = scrape()
+
+        # add seniority
         for r in all_rows:
-            r["Seniority"] = detect_seniority(r.get("Job Title",""))
+            r["Seniority"] = detect_seniority(r.get("Job Title", ""))
+
+        # dedupe on Job Link, prefer row with Posting Date
         dedup = {}
         for r in all_rows:
             lk = r.get("Job Link") or ""
@@ -419,29 +660,39 @@ if __name__ == "__main__":
                 if not existing.get("Posting Date") and r.get("Posting Date"):
                     dedup[lk] = r
                 continue
+
             pd = r.get("Posting Date") or ""
             if pd:
                 try:
                     d = datetime.fromisoformat(pd).date()
                     r["Days Since Posted"] = str((date.today() - d).days)
-                except:
+                except Exception:
                     r["Days Since Posted"] = ""
             else:
                 r["Days Since Posted"] = ""
+
             dedup[lk] = r
+
         out = list(dedup.values())
-        out_sorted = sorted(out, key=lambda x: (x.get("Company","").lower(), x.get("Job Title","").lower()))
+        out_sorted = sorted(out, key=lambda x: (x.get("Company", "").lower(), x.get("Job Title", "").lower()))
+
         repo_root = os.path.dirname(os.path.abspath(__file__))
         outfile = os.path.join(repo_root, "jobs_final_hard.csv")
-        fieldnames=["Company","Job Title","Job Link","Location","Posting Date","Days Since Posted","Seniority"]
+        fieldnames = ["Company", "Job Title", "Job Link", "Location",
+                      "Posting Date", "Days Since Posted", "Seniority"]
+
         with open(outfile, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             for r in out_sorted:
-                row_to_write = {k: (r.get(k,"") if r.get(k) is not None else "") for k in fieldnames}
+                row_to_write = {k: (r.get(k, "") if r.get(k) is not None else "") for k in fieldnames}
                 writer.writerow(row_to_write)
+
         print(f"[OK] wrote {len(out_sorted)} rows -> {outfile}")
+
     except KeyboardInterrupt:
-        print("Interrupted"); sys.exit(1)
+        print("Interrupted")
+        sys.exit(1)
     except Exception as e:
-        print(f"An unexpected error occurred: {e}"); sys.exit(1)
+        print(f"An unexpected error occurred: {e}")
+        sys.exit(1)
