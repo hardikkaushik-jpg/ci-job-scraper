@@ -1,49 +1,53 @@
-# extractor_salesforce.py
+# salesforce.py
+# Deep extractor for Salesforce careers portal
 
-import re, json
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-RELEVANT = re.compile(r"(mulesoft|tableau|integration|data|analytics|engineer|etl|api|platform)", re.I)
-
-def fetch_detail(page, link):
-    try:
-        page.goto(link, timeout=45000, wait_until="networkidle")
-        page.wait_for_timeout(1400)
-
-        s = BeautifulSoup(page.content(), "lxml")
-
-        title = (s.find("h1").get_text(" ", strip=True)
-                 if s.find("h1") else "")
-
-        loc = ""
-        le = s.select_one(".job-location, .location")
-        if le: loc = le.get_text(" ", strip=True)
-
-        dt = ""
-        for js in s.find_all("script", type="application/ld+json"):
-            try:
-                d = json.loads(js.string)
-                if d.get("datePosted"):
-                    dt = d["datePosted"].split("T")[0]
-            except:
-                pass
-
-        return title, loc, dt
-    except:
-        return "", "", ""
-
 def extract_salesforce(soup, page, base_url):
-    out = []
+    results = []
+    seen = set()
 
-    for row in soup.select("a[href*='/job/']"):
-        href = urljoin(base_url, row.get("href"))
-        text = row.get_text(" ", strip=True)
+    # Salesforce React site renders job cards with dynamic classes
+    job_cards = soup.select("a[href*='/job/'], div[class*='job-card']")
 
-        if not RELEVANT.search(text): continue
+    for card in job_cards:
+        # Get anchor
+        a = card if card.name == "a" else card.find("a", href=True)
+        if not a or not a.get("href"):
+            continue
 
-        title, loc, dt = fetch_detail(page, href)
-        if RELEVANT.search(title):
-            out.append((href, title, None))
+        raw_link = a.get("href").strip()
+        if not raw_link:
+            continue
 
-    return out
+        link = urljoin(base_url, raw_link)
+
+        # Dedupe
+        if link in seen:
+            continue
+        seen.add(link)
+
+        # Title
+        title = a.get_text(" ", strip=True)
+
+        # If empty, fallback to card content
+        if not title:
+            title = card.get_text(" ", strip=True)
+
+        if not title or len(title) < 3:
+            continue
+
+        # Location try selectors
+        loc = ""
+        for sel in [".location", ".info", ".job-location", "[data-geography]"]:
+            el = card.select_one(sel)
+            if el and el.get_text(strip=True):
+                loc = el.get_text(" ", strip=True)
+                break
+
+        label = f"{title} ({loc})" if loc else title
+
+        results.append((link, label))
+
+    return results
