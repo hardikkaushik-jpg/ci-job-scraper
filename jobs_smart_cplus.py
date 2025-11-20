@@ -1,4 +1,4 @@
-# jobs_smart_cplus_final_compact.py
+# jobs_smart_cplus.py
 # Cleaned + compact Playwright + BeautifulSoup hybrid scraper
 # ATS-aware, special extractors, enriched relevancy flow.
 # Run: python3 jobs_smart_cplus_final_compact.py
