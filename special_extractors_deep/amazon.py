@@ -1,55 +1,77 @@
-# extractor_amazon.py
+# amazon.py
+# Deep extractor for https://www.amazon.jobs/en/
+# Extracts all AWS + Amazon Data/ETL/Engineering relevant roles via API calls.
 
-import re
+import json, re, time
+from urllib.parse import urljoin, urlencode
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
 
-RELEVANT = re.compile(r"(aws|redshift|glue|kinesis|data|etl|lake|pipeline|integration)", re.I)
+RELEVANT = re.compile(
+    r"(data|etl|pipeline|integration|analytics|warehouse|lake|engineer|ml|"
+    r"sde|big\s*data|bi|platform|cloud|aws)",
+    re.I
+)
 
-def fetch_detail(page, link):
-    try:
-        page.goto(link, timeout=45000, wait_until="networkidle")
-        page.wait_for_timeout(900)
-        html = page.content()
-        soup = BeautifulSoup(html, "lxml")
+API_BASE = "https://www.amazon.jobs/en/search.json?"
 
-        title = soup.find("h1")
-        title = title.get_text(" ", strip=True) if title else ""
-
-        location = ""
-        loc_el = soup.select_one(".job-info span")
-        if loc_el:
-            location = loc_el.get_text(" ", strip=True)
-
-        # posted date
-        dt = ""
-        dt_el = soup.find("span", {"class": "posting-date"})
-        if dt_el:
-            dt = dt_el.get_text(" ", strip=True)
-
-        return title, location, dt
-
-    except:
-        return "", "", ""
 
 def extract_amazon(soup, page, base_url):
-    out = []
+    results = []
+    seen = set()
 
-    job_cards = soup.select("div.job-tile, a[href*='/jobs/']")
-    for card in job_cards:
-        a = card.find("a", href=True)
-        if not a:
+    # Amazon search API supports pagination & filters
+    # We fetch first ~10 pages (enough for 500–800 roles)
+    MAX_PAGES = 10
+
+    for page_num in range(1, MAX_PAGES + 1):
+
+        params = {
+            "normalized_country_code[]": "",
+            "radius": "24km",
+            "offset": (page_num - 1) * 10,
+            "result_limit": 10,
+            "sort": "recent",
+            "category[]": "Software Development",
+            "category[]": "Business Intelligence",
+            "category[]": "Machine Learning Science",
+            "category[]": "Solutions Architect",
+        }
+
+        api_url = API_BASE + urlencode(params, doseq=True)
+
+        try:
+            page.goto(api_url, wait_until="networkidle", timeout=45000)
+            time.sleep(0.3)
+            raw = page.inner_text("pre")  # API result is JSON in <pre>
+            data = json.loads(raw)
+        except Exception:
             continue
 
-        link = urljoin(base_url, a.get("href"))
-        text = a.get_text(" ", strip=True)
+        jobs = data.get("jobs", [])
+        if not jobs:
+            break
 
-        if not RELEVANT.search(text):
-            continue
+        for j in jobs:
+            title = j.get("title", "").strip()
+            link = j.get("job_path", "")
+            loc = j.get("normalized_location", "")
+            date = j.get("posted_date", "")
 
-        title, loc, dt = fetch_detail(page, link)
+            if not title or not link:
+                continue
 
-        if RELEVANT.search(title):
-            out.append((link, title, None))
+            full_link = urljoin("https://www.amazon.jobs", link)
 
-    return out
+            # Check data relevance
+            if not RELEVANT.search(title):
+                continue
+
+            if full_link in seen:
+                continue
+            seen.add(full_link)
+
+            label = f"{title} ({loc})" if loc else title
+
+            results.append((full_link, label))
+
+    return results
