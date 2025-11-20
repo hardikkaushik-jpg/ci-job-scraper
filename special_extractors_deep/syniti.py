@@ -1,38 +1,65 @@
-# extractor_syniti.py
+# special_extractors_deep/extract_syniti.py
 
-import re
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-RELEVANT = re.compile(r"(syniti|data|migration|governance|integration|etl|engineer)", re.I)
+def extract_syniti(soup, page, main_url):
+    """
+    Deep extractor for Syniti (Workday ATS)
+    Example URL:
+        https://careers.syniti.com/go/Explore-Our-Roles/8777900/
 
-def fetch_detail(page, link):
-    try:
-        page.goto(link, timeout=35000, wait_until="networkidle")
-        page.wait_for_timeout(1000)
-        s = BeautifulSoup(page.content(), "lxml")
+    Logic:
+        - Detect Workday job cards
+        - Extract title + job link
+        - Return exact HTML element for scoring
+    """
 
-        title = s.find("h1")
-        title = title.get_text(" ", strip=True) if title else ""
+    results = []
 
-        loc_el = s.select_one(".job-location, .location")
-        loc = loc_el.get_text(" ", strip=True) if loc_el else ""
+    # ---------------------------------------------
+    # 1) Standard Workday job cards
+    # ---------------------------------------------
+    # Most Syniti jobs appear in:
+    #   <a class="jobTitle-link" href="/en-US/.../job/...">
+    #
+    for a in soup.select("a.jobTitle-link, a.WD-Text, a[data-automation-id='jobTitle']"):
+        href = a.get("href")
+        if not href:
+            continue
 
-        return title, loc, ""
-    except:
-        return "", "", ""
+        link = urljoin(main_url, href)
+        title = a.get_text(" ", strip=True)
+        if not title:
+            continue
 
-def extract_syniti(soup, page, base_url):
-    out = []
+        results.append((link, title, a))
 
-    for row in soup.select("a[href*='/job/']"):
-        link = urljoin(base_url, row.get("href"))
-        txt = row.get_text(" ", strip=True)
+    if results:
+        return results
 
-        if not RELEVANT.search(txt): continue
+    # ---------------------------------------------
+    # 2) Workday table fallback format
+    # ---------------------------------------------
+    rows = soup.select("tr[data-automation-id='job'] a[href]")
+    for a in rows:
+        link = urljoin(main_url, a["href"])
+        title = a.get_text(" ", strip=True)
+        if title:
+            results.append((link, title, a))
 
-        title, loc, _ = fetch_detail(page, link)
-        if RELEVANT.search(title):
-            out.append((link, title, None))
+    if results:
+        return results
 
-    return out
+    # ---------------------------------------------
+    # 3) Last fallback: any anchor containing /job/
+    # ---------------------------------------------
+    for a in soup.find_all("a", href=True):
+        h = a["href"].lower()
+        if "job" in h and ("syniti" in h or "wd" in h or "workday" in h):
+            link = urljoin(main_url, a["href"])
+            title = a.get_text(" ", strip=True)
+            if title:
+                results.append((link, title, a))
+
+    return results
