@@ -1,51 +1,49 @@
-# extractor_atlan.py
+# atlan.py
+# Special extractor for Atlan (AshbyHQ platform)
 
-import re, json
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-
-RELEVANT = re.compile(r"(data|integration|catalog|governance|connector|pipeline|engineer|analytics)", re.I)
-
-def fetch_detail(page, link):
-    try:
-        page.goto(link, timeout=35000, wait_until="networkidle")
-        page.wait_for_timeout(700)
-        html = page.content()
-        soup = BeautifulSoup(html, "lxml")
-
-        title = soup.find("h1")
-        title = title.get_text(" ", strip=True) if title else ""
-
-        loc = ""
-        loc_el = soup.select_one(".job-location, .location, [data-test='location']")
-        if loc_el:
-            loc = loc_el.get_text(" ", strip=True)
-
-        dt = ""
-        for sc in soup.find_all("script", type="application/ld+json"):
-            try:
-                o = json.loads(sc.string)
-                if isinstance(o, dict) and o.get("datePosted"):
-                    dt = o["datePosted"].split("T")[0]
-            except:
-                pass
-
-        return title, loc, dt
-    except:
-        return "", "", ""
 
 def extract_atlan(soup, page, base_url):
-    out = []
+    results = []
 
-    for a in soup.select("a[href*='atlan.com/careers/job']"):
-        href = urljoin(base_url, a.get("href"))
-        text = a.get_text(" ", strip=True)
+    # 1) Ashby always embeds job board URL: https://jobs.ashbyhq.com/atlan
+    ashby_url = "https://jobs.ashbyhq.com/atlan"
 
-        if not RELEVANT.search(text):
+    try:
+        page.goto(ashby_url, timeout=45000, wait_until="networkidle")
+        page.wait_for_load_state("networkidle")
+        page.wait_for_timeout(800)
+        ashby_html = page.content()
+    except Exception:
+        return results
+
+    s = BeautifulSoup(ashby_html, "lxml")
+
+    # 2) Ashby job cards follow this selector
+    cards = s.select("a[href*='/jobs/']")
+    seen = set()
+
+    for a in cards:
+        href = a.get("href")
+        if not href:
+            continue
+        if "/jobs/" not in href:
             continue
 
-        title, loc, dt = fetch_detail(page, href)
-        if RELEVANT.search(title):
-            out.append((href, title, None))
+        # Normalise link
+        if href.startswith("/"):
+            link = "https://jobs.ashbyhq.com" + href
+        else:
+            link = href
 
-    return out
+        if link in seen:
+            continue
+        seen.add(link)
+
+        title = a.get_text(" ", strip=True)
+        if not title:
+            continue
+
+        results.append((link, title))
+
+    return results
