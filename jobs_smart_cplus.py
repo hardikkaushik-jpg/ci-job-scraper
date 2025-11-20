@@ -23,7 +23,7 @@ COMPANIES = {
     "Anomalo": ["https://boards.greenhouse.io/anomalojobs"],
     "BigEye": ["https://www.bigeye.com/careers#positions"],
     "Boomi": ["https://boomi.com/company/careers/#greenhouseapp"],
-    "CastorDoc": ["https://jobs.ashbyhq.com/coalesce"],
+    "CastorDoc (Coalesce)": ["https://jobs.ashbyhq.com/coalesce"],
     "Cloudera": ["https://cloudera.wd5.myworkdayjobs.com/External_Career"],
     "Collibra": ["https://www.collibra.com/company/careers#sub-menu-find-jobs"],
     "Couchbase": ["https://www.couchbase.com/careers/"],
@@ -49,18 +49,17 @@ COMPANIES = {
     "Pentaho": ["https://www.hitachivantara.com/en-us/company/careers/job-search","https://www.hitachivantara.com/en-us/careers.html"],
     "Qlik": ["http://careerhub.qlik.com/careers"],
     "Sifflet": ["https://www.welcometothejungle.com/en/companies/sifflet/jobs"],
-    "Solidatus": ["https://www.solidatus.com/careers/"],
     "Snowflake": ["https://careers.snowflake.com/global/en/search-results"],
     "Syniti": ["https://careers.syniti.com/go/Explore-Our-Roles/8777900/"],
     "Teradata": ["https://careers.teradata.com/jobs"],
     "Vertica": ["https://careers.opentext.com/us/en/home"],
-    "Yellowbrick": ["https://yellowbrick.com/company/careers/"],
     # large noisy portals
     "Salesforce": ["https://careers.salesforce.com/en/jobs/"],
     "Amazon": ["https://www.amazon.jobs/en/"],
     "IBM": ["https://www.ibm.com/careers/search"],
     "SAP": ["https://jobs.sap.com/"],
 }
+
 PAGE_NAV_TIMEOUT = 40000
 PAGE_DOM_TIMEOUT = 15000
 SLEEP_BETWEEN_REQUESTS = 0.18
