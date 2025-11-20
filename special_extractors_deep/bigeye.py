@@ -1,46 +1,55 @@
-# extractor_bigeye.py
+# bigeye.py
+# Deep extractor for BigEye (static HTML job cards)
 
-import re
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-RELEVANT = re.compile(r"(observability|data|pipeline|cloud|integration|etl|warehouse|sql)", re.I)
-
-def fetch_detail(page, link):
-    try:
-        page.goto(link, timeout=30000, wait_until="networkidle")
-        page.wait_for_timeout(600)
-        s = BeautifulSoup(page.content(), "lxml")
-
-        h = s.find("h1")
-        title = h.get_text(" ", strip=True) if h else ""
-
-        loc = ""
-        loc_el = s.select_one(".job-location, .location")
-        if loc_el:
-            loc = loc_el.get_text(" ", strip=True)
-
-        dt = ""
-        return title, loc, dt
-    except:
-        return "", "", ""
-
 def extract_bigeye(soup, page, base_url):
-    out = []
+    results = []
 
-    positions_section = soup.find(id="positions")
-    if not positions_section:
-        return out
+    # BigEye renders job cards inside <div class="careers-list"> or <div class="positions">
+    # Each card typically contains:
+    #   <a href="/careers/<slug>">Job Title</a>
+    #   <div class="location">...</div>
 
-    for a in positions_section.select("a[href]"):
-        href = urljoin(base_url, a.get("href"))
-        text = a.get_text(" ", strip=True)
+    job_selectors = [
+        ".positions a",               # older site layout
+        ".careers-list a",            # current layout
+        ".job-card a",                # fallback
+        "a[href*='/careers']"         # worst-case fallback
+    ]
 
-        if not RELEVANT.search(text):
-            continue
+    seen = set()
 
-        title, loc, dt = fetch_detail(page, href)
-        if RELEVANT.search(title):
-            out.append((href, title, None))
+    for sel in job_selectors:
+        for a in soup.select(sel):
+            href = a.get("href", "")
+            text = a.get_text(" ", strip=True)
 
-    return out
+            if not href or not text:
+                continue
+
+            # Normalize URL
+            link = urljoin(base_url, href)
+
+            # Dedupe
+            if link in seen:
+                continue
+            seen.add(link)
+
+            # Try to detect location from nearby elements
+            parent = a.parent
+            loc = ""
+
+            # Check sibling/parent
+            if parent:
+                loc_el = parent.select_one(".location")
+                if loc_el:
+                    loc = loc_el.get_text(" ", strip=True)
+
+            # Put location into the combined label
+            label = f"{text} ({loc})" if loc else text
+
+            results.append((link, label))
+
+    return results
