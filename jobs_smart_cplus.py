@@ -11,56 +11,13 @@ import re, csv, time, sys, json, os
 from datetime import datetime, date, timedelta
 
 # import deep site-specific extractors (created separately)
-# Ensure special_extractors_deep.py is in the same directory
 from special_extractors_deep import SPECIAL_EXTRACTORS_DEEP
 
 # ---------- CONFIG ----------
-# MODIFIED: Temporarily restricted to Cloudera for debugging
+# Still restricted to Cloudera for debugging
 COMPANIES = {
     "Cloudera": ["https://cloudera.wd5.myworkdayjobs.com/External_Career"]
 }
-
-# ORIGINAL LIST (Commented out):
-# COMPANIES = {
-#     "Airtable": ["https://airtable.com/careers#open-positions"],
-#     "Alation": ["https://alation.wd503.myworkdayjobs.com/ExternalSite"],
-#     "Alteryx": ["https://alteryx.wd108.myworkdayjobs.com/AlteryxCareers"],
-#     "Ataccama": ["https://jobs.ataccama.com/#one-team"],
-#     "Atlan": ["https://atlan.com/careers"],
-#     "Anomalo": ["https://boards.greenhouse.io/anomalojobs"],
-#     "BigEye": ["https://www.bigeye.com/careers#positions"],
-#     "Boomi": ["https://boomi.com/company/careers/#greenhouseapp"],
-#     "CastorDoc (Coalesce)": ["https://jobs.ashbyhq.com/coalesce"],
-#     "Cloudera": ["https://cloudera.wd5.myworkdayjobs.com/External_Career"],
-#     "Collibra": ["https://www.collibra.com/company/careers#sub-menu-find-jobs"],
-#     "Couchbase": ["https://www.couchbase.com/careers/"],
-#     "Data.World": ["https://data.world/company/careers/#careers-list"],
-#     "Databricks": ["https://www.databricks.com/company/careers/open-positions"],
-#     "Datadog": ["https://careers.datadoghq.com/all-jobs/"],
-#     "DataGalaxy": ["https://www.welcometothejungle.com/en/companies/datagalaxy/jobs"],
-#     "Decube": ["https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41"],
-#     "Exasol": ["https://careers.exasol.com/en/jobs"],
-#     "Firebolt": ["https://www.firebolt.io/careers"],
-#     "Fivetran": ["https://www.fivetran.com/careers#jobs"],
-#     "InfluxData": ["https://www.influxdata.com/careers/#jobs"],
-#     "Informatica": ["https://informatica.gr8people.com/jobs", "https://www.informatica.com/us/careers.html"],
-#     "Matillion": ["https://jobs.lever.co/matillion"],
-#     "MongoDB": ["https://www.mongodb.com/company/careers/teams/engineering"],
-#     "Monte Carlo": ["https://jobs.ashbyhq.com/montecarlodata"],
-#     "Oracle": ["https://careers.oracle.com/en/sites/jobsearch/jobs"],
-#     "Pentaho": ["https://www.hitachivantara.com/en-us/company/careers/job-search","https://www.hitachivantara.com/en-us/careers.html"],
-#     "Qlik": ["http://careerhub.qlik.com/careers"],
-#     "Sifflet": ["https://www.welcometothejungle.com/en/companies/sifflet/jobs"],
-#     "Snowflake": ["https://careers.snowflake.com/global/en/search-results"],
-#     "Syniti": ["https://careers.syniti.com/go/Explore-Our-Roles/8777900/"],
-#     "Teradata": ["https://careers.teradata.com/jobs"],
-#     "Vertica": ["https://careers.opentext.com/us/en/home"],
-#     # large noisy portals
-#     "Salesforce": ["https://careers.salesforce.com/en/jobs/"],
-#     "Amazon": ["https://www.amazon.jobs/en/"],
-#     "IBM": ["https://www.ibm.com/careers/search"],
-#     "SAP": ["https://jobs.sap.com/"],
-# }
 
 PAGE_NAV_TIMEOUT = 40000
 PAGE_DOM_TIMEOUT = 15000
@@ -97,7 +54,7 @@ def score_title_desc(title, desc, company=""):
         score += 1
     return score
 
-# helpers (kept compact; identical behavior to previous file)
+# helpers
 def normalize_link(base, href):
     if not href: return ""
     href = href.strip()
@@ -207,8 +164,6 @@ def _iso_only_date(raw):
 def extract_date_from_html(html_text):
     if not html_text:
         return ""
-
-    # JSON-LD "datePosted"
     m = re.search(r'"datePosted"\s*:\s*"([^"]+)"', html_text)
     if m:
         raw = m.group(1)
@@ -216,8 +171,6 @@ def extract_date_from_html(html_text):
             return datetime.fromisoformat(raw.split("T")[0]).date().isoformat()
         except:
             pass
-
-    # <time datetime="...">
     m2 = re.search(r'<time[^>]+datetime=["\']([^"\']+)["\']', html_text, re.I)
     if m2:
         raw = m2.group(1)
@@ -225,8 +178,6 @@ def extract_date_from_html(html_text):
             return datetime.fromisoformat(raw.split("T")[0]).date().isoformat()
         except:
             pass
-
-    # "posted X days ago"
     mm = re.search(r'posted\s+(\d+)\s+days?\s+ago', html_text, re.I)
     if mm:
         try:
@@ -234,12 +185,9 @@ def extract_date_from_html(html_text):
             return (date.today() - timedelta(days=days)).isoformat()
         except:
             pass
-
-    # fallback ISO-like date anywhere in the HTML
     mm2 = re.search(r'(\d{4}-\d{2}-\d{2})', html_text)
     if mm2:
         return mm2.group(1)
-
     return ""
 
 def scrape():
@@ -259,22 +207,19 @@ def scrape():
                 soup = BeautifulSoup(listing_html, "lxml")
                 candidates = []
 
-                # site-specific deep extractors (1:1-style, imported)
-                try:
-                    if company in SPECIAL_EXTRACTORS_DEEP:
+                # --- REPLACED BLOCK START ---
+                if company in SPECIAL_EXTRACTORS_DEEP:
+                    print(f"[DEBUG] Running special extractor for {company}")
+                    try:
                         special = SPECIAL_EXTRACTORS_DEEP[company](soup, page, main_url)
-                        # --- DEBUG PRINT ADDED HERE ---
-                        print("[DEBUG] SPECIAL EXTRACTOR RETURNED:", company, len(special))
-                        # ------------------------------
+                        print(f"[DEBUG] SPECIAL RETURNED FOR {company}: {len(special)} items")
                         for cand in special:
-                            if not cand: continue
-                            href = normalize_link(main_url, cand[0])
-                            txt = cand[1] if len(cand) > 1 else ""
-                            el = cand[2] if len(cand) > 2 else None
-                            if href and (href, txt) not in [(c[0], c[1]) for c in candidates]:
-                                candidates.append((href, txt, el))
-                except Exception as e:
-                    print(f"[WARN] special extractor {company} failed: {e}")
+                            print("[DEBUG ITEM]", cand)
+                    except Exception as e:
+                        print(f"[DEBUG] SPECIAL EXTRACTOR ERROR for {company} ->", e)
+                else:
+                    print(f"[DEBUG] Special extractor NOT found for {company}")
+                # --- REPLACED BLOCK END ---
 
                 # generic anchors
                 for a in soup.find_all("a", href=True):
@@ -283,7 +228,7 @@ def scrape():
                     if is_likely_job_anchor(href_abs, text):
                         candidates.append((href_abs, text, a))
 
-                # preserved Fivetran extractor (works well)
+                # preserved Fivetran extractor
                 if "fivetran.com" in main_url:
                     for job in soup.select("div[data-job-id], div.job-card, a[data-job-id]"):
                         text = job.get_text(" ", strip=True)
@@ -333,7 +278,7 @@ def scrape():
                     if skip: continue
                     filtered.append((href, text, el))
 
-                # parse filtered candidates (unchanged logic)
+                # parse filtered candidates
                 for link, anchor_text, el in filtered:
                     time.sleep(SLEEP_BETWEEN_REQUESTS)
                     title_candidate = re.sub(r'\s+', ' ', (anchor_text or "")).strip()
@@ -379,12 +324,10 @@ def scrape():
                                         newt = clean_title(header.get_text(" ", strip=True))
                                         if newt and newt != title_clean:
                                             title_clean = newt
-                                    # location selectors + json-ld date detection
                                     for sel in ["span.location", ".job-location", ".location", "[data-test='job-location']", ".posting-location", ".job_meta_location", ".location--name"]:
                                         eloc = s.select_one(sel)
                                         if eloc and eloc.get_text(strip=True):
                                             location_candidate = eloc.get_text(" ", strip=True); break
-                                    # json-ld quick scan
                                     for script in s.find_all("script", type="application/ld+json"):
                                         text = script.string or ""
                                         if not text: continue
@@ -424,7 +367,6 @@ def scrape():
                     location_candidate = location_candidate or ""
                     posting_date_final = posting_date or ""
                     if not location_candidate and detail_html:
-                        # FIXED LINES BELOW: Removed redundant backslashes from quotes within raw string regex
                         m = re.search(r'"addressLocality"\s*:\s*"([^"]+)"', detail_html)
                         if m:
                             city = m.group(1)
