@@ -181,6 +181,21 @@ def should_drop_by_title(title):
     if ROLE_WORDS_RE.search((title or "").lower()): return False
     if re.search(r'\\bintern\\b', (title or "").lower()): return False
     return True
+def _iso_only_date(raw):
+    if not raw:
+        return ""
+    raw = raw.strip()
+    try:
+        return datetime.fromisoformat(raw.replace("Z", "")).date().isoformat()
+    except:
+        pass
+    try:
+        m = re.search(r"(\d{4}-\d{2}-\d{2})", raw)
+        if m:
+            return m.group(1)
+    except:
+        pass
+    return ""
 
 def scrape():
     rows = []
