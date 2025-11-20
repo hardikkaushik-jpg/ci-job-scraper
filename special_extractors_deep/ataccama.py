@@ -1,54 +1,51 @@
-# extractor_ataccama.py
+# ataccama.py
+# Special extractor for Ataccama (SmartRecruiters platform)
 
-import re, json
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
 
-RELEVANT = re.compile(r"(data|quality|governance|integration|catalog|engineer|cloud)", re.I)
-
-def fetch_detail(page, link):
-    try:
-        page.goto(link, timeout=32000, wait_until="networkidle")
-        page.wait_for_timeout(800)
-
-        html = page.content()
-        s = BeautifulSoup(html, "lxml")
-
-        title = s.find("h1")
-        title = title.get_text(" ", strip=True) if title else ""
-
-        loc = ""
-        loc_el = s.select_one(".position-info__location, .job-location")
-        if loc_el:
-            loc = loc_el.get_text(" ", strip=True)
-
-        dt = ""
-        for sc in s.find_all("script", type="application/ld+json"):
-            try:
-                d = json.loads(sc.string)
-                if d.get("datePosted"):
-                    dt = d["datePosted"].split("T")[0]
-            except:
-                pass
-
-        return title, loc, dt
-
-    except:
-        return "", "", ""
+SMARTRECRUITERS_URL = "https://jobs.smartrecruiters.com/Ataccama/"
 
 def extract_ataccama(soup, page, base_url):
-    out = []
+    results = []
 
-    for a in soup.select("a[href*='/job/']"):
-        href = urljoin(base_url, a.get("href"))
-        text = a.get_text(" ", strip=True)
+    # 1) Directly load SmartRecruiters job board
+    try:
+        page.goto(SMARTRECRUITERS_URL, timeout=45000, wait_until="networkidle")
+        page.wait_for_timeout(900)
+        html = page.content()
+    except Exception:
+        return results
 
-        if not RELEVANT.search(text):
+    s = BeautifulSoup(html, "lxml")
+
+    # 2) SmartRecruiters job card selector
+    cards = s.select("div.opening > a, a[href*='careers.smartrecruiters.com'], a[href*='/Ataccama/']")
+    seen = set()
+
+    for a in cards:
+        href = a.get("href")
+        if not href:
             continue
 
-        title, loc, dt = fetch_detail(page, href)
+        # Normalize link
+        if href.startswith("/"):
+            link = "https://jobs.smartrecruiters.com" + href
+        else:
+            link = href
 
-        if RELEVANT.search(title):
-            out.append((href, title, None))
+        if link in seen:
+            continue
+        seen.add(link)
 
-    return out
+        # Extract job title
+        title = a.get_text(" ", strip=True)
+        if not title:
+            continue
+
+        # Ignore garbage duplicates
+        if "Ataccama" in title and len(title.split()) <= 2:
+            continue
+
+        results.append((link, title))
+
+    return results
