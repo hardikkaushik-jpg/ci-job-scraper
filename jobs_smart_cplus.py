@@ -11,49 +11,56 @@ import re, csv, time, sys, json, os
 from datetime import datetime, date, timedelta
 
 # import deep site-specific extractors (created separately)
+# Ensure special_extractors_deep.py is in the same directory
 from special_extractors_deep import SPECIAL_EXTRACTORS_DEEP
 
 # ---------- CONFIG ----------
+# MODIFIED: Temporarily restricted to Cloudera for debugging
 COMPANIES = {
-    "Airtable": ["https://airtable.com/careers#open-positions"],
-    "Alation": ["https://alation.wd503.myworkdayjobs.com/ExternalSite"],
-    "Alteryx": ["https://alteryx.wd108.myworkdayjobs.com/AlteryxCareers"],
-    "Ataccama": ["https://jobs.ataccama.com/#one-team"],
-    "Atlan": ["https://atlan.com/careers"],
-    "Anomalo": ["https://boards.greenhouse.io/anomalojobs"],
-    "BigEye": ["https://www.bigeye.com/careers#positions"],
-    "Boomi": ["https://boomi.com/company/careers/#greenhouseapp"],
-    "CastorDoc (Coalesce)": ["https://jobs.ashbyhq.com/coalesce"],
-    "Cloudera": ["https://cloudera.wd5.myworkdayjobs.com/External_Career"],
-    "Collibra": ["https://www.collibra.com/company/careers#sub-menu-find-jobs"],
-    "Couchbase": ["https://www.couchbase.com/careers/"],
-    "Data.World": ["https://data.world/company/careers/#careers-list"],
-    "Databricks": ["https://www.databricks.com/company/careers/open-positions"],
-    "Datadog": ["https://careers.datadoghq.com/all-jobs/"],
-    "DataGalaxy": ["https://www.welcometothejungle.com/en/companies/datagalaxy/jobs"],
-    "Decube": ["https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41"],
-    "Exasol": ["https://careers.exasol.com/en/jobs"],
-    "Firebolt": ["https://www.firebolt.io/careers"],
-    "Fivetran": ["https://www.fivetran.com/careers#jobs"],
-    "InfluxData": ["https://www.influxdata.com/careers/#jobs"],
-    "Informatica": ["https://informatica.gr8people.com/jobs", "https://www.informatica.com/us/careers.html"],
-    "Matillion": ["https://jobs.lever.co/matillion"],
-    "MongoDB": ["https://www.mongodb.com/company/careers/teams/engineering"],
-    "Monte Carlo": ["https://jobs.ashbyhq.com/montecarlodata"],
-    "Oracle": ["https://careers.oracle.com/en/sites/jobsearch/jobs"],
-    "Pentaho": ["https://www.hitachivantara.com/en-us/company/careers/job-search","https://www.hitachivantara.com/en-us/careers.html"],
-    "Qlik": ["http://careerhub.qlik.com/careers"],
-    "Sifflet": ["https://www.welcometothejungle.com/en/companies/sifflet/jobs"],
-    "Snowflake": ["https://careers.snowflake.com/global/en/search-results"],
-    "Syniti": ["https://careers.syniti.com/go/Explore-Our-Roles/8777900/"],
-    "Teradata": ["https://careers.teradata.com/jobs"],
-    "Vertica": ["https://careers.opentext.com/us/en/home"],
-    # large noisy portals
-    "Salesforce": ["https://careers.salesforce.com/en/jobs/"],
-    "Amazon": ["https://www.amazon.jobs/en/"],
-    "IBM": ["https://www.ibm.com/careers/search"],
-    "SAP": ["https://jobs.sap.com/"],
+    "Cloudera": ["https://cloudera.wd5.myworkdayjobs.com/External_Career"]
 }
+
+# ORIGINAL LIST (Commented out):
+# COMPANIES = {
+#     "Airtable": ["https://airtable.com/careers#open-positions"],
+#     "Alation": ["https://alation.wd503.myworkdayjobs.com/ExternalSite"],
+#     "Alteryx": ["https://alteryx.wd108.myworkdayjobs.com/AlteryxCareers"],
+#     "Ataccama": ["https://jobs.ataccama.com/#one-team"],
+#     "Atlan": ["https://atlan.com/careers"],
+#     "Anomalo": ["https://boards.greenhouse.io/anomalojobs"],
+#     "BigEye": ["https://www.bigeye.com/careers#positions"],
+#     "Boomi": ["https://boomi.com/company/careers/#greenhouseapp"],
+#     "CastorDoc (Coalesce)": ["https://jobs.ashbyhq.com/coalesce"],
+#     "Cloudera": ["https://cloudera.wd5.myworkdayjobs.com/External_Career"],
+#     "Collibra": ["https://www.collibra.com/company/careers#sub-menu-find-jobs"],
+#     "Couchbase": ["https://www.couchbase.com/careers/"],
+#     "Data.World": ["https://data.world/company/careers/#careers-list"],
+#     "Databricks": ["https://www.databricks.com/company/careers/open-positions"],
+#     "Datadog": ["https://careers.datadoghq.com/all-jobs/"],
+#     "DataGalaxy": ["https://www.welcometothejungle.com/en/companies/datagalaxy/jobs"],
+#     "Decube": ["https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41"],
+#     "Exasol": ["https://careers.exasol.com/en/jobs"],
+#     "Firebolt": ["https://www.firebolt.io/careers"],
+#     "Fivetran": ["https://www.fivetran.com/careers#jobs"],
+#     "InfluxData": ["https://www.influxdata.com/careers/#jobs"],
+#     "Informatica": ["https://informatica.gr8people.com/jobs", "https://www.informatica.com/us/careers.html"],
+#     "Matillion": ["https://jobs.lever.co/matillion"],
+#     "MongoDB": ["https://www.mongodb.com/company/careers/teams/engineering"],
+#     "Monte Carlo": ["https://jobs.ashbyhq.com/montecarlodata"],
+#     "Oracle": ["https://careers.oracle.com/en/sites/jobsearch/jobs"],
+#     "Pentaho": ["https://www.hitachivantara.com/en-us/company/careers/job-search","https://www.hitachivantara.com/en-us/careers.html"],
+#     "Qlik": ["http://careerhub.qlik.com/careers"],
+#     "Sifflet": ["https://www.welcometothejungle.com/en/companies/sifflet/jobs"],
+#     "Snowflake": ["https://careers.snowflake.com/global/en/search-results"],
+#     "Syniti": ["https://careers.syniti.com/go/Explore-Our-Roles/8777900/"],
+#     "Teradata": ["https://careers.teradata.com/jobs"],
+#     "Vertica": ["https://careers.opentext.com/us/en/home"],
+#     # large noisy portals
+#     "Salesforce": ["https://careers.salesforce.com/en/jobs/"],
+#     "Amazon": ["https://www.amazon.jobs/en/"],
+#     "IBM": ["https://www.ibm.com/careers/search"],
+#     "SAP": ["https://jobs.sap.com/"],
+# }
 
 PAGE_NAV_TIMEOUT = 40000
 PAGE_DOM_TIMEOUT = 15000
@@ -256,6 +263,9 @@ def scrape():
                 try:
                     if company in SPECIAL_EXTRACTORS_DEEP:
                         special = SPECIAL_EXTRACTORS_DEEP[company](soup, page, main_url)
+                        # --- DEBUG PRINT ADDED HERE ---
+                        print("[DEBUG] SPECIAL EXTRACTOR RETURNED:", company, len(special))
+                        # ------------------------------
                         for cand in special:
                             if not cand: continue
                             href = normalize_link(main_url, cand[0])
