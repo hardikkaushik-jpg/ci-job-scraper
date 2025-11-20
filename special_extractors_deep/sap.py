@@ -1,39 +1,87 @@
-# extractor_sap.py
+# sap.py
+# Deep extractor for SAP (SuccessFactors ATS)
+#
+# This is *not* generic — custom-tailored to SAP's SuccessFactors HTML.
 
-import re
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-RELEVANT = re.compile(r"(sap|hana|analytics|etl|integration|data|engineer|cloud)", re.I)
-
-def fetch_detail(page, link):
-    try:
-        page.goto(link, timeout=45000, wait_until="networkidle")
-        page.wait_for_timeout(1200)
-
-        s = BeautifulSoup(page.content(), "lxml")
-
-        h = s.find("h1")
-        title = h.get_text(" ", strip=True) if h else ""
-
-        loc_el = s.select_one(".job-location, .location")
-        loc = loc_el.get_text(" ", strip=True) if loc_el else ""
-
-        return title, loc, ""
-    except:
-        return "", "", ""
-
 def extract_sap(soup, page, base_url):
-    out = []
+    results = []
+    seen = set()
 
-    for a in soup.select("a[href*='/job/']"):
-        href = urljoin(base_url, a.get("href"))
-        text = a.get_text(" ", strip=True)
+    # SAP job anchors typically contain '/job/' OR have class 'jobTitle-link'
+    selectors = [
+        "a.jobTitle-link",
+        "a[href*='/job/']",
+        "a.sf-job-list-title",  # rare but appears in some markets
+    ]
 
-        if not RELEVANT.search(text): continue
+    anchors = []
+    for sel in selectors:
+        anchors.extend(soup.select(sel))
 
-        title, loc, _ = fetch_detail(page, href)
-        if RELEVANT.search(title):
-            out.append((href, title, None))
+    for a in anchors:
+        href = a.get("href", "").strip()
+        if not href:
+            continue
 
-    return out
+        link = urljoin(base_url, href)
+        if link in seen:
+            continue
+        seen.add(link)
+
+        # Extract title (anchor text or nested title div)
+        title = a.get_text(" ", strip=True)
+        if not title:
+            h = a.find("h2") or a.find("h3")
+            if h:
+                title = h.get_text(" ", strip=True)
+
+        if not title:
+            continue
+
+        # Try extracting location — SAP uses multiple patterns:
+        loc = ""
+
+        # 1) Look in parent tile
+        tile = a.find_parent(["div", "article", "li"])
+        if tile:
+            # Possible patterns inside SAP tiles
+            loc_candidates = tile.select(".jobLocation, .job-location, .jLR, span[class*='location']")
+            for el in loc_candidates:
+                txt = el.get_text(" ", strip=True)
+                if txt:
+                    loc = txt
+                    break
+
+        # 2) If missing, try looking at siblings
+        if not loc and tile:
+            for sib in tile.find_all(["div", "span"], recursive=True):
+                txt = sib.get_text(" ", strip=True)
+                if txt and any(
+                    k in txt.lower()
+                    for k in [
+                        "remote",
+                        "hybrid",
+                        "germany",
+                        "india",
+                        "usa",
+                        "canada",
+                        "france",
+                        "australia",
+                        "united",
+                        "singapore",
+                        "japan",
+                        "brazil",
+                    ]
+                ):
+                    loc = txt
+                    break
+
+        # Combine title + location as label
+        label = f"{title} ({loc})" if loc else title
+
+        results.append((link, label))
+
+    return results
