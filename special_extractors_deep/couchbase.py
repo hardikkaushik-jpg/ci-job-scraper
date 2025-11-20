@@ -1,52 +1,47 @@
-# extractor_couchbase.py
+# couchbase.py
+# Deep extractor for Couchbase (Greenhouse embedded jobs)
 
-import re, json
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-RELEVANT = re.compile(r"(couchbase|nosql|database|data|cloud|engineer|integration|pipelines?)", re.I)
+def extract_couchbase(soup, page, base_url):
+    results = []
+    seen = set()
 
-def fetch_detail(page, link):
-    try:
-        page.goto(link, timeout=36000, wait_until="networkidle")
-        page.wait_for_timeout(750)
+    # Couchbase career page uses Greenhouse embeds via class `.opening`
+    job_rows = soup.select(".opening")
 
-        s = BeautifulSoup(page.content(), "lxml")
+    # Fallback – Look for any anchors pointing to Greenhouse jobs
+    if not job_rows:
+        job_rows = soup.select("a[href*='greenhouse']")
 
-        title = s.find("h1")
-        title = title.get_text(" ", strip=True) if title else ""
+    for row in job_rows:
+        # Extract the anchor
+        a = row.find("a", href=True) if row.find("a", href=True) else row
+        if not a or not a.get("href"):
+            continue
 
+        raw_link = a.get("href").strip()
+        link = urljoin(base_url, raw_link)
+
+        if link in seen:
+            continue
+        seen.add(link)
+
+        # Extract title
+        title = a.get_text(" ", strip=True)
+        if not title:
+            continue
+
+        # Extract location if shown
         loc = ""
-        loc_el = s.select_one(".job-location, .location")
+        loc_el = row.select_one(".location")
         if loc_el:
             loc = loc_el.get_text(" ", strip=True)
 
-        dt = ""
-        for sc in s.find_all("script", type="application/ld+json"):
-            try:
-                obj = json.loads(sc.string)
-                if obj.get("datePosted"):
-                    dt = obj["datePosted"].split("T")[0]
-            except:
-                pass
+        # Combined label for generic extractor contract
+        label = f"{title} ({loc})" if loc else title
 
-        return title, loc, dt
-    except:
-        return "", "", ""
+        results.append((link, label))
 
-def extract_couchbase(soup, page, base_url):
-    out = []
-
-    for a in soup.select("a[href*='/careers/']"):
-        href = urljoin(base_url, a.get("href"))
-        text = a.get_text(" ", strip=True)
-
-        if not RELEVANT.search(text):
-            continue
-
-        title, loc, dt = fetch_detail(page, href)
-
-        if RELEVANT.search(title):
-            out.append((href, title, None))
-
-    return out
+    return results
