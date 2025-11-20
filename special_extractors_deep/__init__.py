@@ -2,6 +2,7 @@
 # Master registry for all deep extractors
 
 from .alation import extract_alation
+from .alteryx import extract_alteryx.py
 from .amazon import extract_amazon
 from .anomalo import extract_anomalo
 from .ataccama import extract_ataccama
@@ -36,6 +37,7 @@ from .snowflake import extract_snowflake
 # Master registry
 SPECIAL_EXTRACTORS_DEEP = {
     "Alation": extract_alation,
+    "Alteryx": extract_alteryx,
     "Amazon": extract_amazon,
     "Anomalo": extract_anomalo,
     "Ataccama": extract_ataccama,
