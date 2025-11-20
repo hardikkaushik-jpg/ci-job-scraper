@@ -1,52 +1,61 @@
-# extractor_collibra.py
+# collibra.py
+# Special extractor for Collibra (Greenhouse embedded widget)
 
-import re, json
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
+import time
 
-RELEVANT = re.compile(r"(data|governance|catalog|quality|integration|engineer|platform|cloud)", re.I)
+def extract_collibra(soup, page, main_url):
+    results = []
 
-def fetch_detail(page, link):
+    # 1) Locate the Greenhouse iframe
+    iframe = soup.find("iframe", src=True)
+    if not iframe:
+        return results
+
+    src = iframe.get("src")
+    if not src:
+        return results
+
+    # 2) Load Greenhouse iframe URL
     try:
-        page.goto(link, timeout=38000, wait_until="networkidle")
-        page.wait_for_timeout(700)
+        page.goto(src, timeout=45000, wait_until="networkidle")
+        page.wait_for_load_state("networkidle")
+        page.wait_for_timeout(800)
+        gh_html = page.content()
+    except Exception:
+        return results
 
-        s = BeautifulSoup(page.content(), "lxml")
+    gh = BeautifulSoup(gh_html, "lxml")
 
-        title = s.find("h1")
-        title = title.get_text(" ", strip=True) if title else ""
+    # 3) Extract job cards
+    postings = gh.select("div.opening, div.job, div opening, a[href*='/jobs/']")
+    if not postings:
+        postings = gh.find_all("a", href=True)
 
-        loc = ""
-        loc_el = s.select_one(".location, .job-location")
-        if loc_el:
-            loc = loc_el.get_text(" ", strip=True)
+    seen = set()
 
-        dt = ""
-        for sc in s.find_all("script", type="application/ld+json"):
-            try:
-                d = json.loads(sc.string)
-                if d.get("datePosted"):
-                    dt = d["datePosted"].split("T")[0]
-            except:
-                pass
-
-        return title, loc, dt
-
-    except:
-        return "", "", ""
-
-def extract_collibra(soup, page, base_url):
-    out = []
-
-    for a in soup.select("a[href*='collibra.com/careers/job']"):
-        href = urljoin(base_url, a.get("href"))
-        text = a.get_text(" ", strip=True)
-
-        if not RELEVANT.search(text):
+    for p in postings:
+        href = p.get("href")
+        if not href:
+            continue
+        if "/jobs/" not in href:
             continue
 
-        title, loc, dt = fetch_detail(page, href)
-        if RELEVANT.search(title):
-            out.append((href, title, None))
+        # absolute link
+        if href.startswith("/"):
+            link = "https://boards.greenhouse.io" + href
+        else:
+            link = href
 
-    return out
+        if link in seen:
+            continue
+        seen.add(link)
+
+        # title extraction
+        text = p.get_text(" ", strip=True)
+        if not text:
+            continue
+
+        results.append((link, text))
+
+    return results
