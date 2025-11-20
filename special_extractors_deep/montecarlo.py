@@ -4,7 +4,7 @@
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-def extract_monte_carlo(soup, page, base_url):
+def extract_montecarlo(soup, page, base_url):
     results = []
     seen = set()
 
