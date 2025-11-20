@@ -29,6 +29,8 @@ from .vertica import extract_vertica
 from .yellowbrick import extract_yellowbrick
 from .sap import extract_sap
 from .salesforce import extract_salesforce
+from .snowflake import extract_snowflake
+
 
 # Master registry
 SPECIAL_EXTRACTORS_DEEP = {
@@ -60,4 +62,5 @@ SPECIAL_EXTRACTORS_DEEP = {
     "Yellowbrick": extract_yellowbrick,
     "SAP": extract_sap,
     "Salesforce": extract_salesforce,
+    "Snowflake": extract_snowflake,
 }
