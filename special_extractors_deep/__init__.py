@@ -55,7 +55,7 @@ SPECIAL_EXTRACTORS_DEEP = {
     "IBM": extract_ibm,
     "Informatica": extract_informatica,
     "InfluxData": extract_influxdata,
-    "Monte Carlo": extract_montecarlo
+    "Monte Carlo": extract_montecarlo,
     "Oracle": extract_oracle,
     "Pentaho": extract_pentaho,
     "Precisely": extract_precisely,
