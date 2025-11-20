@@ -62,12 +62,12 @@ MAX_DETAIL_PAGES = 12000
 
 # ---------- PATTERNS ----------
 FORBIDDEN_RE = re.compile(
-    r'\\b(?:privacy|about|press|blog|partners|pricing|docs|support|events|resources|login|apply now|read more)\\b', re.I
+    r'\b(?:privacy|about|press|blog|partners|pricing|docs|support|events|resources|login|apply now|read more)\b', re.I
 )
 
-LOC_RE = re.compile(r'\\b(?:remote|hybrid|usa|united states|uk|germany|india|london|new york|singapore|berlin|bengaluru)\\b', re.I)
+LOC_RE = re.compile(r'\b(?:remote|hybrid|usa|united states|uk|germany|india|london|new york|singapore|berlin|bengaluru)\b', re.I)
 
-ROLE_WORDS_RE = re.compile(r'\\b(?:engineer|developer|manager|director|architect|scientist|analyst|product|sre|intern)\\b', re.I)
+ROLE_WORDS_RE = re.compile(r'\b(?:engineer|developer|manager|director|architect|scientist|analyst|product|sre|intern)\b', re.I)
 
 COMPANY_SKIP_RULES = {
     "Ataccama": [r'one-team', r'blog', r'about'],
@@ -78,7 +78,7 @@ COMPANY_SKIP_RULES = {
 
 CRITICAL_COMPANIES = {"fivetran","ataccama","datadog","snowflake","matillion","oracle","mongodb","databricks"}
 
-RELEVANCE_HARD = [r'\\bdata engineer\\b', r'\\betl\\b', r'\\bintegrat', r'\\bconnector', r'\\bpipeline\\b', r'\\bsnowflake\\b', r'\\bdatabricks\\b', r'\\bobs ervab']
+RELEVANCE_HARD = [r'\bdata engineer\b', r'\betl\b', r'\bintegrat', r'\bconnector', r'\bpipeline\b', r'\bsnowflake\b', r'\bdatabricks\b', r'\bobs ervab']
 RELEVANCY_THRESHOLD = 2
 
 def score_title_desc(title, desc, company=""):
@@ -102,18 +102,18 @@ def normalize_link(base, href):
 
 def clean_title(raw):
     if not raw: return ""
-    t = re.sub(r'\\s+', ' ', raw).strip()
+    t = re.sub(r'\s+', ' ', raw).strip()
     t = FORBIDDEN_RE.sub('', t)
-    t = re.sub(r'\\((?:remote|hybrid)[^)]+\\)\\s*$', '', t, flags=re.I).strip()
-    t = re.sub(r'^[\\-\\•\\*]\\s*', '', t)
+    t = re.sub(r'\((?:remote|hybrid)[^)]+\)\s*$', '', t, flags=re.I).strip()
+    t = re.sub(r'^[\-•\*]\s*', '', t)
     return t.strip(" -:,.|")[:240]
 
 def extract_location_from_text(txt):
     if not txt: return "", ""
-    s = txt.replace("\\r"," ").replace("\\n"," ").strip()
-    paren = re.search(r'\\(([^)]+)\\)\\s*$', s)
+    s = txt.replace("\r"," ").replace("\n"," ").strip()
+    paren = re.search(r'\(([^)]+)\)\s*$', s)
     if paren: return s[:paren.start()].strip(" -:,"), paren.group(1)
-    parts = re.split(r'\\s{2,}| - | — | – | \\| |·|•|,', s)
+    parts = re.split(r'\s{2,}| - | — | – | \| |·|•|,', s)
     parts = [p.strip() for p in parts if p.strip()]
     if len(parts) >= 2 and (LOC_RE.search(parts[-1]) or len(parts[-1].split())<=4):
         return " ".join(parts[:-1]), parts[-1]
@@ -179,7 +179,7 @@ def should_drop_by_title(title):
     if not title or title.strip()=="":
         return True
     if ROLE_WORDS_RE.search((title or "").lower()): return False
-    if re.search(r'\\bintern\\b', (title or "").lower()): return False
+    if re.search(r'\bintern\b', (title or "").lower()): return False
     return True
 def _iso_only_date(raw):
     if not raw:
@@ -206,10 +206,10 @@ def scrape():
         page = context.new_page()
         for company, url_list in COMPANIES.items():
             for main_url in url_list:
-                print(f\"[SCRAPING] {company} -> {main_url}\")
+                print(f"[SCRAPING] {company} -> {main_url}")
                 listing_html = fetch_page_content(page, main_url)
                 if not listing_html:
-                    print(f\"[WARN] no html for {company} ({main_url}) - skipping\")
+                    print(f"[WARN] no html for {company} ({main_url}) - skipping")
                     continue
                 soup = BeautifulSoup(listing_html, "lxml")
                 candidates = []
@@ -221,49 +221,49 @@ def scrape():
                         for cand in special:
                             if not cand: continue
                             href = normalize_link(main_url, cand[0])
-                            txt = cand[1] if len(cand) > 1 else \"\"
+                            txt = cand[1] if len(cand) > 1 else ""
                             el = cand[2] if len(cand) > 2 else None
                             if href and (href, txt) not in [(c[0], c[1]) for c in candidates]:
                                 candidates.append((href, txt, el))
                 except Exception as e:
-                    print(f\"[WARN] special extractor {company} failed: {e}\")
+                    print(f"[WARN] special extractor {company} failed: {e}")
 
                 # generic anchors
-                for a in soup.find_all(\"a\", href=True):
-                    href = a.get(\"href\"); text = a.get_text(\" \", strip=True) or \"\"
+                for a in soup.find_all("a", href=True):
+                    href = a.get("href"); text = a.get_text(" ", strip=True) or ""
                     href_abs = normalize_link(main_url, href)
                     if is_likely_job_anchor(href_abs, text):
                         candidates.append((href_abs, text, a))
 
                 # preserved Fivetran extractor (works well)
-                if \"fivetran.com\" in main_url:
-                    for job in soup.select(\"div[data-job-id], div.job-card, a[data-job-id]\"):
-                        text = job.get_text(\" \", strip=True)
-                        link = job.get(\"href\") or job.get(\"data-url\") or job.get(\"data-job-url\") or job.get(\"data-job-id\")
-                        if link and not link.startswith(\"http\") and job.get(\"data-job-id\"):
-                            link = f\"https://www.fivetran.com/careers/job/{job.get('data-job-id')}\"
+                if "fivetran.com" in main_url:
+                    for job in soup.select("div[data-job-id], div.job-card, a[data-job-id]"):
+                        text = job.get_text(" ", strip=True)
+                        link = job.get("href") or job.get("data-url") or job.get("data-job-url") or job.get("data-job-id")
+                        if link and not link.startswith("http") and job.get("data-job-id"):
+                            link = f"https://www.fivetran.com/careers/job/{job.get('data-job-id')}"
                         link = normalize_link(main_url, link)
                         if text.strip(): candidates.append((link, text, job))
 
                 # job-card containers
-                for el in soup.select(\"[data-job], .job, .job-listing, .job-card, .opening, .position, .posting, .role, .job-row\"):
-                    a = el.find(\"a\", href=True)
-                    text = a.get_text(\" \", strip=True) if a else el.get_text(\" \", strip=True)
-                    href = normalize_link(main_url, a.get(\"href\")) if a else \"\"
+                for el in soup.select("[data-job], .job, .job-listing, .job-card, .opening, .position, .posting, .role, .job-row"):
+                    a = el.find("a", href=True)
+                    text = a.get_text(" ", strip=True) if a else el.get_text(" ", strip=True)
+                    href = normalize_link(main_url, a.get("href")) if a else ""
                     if is_likely_job_anchor(href, text):
                         candidates.append((href, text, el))
 
                 # iframe -> ATS fallback
                 if not candidates:
-                    for iframe in soup.find_all(\"iframe\", src=True):
-                        src = iframe.get(\"src\")
-                        if src and any(k in src for k in (\"greenhouse\",\"lever\",\"myworkday\",\"bamboohr\",\"ashby\",\"jobs.lever\",\"jobvite\")):
+                    for iframe in soup.find_all("iframe", src=True):
+                        src = iframe.get("src")
+                        if src and any(k in src for k in ("greenhouse","lever","myworkday","bamboohr","ashby","jobs.lever","jobvite")):
                             src_full = normalize_link(main_url, src)
                             iframe_html = fetch_page_content(page, src_full)
                             if iframe_html:
-                                f_soup = BeautifulSoup(iframe_html, \"lxml\")
-                                for a in f_soup.find_all(\"a\", href=True):
-                                    href = a.get(\"href\"); text = a.get_text(\" \", strip=True) or \"\"
+                                f_soup = BeautifulSoup(iframe_html, "lxml")
+                                for a in f_soup.find_all("a", href=True):
+                                    href = a.get("href"); text = a.get_text(" ", strip=True) or ""
                                     href_abs = normalize_link(src_full, href)
                                     if is_likely_job_anchor(href_abs, text):
                                         candidates.append((href_abs, text, a))
@@ -271,11 +271,11 @@ def scrape():
                 # dedupe + company skip rules
                 seen = set(); filtered = []
                 for href, text, el in candidates:
-                    if not href or href.rstrip(\"/\") == main_url.rstrip(\"/\"): continue
+                    if not href or href.rstrip("/") == main_url.rstrip("/"): continue
                     if href in seen: continue
                     seen.add(href)
                     skip = False
-                    low_text = (text or \"\").lower()
+                    low_text = (text or "").lower()
                     for c, rules in COMPANY_SKIP_RULES.items():
                         if c.lower() == company.lower():
                             for r in rules:
@@ -288,57 +288,57 @@ def scrape():
                 # parse filtered candidates (unchanged logic)
                 for link, anchor_text, el in filtered:
                     time.sleep(SLEEP_BETWEEN_REQUESTS)
-                    title_candidate = re.sub(r'\\s+', ' ', (anchor_text or \"\")).strip()
+                    title_candidate = re.sub(r'\s+', ' ', (anchor_text or "")).strip()
                     title_clean, location_candidate = extract_location_from_text(title_candidate)
                     title_clean = clean_title(title_clean or title_candidate)
                     card_loc = try_extract_location_from_card(el)
                     if card_loc and not location_candidate:
                         location_candidate = card_loc
 
-                    light_score = score_title_desc(title_candidate, \"\", company)
-                    posting_date = \"\"
+                    light_score = score_title_desc(title_candidate, "", company)
+                    posting_date = ""
                     must_detail = False
                     must_reasons = []
-                    if company.lower() in CRITICAL_COMPANIES: must_detail = True; must_reasons.append(\"critical_company\")
-                    if not location_candidate: must_detail = True; must_reasons.append(\"no_location\")
-                    if len((title_clean or \"\").split()) < 2: must_detail = True; must_reasons.append(\"short_title\")
-                    if LOC_RE.search(title_candidate): must_detail = True; must_reasons.append(\"title_contains_loc\")
-                    if any(x in (link or \"\").lower() for x in [\"/job/\",\"/jobs/\",\"greenhouse\",\"lever.co\",\"ashby\",\"bamboohr\",\"myworkdayjobs\",\"gr8people\",\"welcometothejungle\",\"jobvite\",\"smartrecruiters\"]):
-                        must_detail = True; must_reasons.append(\"link_looks_like_ats\")
+                    if company.lower() in CRITICAL_COMPANIES: must_detail = True; must_reasons.append("critical_company")
+                    if not location_candidate: must_detail = True; must_reasons.append("no_location")
+                    if len((title_clean or "").split()) < 2: must_detail = True; must_reasons.append("short_title")
+                    if LOC_RE.search(title_candidate): must_detail = True; must_reasons.append("title_contains_loc")
+                    if any(x in (link or "").lower() for x in ["/job/","/jobs/","greenhouse","lever.co","ashby","bamboohr","myworkdayjobs","gr8people","welcometothejungle","jobvite","smartrecruiters"]):
+                        must_detail = True; must_reasons.append("link_looks_like_ats")
 
                     if must_detail:
-                        print(f\"[DETAIL_DECISION] (forced) {company} {link} reasons={','.join(must_reasons)}\")
+                        print(f"[DETAIL_DECISION] (forced) {company} {link} reasons={','.join(must_reasons)}")
                     else:
-                        print(f\"[LIGHT_SCORE] {company} {link} title='{title_candidate[:60]}' score={light_score}\")
+                        print(f"[LIGHT_SCORE] {company} {link} title='{title_candidate[:60]}' score={light_score}")
 
-                    detail_html = \"\"
+                    detail_html = ""
                     final_score = light_score
 
                     if light_score >= RELEVANCY_THRESHOLD and not must_detail:
-                        print(f\"[KEEP-LIGHT] {company} | {title_candidate} | score={light_score}\")
+                        print(f"[KEEP-LIGHT] {company} | {title_candidate} | score={light_score}")
                     else:
                         if light_score <= 0 and not must_detail:
-                            print(f\"[DROP-LIGHT] Dropping {company} | {title_candidate} score={light_score}\")
+                            print(f"[DROP-LIGHT] Dropping {company} | {title_candidate} score={light_score}")
                             continue
                         if detail_count < MAX_DETAIL_PAGES:
                             detail_count += 1
                             detail_html = fetch_page_content(page, link)
                             if detail_html:
                                 try:
-                                    s = BeautifulSoup(detail_html, \"lxml\")
-                                    header = s.find(\"h1\")
+                                    s = BeautifulSoup(detail_html, "lxml")
+                                    header = s.find("h1")
                                     if header:
-                                        newt = clean_title(header.get_text(\" \", strip=True))
+                                        newt = clean_title(header.get_text(" ", strip=True))
                                         if newt and newt != title_clean:
                                             title_clean = newt
                                     # location selectors + json-ld date detection
-                                    for sel in [\"span.location\", \".job-location\", \".location\", \"[data-test='job-location']\", \".posting-location\", \".job_meta_location\", \".location--name\"]:
+                                    for sel in ["span.location", ".job-location", ".location", "[data-test='job-location']", ".posting-location", ".job_meta_location", ".location--name"]:
                                         eloc = s.select_one(sel)
                                         if eloc and eloc.get_text(strip=True):
-                                            location_candidate = eloc.get_text(\" \", strip=True); break
+                                            location_candidate = eloc.get_text(" ", strip=True); break
                                     # json-ld quick scan
-                                    for script in s.find_all(\"script\", type=\"application/ld+json\"):
-                                        text = script.string or \"\"
+                                    for script in s.find_all("script", type="application/ld+json"):
+                                        text = script.string or ""
                                         if not text: continue
                                         try:
                                             payload = json.loads(text)
@@ -347,52 +347,53 @@ def scrape():
                                         items = payload if isinstance(payload, list) else [payload]
                                         for item in items:
                                             if isinstance(item, dict):
-                                                if isinstance(item.get(\"datePosted\"), str) and not posting_date:
-                                                    posting_date = _iso_only_date(item.get(\"datePosted\"))
-                                                jl = item.get(\"jobLocation\") or item.get(\"jobLocations\")
+                                                if isinstance(item.get("datePosted"), str) and not posting_date:
+                                                    posting_date = _iso_only_date(item.get("datePosted"))
+                                                jl = item.get("jobLocation") or item.get("jobLocations")
                                                 if jl:
                                                     jl_entry = jl[0] if isinstance(jl, list) else jl
                                                     if isinstance(jl_entry, dict):
-                                                        addr = jl_entry.get(\"address\") or jl_entry
+                                                        addr = jl_entry.get("address") or jl_entry
                                                         if isinstance(addr, dict):
                                                             parts = []
-                                                            for k in (\"addressLocality\",\"addressRegion\",\"addressCountry\",\"postalCode\"):
+                                                            for k in ("addressLocality","addressRegion","addressCountry","postalCode"):
                                                                 v = addr.get(k)
                                                                 if v: parts.append(str(v))
                                                             if parts:
-                                                                location_candidate = \", \".join(parts); break
+                                                                location_candidate = ", ".join(parts); break
                                     if not posting_date:
                                         posting_date = extract_date_from_html(detail_html)
                                 except Exception as e:
-                                    print(f\"[WARN] detail parse fail {link} -> {e}\")
+                                    print(f"[WARN] detail parse fail {link} -> {e}")
 
-                        final_score = score_title_desc(title_clean or title_candidate, detail_html or \"\", company)
-                        print(f\"[FINAL_SCORE] {company} {link} final_score={final_score} (light={light_score})\")
+                        final_score = score_title_desc(title_clean or title_candidate, detail_html or "", company)
+                        print(f"[FINAL_SCORE] {company} {link} final_score={final_score} (light={light_score})")
                         if final_score < RELEVANCY_THRESHOLD:
-                            print(f\"[DROP-FINAL] Dropping after detail fetch -> score={final_score} | {company} | title='{title_clean or title_candidate}'\")
+                            print(f"[DROP-FINAL] Dropping after detail fetch -> score={final_score} | {company} | title='{title_clean or title_candidate}'")
                             continue
 
-                    title_final = clean_title(title_clean or anchor_text or \"\")
-                    location_candidate = location_candidate or \"\"
-                    posting_date_final = posting_date or \"\"
+                    title_final = clean_title(title_clean or anchor_text or "")
+                    location_candidate = location_candidate or ""
+                    posting_date_final = posting_date or ""
                     if not location_candidate and detail_html:
-                        m = re.search(r'\"addressLocality\"\\s*:\\s*\"([^\"]+)\"', detail_html)
+                        # FIXED LINES BELOW: Removed redundant backslashes from quotes within raw string regex
+                        m = re.search(r'"addressLocality"\s*:\s*"([^"]+)"', detail_html)
                         if m:
                             city = m.group(1)
-                            m2 = re.search(r'\"addressCountry\"\\s*:\\s*\"([^\"]+)\"', detail_html)
-                            country = m2.group(1) if m2 else \"\"
-                            loc = f\"{city}, {country}\".strip(\", \")
+                            m2 = re.search(r'"addressCountry"\s*:\s*"([^"]+)"', detail_html)
+                            country = m2.group(1) if m2 else ""
+                            loc = f"{city}, {country}".strip(", ")
                             if loc: location_candidate = loc
                         if not location_candidate:
-                            mm = re.search(r'\"additionalLocations\"\\s*:\\s*\\[(.+?)\\]', detail_html, re.S)
+                            mm = re.search(r'"additionalLocations"\s*:\s*\[(.+?)\]', detail_html, re.S)
                             if mm:
                                 locs_raw = mm.group(1); locs = re.findall(r'\"([^"]+)\"', locs_raw)
                                 if locs: location_candidate = locs[0]
                     if not location_candidate:
-                        mloc = re.search(r'/(remote|new[-_]york|london|berlin|singapore|bengaluru)[/\\-]?', link or "", re.I)
+                        mloc = re.search(r'/(remote|new[-_]york|london|berlin|singapore|bengaluru)[/\-]?', link or "", re.I)
                         if mloc: location_candidate = mloc.group(1).replace('-', ' ').title()
                     if not posting_date_final:
-                        posted_from_anchor = re.search(r'posted\\s+(\\d+)\\s+days?\\s+ago', anchor_text or "", re.I)
+                        posted_from_anchor = re.search(r'posted\s+(\d+)\s+days?\s+ago', anchor_text or "", re.I)
                         if posted_from_anchor:
                             d = date.today() - timedelta(days=int(posted_from_anchor.group(1)))
                             posting_date_final = d.isoformat()
@@ -402,12 +403,12 @@ def scrape():
                             "Company": company,
                             "Job Title": title_final,
                             "Job Link": link,
-                            "Location": (location_candidate or \"\").strip(),
+                            "Location": (location_candidate or "").strip(),
                             "Posting Date": posting_date_final,
                             "Days Since Posted": ""
                         })
                     else:
-                        print(f\"[DROP] Dropping non-job row -> {company} | {title_final} | {link}\")
+                        print(f"[DROP] Dropping non-job row -> {company} | {title_final} | {link}")
 
         browser.close()
         return rows
@@ -420,21 +421,21 @@ if __name__ == "__main__":
             r["Seniority"] = detect_seniority(r.get("Job Title",""))
         dedup = {}
         for r in all_rows:
-            lk = r.get("Job Link") or \"\"
+            lk = r.get("Job Link") or ""
             if lk in dedup:
                 existing = dedup[lk]
                 if not existing.get("Posting Date") and r.get("Posting Date"):
                     dedup[lk] = r
                 continue
-            pd = r.get("Posting Date") or \"\"
+            pd = r.get("Posting Date") or ""
             if pd:
                 try:
                     d = datetime.fromisoformat(pd).date()
                     r["Days Since Posted"] = str((date.today() - d).days)
                 except:
-                    r["Days Since Posted"] = \"\"
+                    r["Days Since Posted"] = ""
             else:
-                r["Days Since Posted"] = \"\"
+                r["Days Since Posted"] = ""
             dedup[lk] = r
         out = list(dedup.values())
         out_sorted = sorted(out, key=lambda x: (x.get("Company","").lower(), x.get("Job Title","").lower()))
