@@ -19,6 +19,7 @@ from .firebolt import extract_firebolt
 from .ibm import extract_ibm
 from .informatica import extract_informatica
 from .influxdata import extract_influxdata
+from .montecarlo import extract_montecarlo
 from .oracle import extract_oracle
 from .pentaho import extract_pentaho
 from .precisely import extract_precisely
@@ -54,6 +55,7 @@ SPECIAL_EXTRACTORS_DEEP = {
     "IBM": extract_ibm,
     "Informatica": extract_informatica,
     "InfluxData": extract_influxdata,
+    "Montecarlo": extract_montecarlo,
     "Oracle": extract_oracle,
     "Pentaho": extract_pentaho,
     "Precisely": extract_precisely,
