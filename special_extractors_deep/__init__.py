@@ -19,6 +19,7 @@ from .informatica import extract_informatica
 from .influxdata import extract_influxdata
 from .oracle import extract_oracle
 from .pentaho import extract_pentaho
+from .precisely import extract_precisely
 from .qlik import extract_qlik    
 from .sifflet import extract_sifflet
 from .solidatus import extract_solidatus
@@ -49,6 +50,7 @@ SPECIAL_EXTRACTORS_DEEP = {
     "InfluxData": extract_influxdata,
     "Oracle": extract_oracle,
     "Pentaho": extract_pentaho,
+    "Precisely": extract_precisely,
     "Qlik": extract_qlik,
     "Sifflet": extract_sifflet,
     "Solidatus": extract_solidatus,
