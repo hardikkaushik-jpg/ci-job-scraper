@@ -2,7 +2,7 @@
 # Master registry for all deep extractors
 
 from .alation import extract_alation
-from .alteryx import extract_alteryx.py
+from .alteryx import extract_alteryx
 from .amazon import extract_amazon
 from .anomalo import extract_anomalo
 from .ataccama import extract_ataccama
@@ -55,7 +55,7 @@ SPECIAL_EXTRACTORS_DEEP = {
     "IBM": extract_ibm,
     "Informatica": extract_informatica,
     "InfluxData": extract_influxdata,
-    "Montecarlo": extract_montecarlo,
+    "Monte Carlo": extract_montecarlo
     "Oracle": extract_oracle,
     "Pentaho": extract_pentaho,
     "Precisely": extract_precisely,
