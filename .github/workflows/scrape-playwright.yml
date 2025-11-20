@@ -3,7 +3,7 @@ name: Scrape and Push Jobs (Enterprise C+ Pipeline)
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 6 * * *"  # daily at 06:00 UTC
+    - cron: "0 6 * * *"   # Daily at 06:00 UTC
 
 jobs:
   scrape_and_clean:
@@ -30,7 +30,7 @@ jobs:
         run: |
           python jobs_smart_cplus.py
 
-      - name: Clean & Enrich Output (CLI)
+      - name: Clean & Enrich Output
         run: |
           python clean_jobs_cplus.py
 
