@@ -197,6 +197,44 @@ def _iso_only_date(raw):
         pass
     return ""
 
+def extract_date_from_html(html_text):
+    if not html_text:
+        return ""
+
+    # JSON-LD "datePosted"
+    m = re.search(r'"datePosted"\s*:\s*"([^"]+)"', html_text)
+    if m:
+        raw = m.group(1)
+        try:
+            return datetime.fromisoformat(raw.split("T")[0]).date().isoformat()
+        except:
+            pass
+
+    # <time datetime="...">
+    m2 = re.search(r'<time[^>]+datetime=["\']([^"\']+)["\']', html_text, re.I)
+    if m2:
+        raw = m2.group(1)
+        try:
+            return datetime.fromisoformat(raw.split("T")[0]).date().isoformat()
+        except:
+            pass
+
+    # "posted X days ago"
+    mm = re.search(r'posted\s+(\d+)\s+days?\s+ago', html_text, re.I)
+    if mm:
+        try:
+            days = int(mm.group(1))
+            return (date.today() - timedelta(days=days)).isoformat()
+        except:
+            pass
+
+    # fallback ISO-like date anywhere in the HTML
+    mm2 = re.search(r'(\d{4}-\d{2}-\d{2})', html_text)
+    if mm2:
+        return mm2.group(1)
+
+    return ""
+
 def scrape():
     rows = []
     detail_count = 0
