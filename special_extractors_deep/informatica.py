@@ -1,108 +1,77 @@
-# influxdata.py
-# Deep extractor for InfluxData
-# URL: https://www.influxdata.com/careers/#jobs
+# special_extractors_deep/extract_informatica.py
 
-import re, time, json
-from urllib.parse import urljoin
 from bs4 import BeautifulSoup
+import json, re
+from urllib.parse import urljoin
 
-# Strong relevance filter
-RELEVANT = re.compile(
-    r"(data|cloud|platform|engineer|etl|integration|pipeline|backend|golang|distributed)",
-    re.I
-)
+def extract_informatica(soup, page, main_url):
+    """
+    Deep Informatica extractor.
+    Supports:
+        - https://informatica.gr8people.com/jobs
+        - https://www.informatica.com/us/careers.html (iframe with GR8People)
+    Returns: list of (link, title, el)
+    """
 
-def fetch_detail(page, link):
-    """Optional detail extraction for location + date."""
-    try:
-        page.goto(link, timeout=45000, wait_until="networkidle")
-        page.wait_for_timeout(900)
+    results = []
 
-        s = BeautifulSoup(page.content(), "lxml")
-
-        title = ""
-        loc = ""
-        date = ""
-
-        # generic title selector (non-Workday)
-        h = s.find("h1")
-        if h:
-            title = h.get_text(" ", strip=True)
-
-        # location selectors (Workable/Greenhouse style)
-        for sel in [
-            ".location", ".job-location", ".posting-location",
-            "[data-qa='job-location']", "[data-test='job-location']"
-        ]:
-            el = s.select_one(sel)
-            if el:
-                loc = el.get_text(" ", strip=True)
-                break
-
-        # JSON-LD
-        for script in s.find_all("script", type="application/ld+json"):
-            try:
-                data = json.loads(script.string or "{}")
-            except:
+    # -------------------------
+    # CASE 1: GR8People direct
+    # -------------------------
+    if "gr8people.com" in main_url:
+        cards = soup.select("section.search-results article, div.search-result")
+        for c in cards:
+            a = c.find("a", href=True)
+            if not a:
                 continue
 
-            if isinstance(data, dict):
-                if "datePosted" in data:
-                    date_raw = data["datePosted"]
-                    if "T" in date_raw:
-                        date = date_raw.split("T")[0]
+            link = urljoin(main_url, a["href"])
+            title = a.get_text(" ", strip=True)
+            if not title:
+                continue
 
-        return title, loc, date
+            results.append((link, title, c))
 
-    except Exception:
-        return "", "", ""
+        return results
 
+    # -------------------------------------------------------
+    # CASE 2: Marketing page → iframe containing ATS
+    # -------------------------------------------------------
+    # Look for iframe with GR8People job listings
+    iframe = soup.find("iframe", src=True)
+    if iframe and ("gr8people" in iframe["src"].lower()):
+        iframe_url = urljoin(main_url, iframe["src"])
+        try:
+            page.goto(iframe_url, timeout=30000, wait_until="networkidle")
+            page.wait_for_timeout(600)
+            iframe_html = page.content()
+        except:
+            return results
 
-def extract_influxdata(soup, page, base_url):
-    """Main extractor for InfluxData jobs."""
-    out = []
+        iframe_soup = BeautifulSoup(iframe_html, "lxml")
 
-    # Their job cards are inside a section with CSS grid/list layout
-    job_cards = soup.select("div.career-job, li.career-job, div.job, li.job")
+        cards = iframe_soup.select("section.search-results article, div.search-result")
+        for c in cards:
+            a = c.find("a", href=True)
+            if not a:
+                continue
+            link = urljoin(iframe_url, a["href"])
+            title = a.get_text(" ", strip=True)
+            if not title:
+                continue
+            results.append((link, title, c))
 
-    # fallback: scan anchors (Influx sometimes changes markup)
-    if not job_cards:
-        job_cards = soup.select("a[href*='/careers/']")
+        return results
 
-    for card in job_cards:
-        a = card.find("a", href=True)
-        if not a:
-            continue
+    # -------------------------------------------------------
+    # Fallback: Look for any anchor pointing to Informatica ATS
+    # -------------------------------------------------------
+    for a in soup.find_all("a", href=True):
+        h = a["href"].lower()
+        if "gr8people" in h or "informatica" in h:
+            link = urljoin(main_url, a["href"])
+            title = a.get_text(" ", strip=True)
+            if title:
+                results.append((link, title, a))
 
-        link = urljoin(base_url, a.get("href"))
-        text = a.get_text(" ", strip=True)
-
-        # Extract title + location from text
-        title = text
-        loc = ""
-
-        # Look for patterns like "Software Engineer – Remote" or "| USA"
-        if " - " in text:
-            parts = text.split(" - ")
-            title = parts[0].strip()
-            loc = parts[-1].strip()
-        elif "|" in text:
-            parts = text.split("|")
-            title = parts[0].strip()
-            loc = parts[-1].strip()
-
-        # Relevance filtering
-        combined = f"{title} {loc}"
-        if not RELEVANT.search(combined):
-            continue
-
-        # Fetch detail for better metadata
-        t2, l2, d2 = fetch_detail(page, link)
-
-        final_title = t2 or title
-        final_loc = l2 or loc
-        label = f"{final_title} ({final_loc})" if final_loc else final_title
-
-        out.append((link, label))
-
-    return out
+    return results
