@@ -23,7 +23,7 @@ COMPANIES = {
     "Anomalo": ["https://boards.greenhouse.io/anomalojobs"],
     "BigEye": ["https://www.bigeye.com/careers#positions"],
     "Boomi": ["https://boomi.com/company/careers/#greenhouseapp"],
-    "CastorDoc (Coalesce)": ["https://jobs.ashbyhq.com/coalesce"],
+    "CastorDoc": ["https://jobs.ashbyhq.com/coalesce"],
     "Cloudera": ["https://cloudera.wd5.myworkdayjobs.com/External_Career"],
     "Collibra": ["https://www.collibra.com/company/careers#sub-menu-find-jobs"],
     "Couchbase": ["https://www.couchbase.com/careers/"],
@@ -38,13 +38,18 @@ COMPANIES = {
     "InfluxData": ["https://www.influxdata.com/careers/#jobs"],
     "Informatica": ["https://informatica.gr8people.com/jobs", "https://www.informatica.com/us/careers.html"],
     "Matillion": ["https://jobs.lever.co/matillion"],
-    "MongoDB": ["https://www.mongodb.com/company/careers/teams/engineering"],
+    "MongoDB": ["https://www.mongodb.com/company/careers/teams/engineering",
+        "https://www.mongodb.com/company/careers/teams/marketing",
+        "https://www.mongodb.com/company/careers/teams/sales",
+        "https://www.mongodb.com/company/careers/teams/product-management-and-design"],
     "Monte Carlo": ["https://jobs.ashbyhq.com/montecarlodata"],
     "Oracle": ["https://careers.oracle.com/en/sites/jobsearch/jobs"],
+    "Precisely": ["https://www.precisely.com/careers-and-culture/us-jobs",
+        "https://www.precisely.com/careers-and-culture/international-jobs"],
     "Pentaho": ["https://www.hitachivantara.com/en-us/company/careers/job-search","https://www.hitachivantara.com/en-us/careers.html"],
     "Qlik": ["http://careerhub.qlik.com/careers"],
     "Sifflet": ["https://www.welcometothejungle.com/en/companies/sifflet/jobs"],
-    ""Solidatus": ["https://www.solidatus.com/careers/"],
+    "Solidatus": ["https://www.solidatus.com/careers/"],
     "Snowflake": ["https://careers.snowflake.com/global/en/search-results"],
     "Syniti": ["https://careers.syniti.com/go/Explore-Our-Roles/8777900/"],
     "Teradata": ["https://careers.teradata.com/jobs"],
@@ -56,7 +61,6 @@ COMPANIES = {
     "IBM": ["https://www.ibm.com/careers/search"],
     "SAP": ["https://jobs.sap.com/"],
 }
-
 PAGE_NAV_TIMEOUT = 40000
 PAGE_DOM_TIMEOUT = 15000
 SLEEP_BETWEEN_REQUESTS = 0.18
