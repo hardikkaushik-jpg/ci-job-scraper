@@ -1,40 +1,61 @@
-# extractor_yellowbrick.py
+# special_extractors_deep/extract_yellowbrick.py
 
-import re
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-RELEVANT = re.compile(r"(yellowbrick|data|warehouse|sql|analytics|bi|engineer)", re.I)
+def extract_yellowbrick(soup, page, main_url):
+    """
+    Deep extractor for Yellowbrick careers.
+    URL:
+        https://yellowbrick.com/company/careers/
 
-def fetch_detail(page, link):
-    try:
-        page.goto(link, timeout=30000, wait_until="networkidle")
-        page.wait_for_timeout(800)
+    Yellowbrick loads jobs into <a> tags inside job cards.
+    Often links go to Greenhouse or Jobvite.
+    """
 
-        s = BeautifulSoup(page.content(), "lxml")
+    results = []
 
-        h = s.find("h1")
-        title = h.get_text(" ", strip=True) if h else ""
+    # ------------------------------------------------------
+    # 1) Direct job cards
+    # ------------------------------------------------------
+    # Typical structure:
+    # <a class="job-card" href="https://boards.greenhouse.io/...">
+    for a in soup.select(
+        "a.job-card, a.job, a.career-job, div.job-card a, div.job a"
+    ):
+        href = a.get("href")
+        if not href:
+            continue
 
-        loc = ""
-        loc_el = s.select_one(".location, .job-location")
-        if loc_el: loc = loc_el.get_text(" ", strip=True)
+        title = a.get_text(" ", strip=True)
+        if not title:
+            continue
 
-        return title, loc, ""
-    except:
-        return "", "", ""
+        link = urljoin(main_url, href)
+        results.append((link, title, a))
 
-def extract_yellowbrick(soup, page, base_url):
-    out = []
+    if results:
+        return results
 
-    for a in soup.select("a[href*='/careers/']"):
-        href = urljoin(base_url, a.get("href"))
-        t = a.get_text(" ", strip=True)
+    # ------------------------------------------------------
+    # 2) Generic fallback: catch ATS outbound links
+    # ------------------------------------------------------
+    for a in soup.find_all("a", href=True):
+        href = a["href"]
+        h = href.lower()
 
-        if not RELEVANT.search(t): continue
+        # Yellowbrick uses ATS platforms
+        if (
+            "greenhouse" in h
+            or "jobvite" in h
+            or "/jobs/" in h
+            or "/job/" in h
+        ):
+            title = a.get_text(" ", strip=True)
+            if not title:
+                continue
 
-        title, loc, _ = fetch_detail(page, href)
-        if RELEVANT.search(title):
-            out.append((href, title, None))
+            link = urljoin(main_url, href)
+            results.append((link, title, a))
 
-    return out
+    return results
