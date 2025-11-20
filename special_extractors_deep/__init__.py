@@ -3,6 +3,7 @@
 
 from .alation import extract_alation
 from .amazon import extract_amazon
+from .anomalo import extract_anomalo
 from .ataccama import extract_ataccama
 from .atlan import extract_atlan
 from .bigeye import extract_bigeye
@@ -36,6 +37,7 @@ from .snowflake import extract_snowflake
 SPECIAL_EXTRACTORS_DEEP = {
     "Alation": extract_alation,
     "Amazon": extract_amazon,
+    "Anomalo": extract_anomalo,
     "Ataccama": extract_ataccama,
     "Atlan": extract_atlan,
     "BigEye": extract_bigeye,
