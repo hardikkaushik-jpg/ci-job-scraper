@@ -1,51 +1,68 @@
-# extractor_dataworld.py
+# dataworld.py
+# Deep extractor for Data.World careers page
 
-import re, json
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-
-RELEVANT = re.compile(r"(data|engineer|analytics|cloud|etl|integration|sql|catalog)", re.I)
-
-def fetch_detail(page, link):
-    try:
-        page.goto(link, timeout=35000, wait_until="networkidle")
-        page.wait_for_timeout(800)
-        s = BeautifulSoup(page.content(), "lxml")
-
-        title = s.find("h1")
-        title = title.get_text(" ", strip=True) if title else ""
-
-        loc = ""
-        loc_el = s.select_one(".job-location, .location")
-        if loc_el:
-            loc = loc_el.get_text(" ", strip=True)
-
-        dt = ""
-        for js in s.find_all("script", type="application/ld+json"):
-            try:
-                o = json.loads(js.string)
-                if o.get("datePosted"):
-                    dt = o["datePosted"].split("T")[0]
-            except:
-                pass
-
-        return title, loc, dt
-
-    except:
-        return "", "", ""
+import time, re
 
 def extract_dataworld(soup, page, base_url):
-    out = []
+    results = []
+    seen = set()
 
-    for card in soup.select("div.careers-listing a[href]"):
-        href = urljoin(base_url, card.get("href"))
-        text = card.get_text(" ", strip=True)
+    # --- Dynamic load + scroll ---
+    try:
+        page.goto(base_url, wait_until="networkidle", timeout=45000)
+        for _ in range(3):
+            page.mouse.wheel(0, 1400)
+            time.sleep(0.7)
+        html = page.content()
+        soup = BeautifulSoup(html, "lxml")
+    except Exception:
+        pass
 
-        if not RELEVANT.search(text):
+    # root job list container
+    root = soup.find(id="careers-list")
+    if not root:
+        root = soup  # fallback
+
+    job_cards = root.select("a[href]") + root.select("div.job") + root.select("div.opening")
+
+    for node in job_cards:
+        href = node.get("href")
+        if not href:
             continue
-        
-        title, loc, dt = fetch_detail(page, href)
-        if RELEVANT.search(title):
-            out.append((href, title, None))
 
-    return out
+        link = urljoin(base_url, href)
+
+        # skip non-job navigation anchors
+        if any(bad in link.lower() for bad in ["#","/company","/about","/blog"]):
+            continue
+
+        if link in seen:
+            continue
+        seen.add(link)
+
+        # title
+        title = (
+            node.get_text(" ", strip=True)
+            or (node.find("h2").get_text(" ", strip=True) if node.find("h2") else "")
+            or (node.find("h3").get_text(" ", strip=True) if node.find("h3") else "")
+        )
+
+        if not title or len(title) < 3:
+            continue
+
+        # location
+        location = ""
+        loc_el = (
+            node.find("span", class_=re.compile("location", re.I))
+            or node.find("p")
+            or node.find("div", class_=re.compile("location", re.I))
+        )
+        if loc_el:
+            location = loc_el.get_text(" ", strip=True)
+
+        label = f"{title} ({location})" if location else title
+        results.append((link, label))
+
+    return results
