@@ -1,62 +1,107 @@
-# extract_precisely.py
-# Deep extractor for Precisely careers portals
+# precisely.py
+# Deep extractor for Precisely US + International career pages
 
-import re
-from urllib.parse import urljoin
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+import time, re
 
-RELEVANT = re.compile(
-    r"(data|engineer|developer|etl|integration|product|cloud|analytics|software|platform|architect|manager)",
-    re.I
-)
 
 def extract_precisely(soup, page, base_url):
-    """
-    Extract job title + links from Precisely career pages.
-    Works for both:
-        - US jobs
-        - International jobs
-    """
+    results = []
+    seen = set()
 
-    out = []
+    # --- Load full JS-rendered page ---
+    try:
+        page.goto(base_url, wait_until="networkidle", timeout=45000)
 
-    # All job cards use consistent structure: <a class="job-link"> or deep link inside buttons
-    for job in soup.select("a, div.job-item, div.career-item, li, div"):
-        # Filter realistic job anchors
-        if not job:
-            continue
+        # Scrolling — Precisely loads jobs as you scroll
+        for _ in range(5):
+            page.mouse.wheel(0, 1800)
+            time.sleep(0.7)
 
-        title = job.get_text(" ", strip=True)
-        if not title:
-            continue
+        html = page.content()
+        soup = BeautifulSoup(html, "lxml")
 
-        # Must contain job-relevant words
-        if not RELEVANT.search(title):
-            continue
+    except Exception:
+        pass
 
-        # Find href in <a> or nested <a>
-        href = None
-        if job.name == "a" and job.get("href"):
-            href = job["href"]
-        else:
-            a = job.find("a", href=True)
+    # ================================
+    # Precisely job card selectors
+    # ================================
+    selectors = [
+        "div.careers-job-listing",           # common wrapper
+        "div.job",                           # generic
+        "li.job",                            # list format
+        "div.position",                      # fallback
+        "a.careers-job-listing",             # direct links
+        "a[href*='jobs']",                   # ATS links
+    ]
+
+    job_nodes = []
+    for sel in selectors:
+        job_nodes.extend(soup.select(sel))
+
+    # also catch anchors inside containers
+    job_nodes.extend(soup.select("div.careers-job-listing a[href]"))
+
+    for node in job_nodes:
+        href = node.get("href")
+
+        # sometimes nested inside <a>
+        if not href:
+            a = node.find("a", href=True)
             if a:
                 href = a["href"]
 
         if not href:
             continue
 
-        # Convert to absolute
-        href = urljoin(base_url, href)
+        link = urljoin(base_url, href)
 
-        # Typical non-job noise to eliminate
-        if any(x in href.lower() for x in ["linkedin", "glassdoor", "youtube", "privacy", "culture"]):
+        # Skip noise
+        skip_words = ["privacy", "about", "news", "events", "blog"]
+        if any(sw in link.lower() for sw in skip_words):
             continue
 
-        # Ensure we only pick actual job pages (Precicely uses greenhouse links)
-        if "boards.greenhouse" not in href.lower():
+        if link in seen:
+            continue
+        seen.add(link)
+
+        # ---------- Extract title ----------
+        title = ""
+
+        for tag in ["h2", "h3", "h4"]:
+            t = node.find(tag)
+            if t:
+                title = t.get_text(" ", strip=True)
+                break
+
+        if not title:
+            title = node.get_text(" ", strip=True)
+
+        if not title or len(title) < 3:
             continue
 
-        out.append((href, title))
+        # ---------- Extract location ----------
+        location = ""
 
-    return out
+        # directly labelled nodes
+        loc_el = (node.find("span", class_=re.compile("location", re.I)) or
+                  node.find("div", class_=re.compile("location", re.I)) or
+                  node.find("p", class_=re.compile("location", re.I)))
+
+        if loc_el:
+            location = loc_el.get_text(" ", strip=True)
+
+        # fallback: detect " - " split
+        if not location and " - " in title:
+            parts = title.split(" - ")
+            if len(parts) == 2:
+                title, location = parts[0], parts[1]
+
+        # combine
+        label = f"{title} ({location})" if location else title
+
+        results.append((link, label))
+
+    return results
