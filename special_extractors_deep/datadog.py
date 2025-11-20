@@ -1,48 +1,63 @@
-# extractor_datadog.py
+# datadog.py
+# Deep extractor for Datadog careers page
 
-import re, json
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-RELEVANT = re.compile(r"(observability|metrics|monitor|logs|apm|sre|devops|pipeline|etl|data)", re.I)
-
-def fetch_detail(page, link):
-    try:
-        page.goto(link, timeout=45000, wait_until="networkidle")
-        page.wait_for_timeout(900)
-        soup = BeautifulSoup(page.content(), "lxml")
-
-        title = soup.find("h1")
-        title = title.get_text(" ", strip=True) if title else ""
-
-        loc_el = soup.select_one(".job-location, .location")
-        loc = loc_el.get_text(" ", strip=True) if loc_el else ""
-
-        dt = ""
-        for sc in soup.find_all("script", type="application/ld+json"):
-            try:
-                data = json.loads(sc.string)
-                if data.get("datePosted"):
-                    dt = data["datePosted"].split("T")[0]
-            except:
-                pass
-
-        return title, loc, dt
-    except:
-        return "", "", ""
-
 def extract_datadog(soup, page, base_url):
-    out = []
+    results = []
+    seen = set()
 
-    for job in soup.select("a[href*='/job/']"):
-        href = urljoin(base_url, job.get("href"))
-        text = job.get_text(" ", strip=True)
-
-        if not RELEVANT.search(text):
+    # Datadog jobs always have anchors linking to /job/<slug>
+    for a in soup.select("a[href*='/job/']"):
+        href = a.get("href", "").strip()
+        if not href:
             continue
-        
-        title, loc, dt = fetch_detail(page, href)
-        if RELEVANT.search(title):
-            out.append((href, title, None))
 
-    return out
+        link = urljoin(base_url, href)
+
+        if link in seen:
+            continue
+        seen.add(link)
+
+        # Title extraction: <a> text OR child <h2>
+        text = a.get_text(" ", strip=True)
+        if not text:
+            h2 = a.find("h2")
+            if h2:
+                text = h2.get_text(" ", strip=True)
+
+        if not text:
+            continue
+
+        # Try to find location from nearby elements
+        loc = ""
+
+        parent = a.parent
+        if parent:
+            # Several Datadog builds place location in sibling spans
+            possible = parent.find_all(["span", "div"])
+            for el in possible:
+                t = el.get_text(" ", strip=True)
+                if (
+                    t
+                    and any(k in t.lower() for k in [
+                        "remote", "germany", "usa", "france",
+                        "new york", "london", "singapore",
+                        "india", "poland", "canada"
+                    ])
+                ):
+                    loc = t
+                    break
+
+        # fallback: look for data-qa='location'
+        if not loc:
+            loc_el = soup.find("span", {"data-qa": "location"})
+            if loc_el:
+                loc = loc_el.get_text(" ", strip=True)
+
+        label = f"{text} ({loc})" if loc else text
+
+        results.append((link, label))
+
+    return results
