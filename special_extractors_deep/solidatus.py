@@ -1,38 +1,65 @@
-# extractor_solidatus.py
+# solidatus.py
+# Deep extractor for Solidatus careers page
 
-import re
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-RELEVANT = re.compile(r"(data|lineage|governance|engineer|metadata|connector)", re.I)
-
-def fetch_detail(page, link):
-    try:
-        page.goto(link, timeout=35000, wait_until="networkidle")
-        page.wait_for_timeout(800)
-        s = BeautifulSoup(page.content(), "lxml")
-
-        h = s.find("h1")
-        title = h.get_text(" ", strip=True) if h else ""
-
-        loc_el = s.select_one(".location, .job-location")
-        loc = loc_el.get_text(" ", strip=True) if loc_el else ""
-
-        return title, loc, ""
-    except:
-        return "", "", ""
-
 def extract_solidatus(soup, page, base_url):
-    out = []
+    results = []
+    seen = set()
 
-    for a in soup.select("a[href*='job']"):
-        href = urljoin(base_url, a.get("href"))
-        t = a.get_text(" ", strip=True)
+    # Solidatus uses simple job cards with anchors linking to Ashby or /careers/*
+    selectors = [
+        "a[href*='ashby']",
+        "a[href*='/careers/']",
+        "div.vacancy a",
+        "div.job a",
+        "div.opening a",
+        "div.careers__item a"
+    ]
 
-        if not RELEVANT.search(t): continue
+    anchors = []
+    for sel in selectors:
+        anchors.extend(soup.select(sel))
 
-        title, loc, _ = fetch_detail(page, href)
-        if RELEVANT.search(title):
-            out.append((href, title, None))
+    for a in anchors:
+        href = a.get("href")
+        if not href:
+            continue
 
-    return out
+        link = urljoin(base_url, href)
+        if link in seen:
+            continue
+        seen.add(link)
+
+        # Title extraction
+        title = a.get_text(" ", strip=True)
+
+        # Fallback: use parent text if anchor insufficient
+        if not title or len(title) < 3:
+            parent = a.find_parent()
+            if parent:
+                title = parent.get_text(" ", strip=True)
+
+        if not title or len(title) < 3:
+            continue
+
+        # Location detection inside card or nearby element
+        loc = ""
+        possible_locs = []
+        parent = a.find_parent()
+
+        if parent:
+            for sel in [".location", ".job-location", ".posting-location", ".meta", ".details"]:
+                el = parent.select_one(sel)
+                if el and el.get_text(strip=True):
+                    possible_locs.append(el.get_text(" ", strip=True))
+
+        if possible_locs:
+            loc = possible_locs[0]
+
+        label = f"{title} ({loc})" if loc else title
+
+        results.append((link, label))
+
+    return results
