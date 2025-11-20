@@ -207,19 +207,21 @@ def scrape():
                 soup = BeautifulSoup(listing_html, "lxml")
                 candidates = []
 
-                # --- REPLACED BLOCK START ---
+                # --- SPECIAL EXTRACTORS ---
                 if company in SPECIAL_EXTRACTORS_DEEP:
                     print(f"[DEBUG] Running special extractor for {company}")
                     try:
                         special = SPECIAL_EXTRACTORS_DEEP[company](soup, page, main_url)
                         print(f"[DEBUG] SPECIAL RETURNED FOR {company}: {len(special)} items")
-                        for cand in special:
-                            print("[DEBUG ITEM]", cand)
+
+                        # ⬇️ CRITICAL LINE — ADD SPECIAL ITEMS TO CANDIDATES
+                        for link, text, el in special:
+                            candidates.append((link, text, el))
+
                     except Exception as e:
                         print(f"[DEBUG] SPECIAL EXTRACTOR ERROR for {company} ->", e)
                 else:
                     print(f"[DEBUG] Special extractor NOT found for {company}")
-                # --- REPLACED BLOCK END ---
 
                 # generic anchors
                 for a in soup.find_all("a", href=True):
