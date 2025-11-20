@@ -1,41 +1,60 @@
-# extractor_firebolt.py
+# firebolt.py
+# Deep extractor for Firebolt using AshbyHQ job widgets.
 
-import re
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-RELEVANT = re.compile(r"(data|warehouse|sql|engineer|etl|integration|cloud|query)", re.I)
-
-def fetch_detail(page, link):
-    try:
-        page.goto(link, timeout=35000, wait_until="networkidle")
-        page.wait_for_timeout(800)
-        s = BeautifulSoup(page.content(), "lxml")
-
-        title = s.find("h1")
-        title = title.get_text(" ", strip=True) if title else ""
-
-        loc_el = s.select_one(".location, .job-location")
-        loc = loc_el.get_text(" ", strip=True) if loc_el else ""
-
-        dt = ""
-        return title, loc, dt
-
-    except:
-        return "", "", ""
-
 def extract_firebolt(soup, page, base_url):
-    out = []
+    results = []
+    seen = set()
 
-    for a in soup.select("a[href*='/careers/']"):
-        href = urljoin(base_url, a.get("href"))
-        text = a.get_text(" ", strip=True)
+    # Primary selectors
+    job_cards = soup.select(".ashby-job-card")
 
-        if not RELEVANT.search(text):
+    # Fallback if site structure changes
+    if not job_cards:
+        job_cards = soup.select("a[href*='ashby']")
+
+    for card in job_cards:
+        # Extract title
+        title = ""
+
+        # Standard Ashby title
+        t = card.select_one(".ashby-job-card__title")
+        if t:
+            title = t.get_text(" ", strip=True)
+
+        # Fallback if title was inside the anchor
+        if not title:
+            a = card.find("a")
+            if a:
+                title = a.get_text(" ", strip=True)
+
+        if not title:
             continue
-        
-        title, loc, dt = fetch_detail(page, href)
-        if RELEVANT.search(title):
-            out.append((href, title, None))
 
-    return out
+        # Extract link
+        link = ""
+        a = card.select_one("a.ashby-job-card__link") or card.find("a", href=True)
+        if a and a.get("href"):
+            link = urljoin(base_url, a.get("href").strip())
+
+        if not link:
+            continue
+
+        if link in seen:
+            continue
+        seen.add(link)
+
+        # Extract location
+        loc = ""
+        l = card.select_one(".ashby-job-card__location")
+        if l:
+            loc = l.get_text(" ", strip=True)
+
+        # Combine into (link, label)
+        label = f"{title} ({loc})" if loc else title
+
+        results.append((link, label))
+
+    return results
