@@ -1,29 +1,33 @@
-# extractor_cloudera.py (FULLY FIXED — MATCHES WORKDAY DOM)
+# extractor_cloudera.py — FINAL WORKING VERSION
 
 from urllib.parse import urljoin
+from bs4 import BeautifulSoup
 
 def extract_cloudera(soup, page, base_url):
     """
-    Cloudera uses Workday. We only extract job-card anchors,
-    no detail fetch. Return (href, card_text, element) exactly
-    like the Fivetran extractor pattern.
+    Proper Workday extractor.
+    Force hydration by waiting for job cards.
+    Returns Fivetran-style tuples: (href, text, element).
     """
     out = []
 
-    # Workday job title anchors
-    anchors = soup.select("a[data-automation-id='jobTitle']")
-    for a in anchors:
-        href = a.get("href")
-        text = a.get_text(" ", strip=True)
+    try:
+        # force hydration — this is CRITICAL
+        page.wait_for_selector("a[data-automation-id='jobTitle']", timeout=60000)
+        html = page.content()
+        s = BeautifulSoup(html, "lxml")
 
-        if not href or not text:
-            continue
+        for a in s.select("a[data-automation-id='jobTitle']"):
+            href = a.get("href")
+            text = a.get_text(" ", strip=True)
 
-        # make absolute link
-        link = urljoin(base_url, href)
+            if not href or not text:
+                continue
 
-        # return full Fivetran-style tuple:
-        # (link, card_text, the actual element)
-        out.append((link, text, a))
+            link = urljoin(base_url, href)
+            out.append((link, text, a))
+
+    except Exception as e:
+        print("[CLOUDERA-EXTRACTOR] Failed:", e)
 
     return out
