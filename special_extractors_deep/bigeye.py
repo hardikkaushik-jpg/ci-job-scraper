@@ -1,55 +1,43 @@
-# bigeye.py
-# Deep extractor for BigEye (static HTML job cards)
+# bigeye.py — UPDATED for Gem jobs board
+# Deep extractor for BigEye (Gem ATS)
 
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
+GEM_URL = "https://jobs.gem.com/bigeye"
+
 def extract_bigeye(soup, page, base_url):
     results = []
-
-    # BigEye renders job cards inside <div class="careers-list"> or <div class="positions">
-    # Each card typically contains:
-    #   <a href="/careers/<slug>">Job Title</a>
-    #   <div class="location">...</div>
-
-    job_selectors = [
-        ".positions a",               # older site layout
-        ".careers-list a",            # current layout
-        ".job-card a",                # fallback
-        "a[href*='/careers']"         # worst-case fallback
-    ]
-
     seen = set()
 
-    for sel in job_selectors:
-        for a in soup.select(sel):
-            href = a.get("href", "")
-            text = a.get_text(" ", strip=True)
+    try:
+        page.goto(GEM_URL, timeout=45000, wait_until="networkidle")
+        page.wait_for_timeout(900)
+        html = page.content()
+    except Exception:
+        return results
 
-            if not href or not text:
-                continue
+    s = BeautifulSoup(html, "lxml")
 
-            # Normalize URL
-            link = urljoin(base_url, href)
+    # Gem job cards typically use <a href="/bigeye/xxxxx">Title</a>
+    for a in s.select("a[href*='/bigeye/']"):
+        href = a.get("href", "").strip()
+        if not href:
+            continue
 
-            # Dedupe
-            if link in seen:
-                continue
-            seen.add(link)
+        if href.startswith("/"):
+            link = urljoin(GEM_URL, href)
+        else:
+            link = href
 
-            # Try to detect location from nearby elements
-            parent = a.parent
-            loc = ""
+        if link in seen:
+            continue
+        seen.add(link)
 
-            # Check sibling/parent
-            if parent:
-                loc_el = parent.select_one(".location")
-                if loc_el:
-                    loc = loc_el.get_text(" ", strip=True)
+        title = a.get_text(" ", strip=True)
+        if not title or len(title) < 2:
+            continue
 
-            # Put location into the combined label
-            label = f"{text} ({loc})" if loc else text
-
-            results.append((link, label))
+        results.append((link, title))
 
     return results
