@@ -1,5 +1,4 @@
-# collabira.py — final stable version
-
+# collabira.py — final corrected version
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
@@ -8,54 +7,48 @@ import re
 def extract_collibra(soup, page, main_url):
     GH_URL = "https://boards.greenhouse.io/collibra"
     headers = {"User-Agent": "Mozilla/5.0"}
-    
-    out = []
-    seen = set()
 
+    out = []
+    
     try:
-        print("[SPECIAL] Collibra: Fetching Greenhouse board via requests...")
-        
-        # Use requests — NOT Playwright (Greenhouse blocks chromedriver in CI)
+        # Always use requests (CI safe)
         r = requests.get(GH_URL, headers=headers, timeout=20)
         s = BeautifulSoup(r.text, "lxml")
-        
-        # This is the working selector in your pipeline
-        anchors = s.find_all("a", href=True)
-        
-        for a in anchors:
-            href = a.get("href")
-            if not href or "/jobs/" not in href:
+
+        # Each job is inside a <div class="opening">
+        openings = s.select("div.opening")
+
+        for op in openings:
+            # LEFT SIDE = real job title (non-clickable)
+            title_tag = op.find(text=True, recursive=False)
+            if not title_tag or len(title_tag.strip()) < 2:
+                continue
+            title = title_tag.strip()
+
+            # RIGHT SIDE = the real job link (the "Apply in X" anchor)
+            apply_link = op.find("a", href=True)
+            if not apply_link:
                 continue
             
-            link = urljoin(GH_URL, href)
-            text = a.get_text(" ", strip=True)
-            
-            if not text:
-                continue
-            
-            # FILTER: Remove useless "Apply in X"
-            if re.match(r"^Apply in\b", text, re.I):
-                continue
-            
-            if link in seen:
-                continue
-            seen.add(link)
-            
-            # OPTIONAL: fetch job description
+            href = apply_link.get("href")
+            full_link = urljoin(GH_URL, href)
+            location_text = apply_link.get_text(" ", strip=True)
+
+            # fetch description
             description = ""
             try:
-                detail = requests.get(link, headers=headers, timeout=20)
-                dsoup = BeautifulSoup(detail.text, "lxml")
-                content = dsoup.select_one("div.content")
+                d = requests.get(full_link, headers=headers, timeout=20)
+                ds = BeautifulSoup(d.text, "lxml")
+                content = ds.select_one("div.content")
                 if content:
                     description = content.get_text("\n", strip=True)
             except:
                 pass
-            
-            out.append((link, text, description))
-    
-    except Exception as e:
-        print(f"[ERROR] Collibra extractor failed: {e}")
-        return []
 
+            out.append((full_link, title, description, location_text))
+
+    except Exception as e:
+        print("[Collibra extractor error]", e)
+        return []
+    
     return out
