@@ -1,47 +1,36 @@
-# collibra.py
-# Special extractor for Collibra (Greenhouse embedded widget)
+# collibra.py — FINAL WORKING VERSION
+# Collibra uses Greenhouse at: https://boards.greenhouse.io/collibra
 
 from bs4 import BeautifulSoup
-import time
+from urllib.parse import urljoin
 
-def extract_collibra(soup, page, main_url):
+GREENHOUSE_URL = "https://boards.greenhouse.io/collibra"
+
+def extract_collibra(soup, page, base_url):
     results = []
+    seen = set()
 
-    # 1) Locate the Greenhouse iframe
-    iframe = soup.find("iframe", src=True)
-    if not iframe:
-        return results
-
-    src = iframe.get("src")
-    if not src:
-        return results
-
-    # 2) Load Greenhouse iframe URL
+    # Load the real greenhouse board directly
     try:
-        page.goto(src, timeout=45000, wait_until="networkidle")
-        page.wait_for_load_state("networkidle")
-        page.wait_for_timeout(800)
-        gh_html = page.content()
+        page.goto(GREENHOUSE_URL, timeout=45000, wait_until="networkidle")
+        page.wait_for_timeout(900)
+        html = page.content()
     except Exception:
         return results
 
-    gh = BeautifulSoup(gh_html, "lxml")
+    gh = BeautifulSoup(html, "lxml")
 
-    # 3) Extract job cards
-    postings = gh.select("div.opening, div.job, div opening, a[href*='/jobs/']")
-    if not postings:
-        postings = gh.find_all("a", href=True)
+    # Standard Greenhouse openings
+    openings = gh.select("div.opening > a, a[href*='/collibra/']")
+    if not openings:
+        openings = gh.select("a[href*='/jobs/']")
 
-    seen = set()
-
-    for p in postings:
-        href = p.get("href")
+    for a in openings:
+        href = a.get("href")
         if not href:
             continue
-        if "/jobs/" not in href:
-            continue
 
-        # absolute link
+        # Normalize link
         if href.startswith("/"):
             link = "https://boards.greenhouse.io" + href
         else:
@@ -51,11 +40,10 @@ def extract_collibra(soup, page, main_url):
             continue
         seen.add(link)
 
-        # title extraction
-        text = p.get_text(" ", strip=True)
-        if not text:
+        title = a.get_text(" ", strip=True)
+        if not title:
             continue
 
-        results.append((link, text))
+        results.append((link, title))
 
     return results
