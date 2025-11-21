@@ -1,37 +1,48 @@
-# qlik.py
-# Deep extractor for Qlik CareerHub
+# qlik.py — FINAL CSOD EXTRACTOR for Qlik
+# Handles full JS load, auto-scroll, and CSOD pagination.
 
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-import time
+import time, re
 
 def extract_qlik(soup, page, base_url):
     results = []
     seen = set()
 
-    # Qlik loads jobs dynamically — force JS rendering
+    # ==============================
+    # 1. Load main page fully
+    # ==============================
     try:
-        page.goto(base_url, wait_until="networkidle", timeout=40000)
-        page.wait_for_load_state("networkidle")
-        time.sleep(1.2)
-        html = page.content()
-        soup = BeautifulSoup(html, "lxml")
-    except Exception:
-        pass
+        page.goto(base_url, wait_until="networkidle", timeout=60000)
+        time.sleep(1.0)
+    except Exception as e:
+        print("[QLIK] Initial load failed:", e)
+        return []
 
-    job_cards = []
+    # =========================================
+    # 2. Scroll to the bottom (CSOD lazy loads)
+    # =========================================
+    last_height = -1
+    for _ in range(15):  # scroll enough for 100+ jobs
+        page.mouse.wheel(0, 2500)
+        time.sleep(1.0)
 
-    selectors = [
-        "a.career-site-job",
-        "div.search-results a",
-        "div.job a",
-        "a[href*='job']",
-    ]
+        height = page.evaluate("() => document.body.scrollHeight")
+        if height == last_height:
+            break
+        last_height = height
 
-    for sel in selectors:
-        job_cards.extend(soup.select(sel))
+    html = page.content()
+    soup = BeautifulSoup(html, "lxml")
 
-    for a in job_cards:
+    # =========================================
+    # 3. Extract job cards
+    # =========================================
+    cards = soup.select("a.career-site-job, a[href*='/job/']")
+    if not cards:
+        cards = soup.find_all("a", href=True)
+
+    for a in cards:
         href = a.get("href")
         if not href:
             continue
@@ -41,31 +52,29 @@ def extract_qlik(soup, page, base_url):
             continue
         seen.add(link)
 
-        # Title extraction
+        # ----------------- TITLE -----------------
         title = a.get_text(" ", strip=True)
-
-        # Fallback to parent (Cornerstone sometimes wraps text outside anchor)
-        if not title or len(title) < 3:
+        if not title or len(title) < 2:
+            # Sometimes title is outside <a>
             parent = a.find_parent()
             if parent:
                 title = parent.get_text(" ", strip=True)
 
-        if not title or len(title) < 3:
+        if not title or len(title) < 2:
             continue
 
-        # Location extraction
+        # ---------------- LOCATION ----------------
         loc = ""
         parent = a.find_parent()
-        possible = []
-
         if parent:
-            for sel in [".location", ".job-location", ".posting-location", ".meta", ".details"]:
-                el = parent.select_one(sel)
-                if el and el.get_text(strip=True):
-                    possible.append(el.get_text(" ", strip=True))
+            loc_el = (parent.select_one(".location")
+                      or parent.select_one(".job-location")
+                      or parent.select_one(".posting-location")
+                      or parent.select_one("span[class*='location']")
+                      or parent.select_one("div[class*='meta']"))
 
-        if possible:
-            loc = possible[0]
+            if loc_el:
+                loc = loc_el.get_text(" ", strip=True)
 
         label = f"{title} ({loc})" if loc else title
 
