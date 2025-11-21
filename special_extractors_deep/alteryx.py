@@ -1,64 +1,67 @@
 # alteryx.py
-# Deep extractor for Alteryx (Workday ATS)
+# Correct deep extractor for Alteryx (Workday ATS)
+# Uses Workday cxs API + pagination
 
-from bs4 import BeautifulSoup
 import json
 from urllib.parse import urljoin
 
 def extract_alteryx(soup, page, base_url):
     results = []
+    seen = set()
 
-    # Workday pages always embed job data in:
-    #  <script type="application/ld+json"> ... JobPosting ... </script>
+    # Convert:
+    # https://alteryx.wd108.myworkdayjobs.com/en-US/AlteryxCareers
+    # → https://alteryx.wd108.myworkdayjobs.com/wday/cxs/alteryx/AlteryxCareers/jobs
+    try:
+        parts = base_url.split(".com/")
+        domain = parts[0] + ".com"
+        tenant = parts[1].split("/")[0]          # wd108.myworkdayjobs.com/en-US → "wd108.myworkdayjobs.com"
+        site = parts[1].split("/")[1]            # "AlteryxCareers"
+        api_root = f"{domain}/wday/cxs/alteryx/{site}/jobs"
+    except Exception:
+        return []
 
-    scripts = soup.find_all("script", type="application/ld+json")
-    for s in scripts:
-        raw = s.string or ""
-        if not raw:
-            continue
+    offset = 0
+    limit = 20
+
+    while True:
+        api_url = f"{api_root}?offset={offset}&limit={limit}"
 
         try:
-            data = json.loads(raw)
+            page.goto(api_url, timeout=30000, wait_until="networkidle")
+            raw = page.content()
         except:
-            continue
+            break
 
-        # Could be an array or single object
-        items = data if isinstance(data, list) else [data]
+        # Workday API returns JSON inside <pre>
+        try:
+            start = raw.index("{")
+            json_raw = raw[start:]
+            data = json.loads(json_raw)
+        except:
+            break
 
-        for obj in items:
-            if not isinstance(obj, dict):
-                continue
+        postings = data.get("jobPostings", [])
+        if not postings:
+            break
 
-            # Ensure it's a JobPosting type
-            if obj.get("@type") not in ("JobPosting", "JobPostingType", "Posting"):
-                continue
-
-            title = obj.get("title") or ""
-            link  = obj.get("url") or ""
+        for job in postings:
+            title = job.get("title")
+            link = job.get("externalPath") or job.get("externalUrl")
 
             if not title or not link:
                 continue
 
-            # Normalize link
-            link = urljoin(base_url, link)
+            if link.startswith("/"):
+                link = urljoin(base_url, link)
 
-            # Extract location if present
-            loc = ""
-            jl = obj.get("jobLocation") or obj.get("jobLocations")
-            if jl:
-                entry = jl[0] if isinstance(jl, list) else jl
-                if isinstance(entry, dict):
-                    addr = entry.get("address") or entry
-                    if isinstance(addr, dict):
-                        parts = []
-                        for k in ("addressLocality", "addressRegion", "addressCountry"):
-                            if addr.get(k):
-                                parts.append(addr[k])
-                        if parts:
-                            loc = ", ".join(parts)
+            if link in seen:
+                continue
+            seen.add(link)
 
-            # Push result: (link, title + optional location)
-            label = f"{title} ({loc})" if loc else title
-            results.append((link, label))
+            title = " ".join(title.split()).strip()
+            results.append((link, title))
+
+        offset += limit
 
     return results
