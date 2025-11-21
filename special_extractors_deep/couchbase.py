@@ -1,45 +1,53 @@
-# couchbase.py
-# Deep extractor for Couchbase (Greenhouse embedded jobs)
+# couchbase.py — FINAL WORKING VERSION
+# Couchbase uses Greenhouse hosted board: https://boards.greenhouse.io/couchbase
 
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+
+GH_URL = "https://boards.greenhouse.io/couchbase"
 
 def extract_couchbase(soup, page, base_url):
     results = []
     seen = set()
 
-    # Couchbase career page uses Greenhouse embeds via class `.opening`
-    job_rows = soup.select(".opening")
+    # Load the actual Greenhouse job board
+    try:
+        page.goto(GH_URL, timeout=45000, wait_until="networkidle")
+        page.wait_for_timeout(900)
+        html = page.content()
+    except Exception:
+        return results
 
-    # Fallback – Look for any anchors pointing to Greenhouse jobs
-    if not job_rows:
-        job_rows = soup.select("a[href*='greenhouse']")
+    gh = BeautifulSoup(html, "lxml")
 
-    for row in job_rows:
-        # Extract the anchor
-        a = row.find("a", href=True) if row.find("a", href=True) else row
-        if not a or not a.get("href"):
+    # Standard Greenhouse job card pattern
+    openings = gh.select("div.opening > a, a[href*='/couchbase/']")
+    if not openings:
+        openings = gh.select("a[href*='/jobs/']")
+
+    for a in openings:
+        href = a.get("href")
+        if not href:
             continue
 
-        raw_link = a.get("href").strip()
-        link = urljoin(base_url, raw_link)
+        # Normalize GH link
+        if href.startswith("/"):
+            link = "https://boards.greenhouse.io" + href
+        else:
+            link = href
 
         if link in seen:
             continue
         seen.add(link)
 
-        # Extract title
         title = a.get_text(" ", strip=True)
         if not title:
             continue
 
-        # Extract location if shown
-        loc = ""
-        loc_el = row.select_one(".location")
-        if loc_el:
-            loc = loc_el.get_text(" ", strip=True)
+        # Try to extract location (in <span class="location">)
+        loc_el = a.find_next("span", class_="location")
+        loc = loc_el.get_text(" ", strip=True) if loc_el else ""
 
-        # Combined label for generic extractor contract
         label = f"{title} ({loc})" if loc else title
 
         results.append((link, label))
