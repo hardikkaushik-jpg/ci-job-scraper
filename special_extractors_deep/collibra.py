@@ -1,5 +1,4 @@
-# collibra.py — FINAL WORKING VERSION
-# Collibra uses Greenhouse at: https://boards.greenhouse.io/collibra
+# collibra.py — FINAL WORKING, GREENHOUSE-STABLE VERSION
 
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
@@ -10,38 +9,50 @@ def extract_collibra(soup, page, base_url):
     results = []
     seen = set()
 
-    # Load the real greenhouse board directly
     try:
+        # 1) Load Greenhouse board
         page.goto(GREENHOUSE_URL, timeout=45000, wait_until="networkidle")
-        page.wait_for_timeout(900)
-        html = page.content()
-    except Exception:
+
+        # 2) Wait for job sections to hydrate
+        page.wait_for_selector("section.openings-group, div.opening, a[href*='/jobs/']",
+                               timeout=15000)
+
+        # 3) Extract the ACTUAL DOM (NOT page.content())
+        html = page.inner_html("body")
+
+    except Exception as e:
+        print("[COLLIBRA-EXTRACTOR] Failure:", e)
         return results
 
     gh = BeautifulSoup(html, "lxml")
 
-    # Standard Greenhouse openings
-    openings = gh.select("div.opening > a, a[href*='/collibra/']")
-    if not openings:
-        openings = gh.select("a[href*='/jobs/']")
+    # 4) Greenhouse uses <section class='opening'> or grouped listings
+    selectors = [
+        "div.opening > a",
+        "section.opening a",
+        "section.openings-group a[href*='/jobs/']",
+        "a[href*='/collibra/']",
+        "a[href*='/jobs/']"
+    ]
 
-    for a in openings:
-        href = a.get("href")
-        if not href:
+    links = []
+    for sel in selectors:
+        links.extend(gh.select(sel))
+
+    for a in links:
+        href = a.get("href", "").strip()
+        if not href or "/jobs/" not in href:
             continue
 
-        # Normalize link
-        if href.startswith("/"):
-            link = "https://boards.greenhouse.io" + href
-        else:
-            link = href
+        # Normalize
+        link = urljoin(GREENHOUSE_URL, href)
 
         if link in seen:
             continue
         seen.add(link)
 
         title = a.get_text(" ", strip=True)
-        if not title:
+        if not title or len(title) < 2:
             continue
 
         results.append((link, title))
