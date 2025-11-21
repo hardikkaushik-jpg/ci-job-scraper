@@ -1,49 +1,55 @@
 # ataccama.py
-# Special extractor for Ataccama (SmartRecruiters platform)
+# Correct extractor for Ataccama (jobs.ataccama.com)
 
 from bs4 import BeautifulSoup
+import re
+from urllib.parse import urljoin
 
-SMARTRECRUITERS_URL = "https://jobs.smartrecruiters.com/Ataccama/"
+ATACCAMA_URL = "https://jobs.ataccama.com/"
 
 def extract_ataccama(soup, page, base_url):
     results = []
+    seen = set()
 
-    # 1) Directly load SmartRecruiters job board
+    # Load the real careers page
     try:
-        page.goto(SMARTRECRUITERS_URL, timeout=45000, wait_until="networkidle")
-        page.wait_for_timeout(900)
+        page.goto(ATACCAMA_URL, timeout=45000, wait_until="networkidle")
+        page.wait_for_timeout(800)
         html = page.content()
     except Exception:
         return results
 
     s = BeautifulSoup(html, "lxml")
 
-    # 2) SmartRecruiters job card selector
-    cards = s.select("div.opening > a, a[href*='careers.smartrecruiters.com'], a[href*='/Ataccama/']")
-    seen = set()
-
+    # Job cards use href with UUID
+    cards = s.select("a[href*='ataccama.com/']")
     for a in cards:
         href = a.get("href")
         if not href:
             continue
 
-        # Normalize link
-        if href.startswith("/"):
-            link = "https://jobs.smartrecruiters.com" + href
-        else:
-            link = href
+        link = href if href.startswith("http") else urljoin(ATACCAMA_URL, href)
+
+        # Valid UUID-format job pages
+        if not re.search(r"[0-9a-fA-F\-]{36}", link):
+            continue
 
         if link in seen:
             continue
         seen.add(link)
 
-        # Extract job title
+        # Extract title from text or <h3>
         title = a.get_text(" ", strip=True)
+        if not title:
+            h3 = a.find("h3")
+            if h3:
+                title = h3.get_text(" ", strip=True)
+
         if not title:
             continue
 
-        # Ignore garbage duplicates
-        if "Ataccama" in title and len(title.split()) <= 2:
+        # Ignore junk
+        if len(title.split()) < 2:
             continue
 
         results.append((link, title))
