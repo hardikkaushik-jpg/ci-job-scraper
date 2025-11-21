@@ -2,45 +2,53 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-def extract_collibra():
+def extract_collibra(soup, page, main_url):
     GH_URL = "https://boards.greenhouse.io/collibra"
     headers = {"User-Agent": "Mozilla/5.0"}
-    jobs = []
+
+    out = []
 
     try:
-        # Step 1: Get the main jobs board
+        # Fetch main greenhouse page
         r = requests.get(GH_URL, headers=headers, timeout=20)
-        soup = BeautifulSoup(r.text, "lxml")
+        board = BeautifulSoup(r.text, "lxml")
 
-        # Step 2: Find all job posting links
-        for a in soup.find_all("a", href=True):
+        # Get all job links (Apply in X)
+        links = board.find_all("a", href=True)
+
+        for a in links:
             href = a.get("href")
-            if href and "/collibra/jobs/" in href:
-                job_url = urljoin(GH_URL, href)
 
-                # Step 3: For each job, fetch job details page
-                try:
-                    jr = requests.get(job_url, headers=headers, timeout=20)
-                    jsoup = BeautifulSoup(jr.text, "lxml")
-                    title = jsoup.find("h1", {"class": "app-title"})
-                    location = jsoup.find("div", {"class": "location"})
-                    description = jsoup.find("div", {"class": "section-wrapper"})
+            # Only catch real job pages
+            if not href or "/jobs/" not in href:
+                continue
 
-                    jobs.append({
-                        "url": job_url,
-                        "title": title.get_text(strip=True) if title else "",
-                        "location": location.get_text(strip=True) if location else "",
-                        "description": description.get_text(" ", strip=True) if description else ""
-                    })
-                except Exception as je:
-                    print("[Job details extractor error]", je)
+            job_url = urljoin(GH_URL, href)
+
+            # GO INSIDE THE JOB PAGE
+            try:
+                jr = requests.get(job_url, headers=headers, timeout=20)
+                jsoup = BeautifulSoup(jr.text, "lxml")
+
+                # real title
+                title_el = jsoup.select_one("h1.app-title")
+                title = title_el.get_text(strip=True) if title_el else ""
+
+                # real location
+                loc_el = jsoup.select_one("div.location")
+                location = loc_el.get_text(strip=True) if loc_el else ""
+
+                # full description (used later for relevance score)
+                desc_el = jsoup.select_one("div.section-wrapper")
+                description = desc_el.get_text(" ", strip=True) if desc_el else ""
+
+                if title:
+                    out.append((job_url, title))  # this matches your scraper format
+
+            except Exception as je:
+                print("[Collibra job detail error]", je)
 
     except Exception as e:
         print("[Collibra extractor error]", e)
 
-    return jobs
-
-# Usage example:
-results = extract_collibra()
-for job in results:
-    print(job)
+    return out
