@@ -1,36 +1,35 @@
-# atlan.py
-# Special extractor for Atlan (AshbyHQ platform)
+# atlan.py — FIXED VERSION
+# Deep extractor for Atlan (AshbyHQ platform)
 
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 
 def extract_atlan(soup, page, base_url):
     results = []
-
-    # 1) Ashby always embeds job board URL: https://jobs.ashbyhq.com/atlan
     ashby_url = "https://jobs.ashbyhq.com/atlan"
+    seen = set()
 
     try:
+        # Load Ashby board
         page.goto(ashby_url, timeout=45000, wait_until="networkidle")
-        page.wait_for_load_state("networkidle")
-        page.wait_for_timeout(800)
-        ashby_html = page.content()
+        page.wait_for_timeout(900)
+        html = page.content()
     except Exception:
         return results
 
-    s = BeautifulSoup(ashby_html, "lxml")
+    s = BeautifulSoup(html, "lxml")
 
-    # 2) Ashby job cards follow this selector
-    cards = s.select("a[href*='/jobs/']")
-    seen = set()
+    # Ashby job cards:
+    cards = s.select(
+        "a[href*='/atlan/'], a[href*='/job/'], a[href*='ashbyhq.com/atlan/']"
+    )
 
     for a in cards:
-        href = a.get("href")
+        href = a.get("href", "").strip()
         if not href:
             continue
-        if "/jobs/" not in href:
-            continue
 
-        # Normalise link
+        # Normalize link
         if href.startswith("/"):
             link = "https://jobs.ashbyhq.com" + href
         else:
@@ -40,8 +39,15 @@ def extract_atlan(soup, page, base_url):
             continue
         seen.add(link)
 
+        # Extract title
         title = a.get_text(" ", strip=True)
         if not title:
+            continue
+
+        # Filter garbage
+        if len(title) < 3:
+            continue
+        if "Ashby" in title.lower():
             continue
 
         results.append((link, title))
