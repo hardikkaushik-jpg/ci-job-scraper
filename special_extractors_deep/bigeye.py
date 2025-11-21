@@ -1,47 +1,42 @@
-# bigeye.py — FINAL WORKING VERSION for jobs.gem.com
-# Gem job boards require JS hydration before DOM appears.
-
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+import time
 
-GEM_URL = "https://jobs.gem.com/bigeye"
+def extract_bigeye(soup, page, main_url):
+    """
+    Returns list of (link, title) OR (link, title, el).
+    Gem boards require JS → we load via page (already loaded by main script).
+    """
+    out = []
 
-def extract_bigeye(soup, page, base_url):
-    results = []
-    seen = set()
-
-    # 1) Load real Gem job board
-    try:
-        page.goto(GEM_URL, timeout=45000, wait_until="networkidle")
-        page.wait_for_selector("a[href*='/bigeye/']", timeout=15000)  # CRITICAL
-        html = page.inner_html("body")  # Use DOM, NOT page.content()
-    except Exception as e:
-        print("[BIGEYE-EXTRACTOR] Failed:", e)
-        return results
-
-    s = BeautifulSoup(html, "lxml")
-
-    # 2) Extract hydrated job cards
-    cards = s.select("a[href*='/bigeye/']")
-    for a in cards:
-        href = a.get("href", "").strip()
+    # 1. Try direct anchor scan
+    anchors = soup.find_all("a", href=True)
+    for a in anchors:
+        href = a.get("href")
         if not href:
             continue
+        if "/bigeye" in href or "gem.com" in href:
+            text = a.get_text(" ", strip=True)
+            if text and len(text) > 2:
+                out.append((href, text, a))
 
-        # Normalize link
-        if href.startswith("/"):
-            link = urljoin(GEM_URL, href)
-        else:
-            link = href
+    # 2. If nothing found → load the true Gem iframe URL
+    # (your current main_url for BigEye is WRONG: https://www.bigeye.com/careers#positions
+    #   → no jobs are actually inside this HTML, they are inside Gem.)
+    if not out:
+        gem_url = "https://jobs.gem.com/bigeye?embed=true"
+        try:
+            page.goto(gem_url, wait_until="networkidle", timeout=45000)
+            page.wait_for_timeout(2500)
+            html = page.content()
+            s2 = BeautifulSoup(html, "lxml")
+            for a in s2.find_all("a", href=True):
+                href = a.get("href")
+                if href and "/bigeye" in href:
+                    text = a.get_text(" ", strip=True)
+                    if text:
+                        out.append((urljoin(gem_url, href), text))
+        except Exception:
+            pass
 
-        if link in seen:
-            continue
-        seen.add(link)
-
-        title = a.get_text(" ", strip=True)
-        if not title or len(title) < 2:
-            continue
-
-        results.append((link, title))
-
-    return results
+    return out
