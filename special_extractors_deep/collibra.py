@@ -10,20 +10,28 @@ def extract_collibra(soup, page, main_url):
     seen = set()
 
     try:
-        # STEP 1 — load main board
+        # Fetch main job board
         r = requests.get(GH_URL, headers=headers, timeout=20)
         s = BeautifulSoup(r.text, "lxml")
 
-        # Each job is inside <div class="opening">
+        # Greenhouse job list items live inside div.opening
         for job_item in s.select("div.opening"):
-            title_el = job_item.select_one("a[href*='/jobs/']")
+
+            # Main job link is FIRST anchor inside opening
+            title_el = job_item.find("a", href=True)
             if not title_el:
                 continue
 
             title = title_el.get_text(" ", strip=True)
             link = urljoin(GH_URL, title_el.get("href"))
 
-            # Skip “Apply in X”
+            # ---- FILTER OUT USELESS LINES ----
+            if not title or len(title) < 2:
+                continue
+
+            # These are the garbage lines we saw earlier
+            # "Apply in Raleigh North Carolina"
+            # "Apply in Remote"
             if title.lower().startswith("apply in"):
                 continue
 
@@ -31,21 +39,19 @@ def extract_collibra(soup, page, main_url):
                 continue
             seen.add(link)
 
-            # STEP 2 — fetch job detail page
+            # (Optional) fetch job detail description
             description = ""
             try:
                 detail_html = requests.get(link, headers=headers, timeout=20).text
                 sd = BeautifulSoup(detail_html, "lxml")
 
-                # Collibra puts job text inside <div class="content">
-                content_div = sd.select_one("div.content")
-                if content_div:
-                    description = content_div.get_text("\n", strip=True)
-
-            except Exception:
+                content = sd.select_one("div.content")
+                if content:
+                    description = content.get_text("\n", strip=True)
+            except:
                 pass
 
-            # return (link, title, description)
+            # IMPORTANT: return tuples compatible with your pipeline
             out.append((link, title, description))
 
     except Exception as e:
