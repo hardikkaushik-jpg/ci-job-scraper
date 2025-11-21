@@ -1,42 +1,28 @@
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-import time
 
 def extract_collibra(soup, page, main_url):
     """
-    Returns list of (link, title) OR (link, title, el).
-    Collibra careers page embeds Greenhouse. We load Greenhouse directly.
+    Ignore Collibra marketing URL.
+    Always load official Greenhouse board.
     """
+    GH_URL = "https://boards.greenhouse.io/collibra"
 
     out = []
 
-    # 1. Check if Greenhouse iframe exists
-    iframe = soup.find("iframe", src=True)
-    gh_url = None
-    if iframe:
-        src = iframe.get("src")
-        if "greenhouse" in src:
-            gh_url = urljoin(main_url, src)
-
-    # 2. If iframe missing → fallback to known Collibra board
-    if not gh_url:
-        gh_url = "https://boards.greenhouse.io/collibra"
-
-    # 3. Load Greenhouse board
     try:
-        page.goto(gh_url, wait_until="networkidle", timeout=45000)
-        page.wait_for_timeout(2500)
+        page.goto(GH_URL, wait_until="networkidle", timeout=45000)
+        page.wait_for_timeout(2000)
         html = page.content()
-        s2 = BeautifulSoup(html, "lxml")
+        s = BeautifulSoup(html, "lxml")
 
-        for a in s2.find_all("a", href=True):
+        for a in s.find_all("a", href=True):
             href = a.get("href")
             if href and "/jobs/" in href:
                 text = a.get_text(" ", strip=True)
-                if text:
-                    out.append((urljoin(gh_url, href), text))
-
-    except Exception:
-        pass
+                if text and len(text) >= 2:
+                    out.append((urljoin(GH_URL, href), text))
+    except Exception as e:
+        print("[Collibra extractor error]", e)
 
     return out
