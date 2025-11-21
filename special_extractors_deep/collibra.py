@@ -10,48 +10,44 @@ def extract_collibra(soup, page, main_url):
     seen = set()
 
     try:
-        # Fetch main job board
         r = requests.get(GH_URL, headers=headers, timeout=20)
-        s = BeautifulSoup(r.text, "lxml")
+        html = r.text
+        s = BeautifulSoup(html, "lxml")
 
-        # Greenhouse job list items live inside div.opening
-        for job_item in s.select("div.opening"):
-
-            # Main job link is FIRST anchor inside opening
-            title_el = job_item.find("a", href=True)
-            if not title_el:
+        # Scan ALL anchors (your original logic)
+        for a in s.find_all("a", href=True):
+            href = a.get("href")
+            if not href or "/jobs/" not in href:
                 continue
 
-            title = title_el.get_text(" ", strip=True)
-            link = urljoin(GH_URL, title_el.get("href"))
+            link = urljoin(GH_URL, href)
+            title = a.get_text(" ", strip=True)
 
-            # ---- FILTER OUT USELESS LINES ----
-            if not title or len(title) < 2:
+            if not title:
                 continue
 
-            # These are the garbage lines we saw earlier
-            # "Apply in Raleigh North Carolina"
-            # "Apply in Remote"
-            if title.lower().startswith("apply in"):
+            # --- FILTER OUT THE "Apply in X" ENTRIES ---
+            # These were your 61 garbage items
+            if title.lower().startswith("apply in "):
                 continue
 
+            # avoid duplicates from Greenhouse
             if link in seen:
                 continue
             seen.add(link)
 
-            # (Optional) fetch job detail description
+            # --- FETCH DETAIL PAGE FOR FULL DESCRIPTION ---
             description = ""
             try:
-                detail_html = requests.get(link, headers=headers, timeout=20).text
-                sd = BeautifulSoup(detail_html, "lxml")
-
+                detail_req = requests.get(link, headers=headers, timeout=20)
+                sd = BeautifulSoup(detail_req.text, "lxml")
                 content = sd.select_one("div.content")
                 if content:
                     description = content.get_text("\n", strip=True)
             except:
                 pass
 
-            # IMPORTANT: return tuples compatible with your pipeline
+            # Return EXACTLY what your main pipeline expects
             out.append((link, title, description))
 
     except Exception as e:
