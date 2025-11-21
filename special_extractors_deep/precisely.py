@@ -1,53 +1,68 @@
-# precisely.py
-# Deep extractor for Precisely US + International career pages
+# precisely.py — FINAL VERSION (for your 2 URLs only)
+# Handles dynamic scrolling + custom Precisely page structure
 
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-import time, re
-
+import time
 
 def extract_precisely(soup, page, base_url):
     results = []
     seen = set()
 
-    # --- Load full JS-rendered page ---
+    # ==============================
+    # 1. FULL JS LOAD + SCROLL
+    # ==============================
     try:
-        page.goto(base_url, wait_until="networkidle", timeout=45000)
+        page.goto(base_url, wait_until="networkidle", timeout=60000)
 
-        # Scrolling — Precisely loads jobs as you scroll
-        for _ in range(5):
-            page.mouse.wheel(0, 1800)
-            time.sleep(0.7)
+        # Precisely loads jobs after scrolling
+        last_height = -1
+        for _ in range(12):  # scroll ~12 times (enough for 100+ jobs)
+            page.mouse.wheel(0, 2000)
+            time.sleep(1.0)
+
+            # stop if no more scrolling
+            curr_height = page.evaluate("() => document.body.scrollHeight")
+            if curr_height == last_height:
+                break
+            last_height = curr_height
 
         html = page.content()
         soup = BeautifulSoup(html, "lxml")
 
-    except Exception:
-        pass
+    except Exception as e:
+        print("[PRECISELY] JS load failed:", e)
+        return []
 
-    # ================================
-    # Precisely job card selectors
-    # ================================
+    # ====================================
+    # 2. JOB CARD SELECTORS
+    # ====================================
     selectors = [
-        "div.careers-job-listing",           # common wrapper
-        "div.job",                           # generic
-        "li.job",                            # list format
-        "div.position",                      # fallback
-        "a.careers-job-listing",             # direct links
-        "a[href*='jobs']",                   # ATS links
+        "div.careers-job-listing",
+        "li.careers-job-listing",
+        "div.job",
+        "li.job",
+        "div.position",
+        "a.careers-job-listing",
+        "a[href*='/job/']",
     ]
 
     job_nodes = []
     for sel in selectors:
         job_nodes.extend(soup.select(sel))
 
-    # also catch anchors inside containers
+    # also catch anchors inside nodes
     job_nodes.extend(soup.select("div.careers-job-listing a[href]"))
 
+    # ====================================
+    # 3. PARSE JOB CARDS
+    # ====================================
     for node in job_nodes:
+
+        # -------- Extract link --------
         href = node.get("href")
 
-        # sometimes nested inside <a>
+        # sometimes nested
         if not href:
             a = node.find("a", href=True)
             if a:
@@ -58,18 +73,12 @@ def extract_precisely(soup, page, base_url):
 
         link = urljoin(base_url, href)
 
-        # Skip noise
-        skip_words = ["privacy", "about", "news", "events", "blog"]
-        if any(sw in link.lower() for sw in skip_words):
-            continue
-
         if link in seen:
             continue
         seen.add(link)
 
-        # ---------- Extract title ----------
+        # -------- Extract title --------
         title = ""
-
         for tag in ["h2", "h3", "h4"]:
             t = node.find(tag)
             if t:
@@ -82,25 +91,18 @@ def extract_precisely(soup, page, base_url):
         if not title or len(title) < 3:
             continue
 
-        # ---------- Extract location ----------
-        location = ""
-
-        # directly labelled nodes
-        loc_el = (node.find("span", class_=re.compile("location", re.I)) or
-                  node.find("div", class_=re.compile("location", re.I)) or
-                  node.find("p", class_=re.compile("location", re.I)))
+        # -------- Extract location --------
+        loc = ""
+        loc_el = (
+            node.find("span", class_=lambda x: x and "location" in x.lower()) or
+            node.find("div", class_=lambda x: x and "location" in x.lower()) or
+            node.find("p", class_=lambda x: x and "location" in x.lower())
+        )
 
         if loc_el:
-            location = loc_el.get_text(" ", strip=True)
+            loc = loc_el.get_text(" ", strip=True)
 
-        # fallback: detect " - " split
-        if not location and " - " in title:
-            parts = title.split(" - ")
-            if len(parts) == 2:
-                title, location = parts[0], parts[1]
-
-        # combine
-        label = f"{title} ({location})" if location else title
+        label = f"{title} ({loc})" if loc else title
 
         results.append((link, label))
 
