@@ -1,8 +1,3 @@
-do i add them to the extractor files
-also bro colibra was giving us 61 items just now just scraping the wrong key word
-so you messed something in that extractor
-
-this one
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
