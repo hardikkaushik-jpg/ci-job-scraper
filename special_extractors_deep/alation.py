@@ -1,28 +1,28 @@
-# alation.py
-# REAL Workday extractor for Alation
-# Uses Workday's fs/search API + pagination
-# Same style as Cloudera
+# alation.py — FINAL WORKDAY EXTRACTOR (stable & correct)
 
 import json
 from urllib.parse import urljoin
+from bs4 import BeautifulSoup
 
 def extract_alation(soup, page, base_url):
     results = []
     seen = set()
 
-    # Convert:
+    # -------------------------------
+    # 1) Build API root safely
+    # -------------------------------
+    # Example:
     # https://alation.wd503.myworkdayjobs.com/ExternalSite
-    # → API root:
-    # https://alation.wd503.myworkdayjobs.com/wday/cxs/alation/ExternalSite/jobs
     try:
-        parts = base_url.split(".com/")
-        api_base = parts[0] + ".com/wday/cxs/"  # domain
-        tail = parts[1].split("/")[1]          # "ExternalSite"
-        api_root = api_base + "alation/" + tail + "/jobs"
+        domain = base_url.split(".com/")[0] + ".com"
+        site = base_url.rstrip("/").split("/")[-1]   # "ExternalSite"
+        api_root = f"{domain}/wday/cxs/alation/{site}/jobs"
     except Exception:
-        return []
+        return results
 
-    # Paginated API
+    # -------------------------------
+    # 2) Pagination
+    # -------------------------------
     offset = 0
     limit = 20
 
@@ -30,49 +30,44 @@ def extract_alation(soup, page, base_url):
         api_url = f"{api_root}?offset={offset}&limit={limit}"
 
         try:
-            page.goto(api_url, timeout=30000, wait_until="networkidle")
-            raw = page.content()
+            page.goto(api_url, timeout=25000, wait_until="networkidle")
+            raw_html = page.content()
         except Exception:
             break
 
-        # Workday API is JSON inside <pre> tag
+        # Extract JSON from <pre> safely
         try:
-            start = raw.index("{")
-            json_raw = raw[start:]
-            data = json.loads(json_raw)
+            s = BeautifulSoup(raw_html, "lxml")
+            pre = s.find("pre")
+            if not pre:
+                break
+            data = json.loads(pre.get_text())
         except Exception:
             break
 
-        # No jobs? End.
-        if "jobPostings" not in data or not data["jobPostings"]:
+        postings = data.get("jobPostings", [])
+        if not postings:
             break
 
-        # Process each job
-        for job in data["jobPostings"]:
+        # -------------------------------
+        # 3) Parse each job
+        # -------------------------------
+        for job in postings:
             link = job.get("externalPath") or job.get("externalUrl")
             title = job.get("title")
 
             if not link or not title:
                 continue
 
-            # Normalize link
-            if link.startswith("/"):
-                link = urljoin(base_url, link)
+            # Normalize URL
+            link = urljoin(base_url, link)
 
             if link in seen:
                 continue
             seen.add(link)
 
-            # Clean title
-            title = " ".join(title.split()).strip()
+            results.append((link, title.strip()))
 
-            # Filter garbage
-            if len(title) < 2:
-                continue
-
-            results.append((link, title))
-
-        # Move to next page
         offset += limit
 
     return results
