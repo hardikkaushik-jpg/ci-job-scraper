@@ -39,8 +39,6 @@ COMPANIES = {
     "Informatica": ["https://informatica.gr8people.com/jobs", "https://www.informatica.com/us/careers.html"],
     "Matillion": ["https://jobs.lever.co/matillion"],
     "MongoDB": ["https://www.mongodb.com/company/careers/teams/engineering",
-        "https://www.mongodb.com/company/careers/teams/marketing",
-        "https://www.mongodb.com/company/careers/teams/sales",
         "https://www.mongodb.com/company/careers/teams/product-management-and-design"],
     "Monte Carlo": ["https://jobs.ashbyhq.com/montecarlodata"],
     "Oracle": ["https://careers.oracle.com/en/sites/jobsearch/jobs"],
