@@ -9,46 +9,44 @@ def extract_collibra(soup, page, main_url):
     out = []
 
     try:
-        # Fetch main greenhouse page
+        # fetch main board
         r = requests.get(GH_URL, headers=headers, timeout=20)
+        html = r.text
+        # ---- DEBUG: SHOW WHAT HTML GITHUB ACTIONS ACTUALLY RECEIVES ----
+        print("\n\n====== DEBUG COLLILBRA HTML START ======")
+        print(html[:3000])
+        print("\n--- HTML LENGTH:", len(html))
+        print("====== DEBUG COLLILBRA HTML END ======\n\n")
         board = BeautifulSoup(r.text, "lxml")
 
-        # Get all job links (Apply in X)
-        links = board.find_all("a", href=True)
+        # Each job row is inside div or li with class "opening"
+        openings = board.select("div.opening, li.opening")
 
-        for a in links:
-            href = a.get("href")
+        for op in openings:
 
-            # Only catch real job pages
-            if not href or "/jobs/" not in href:
+            # 1. Title: non-clickable text on the left
+            title_el = op.select_one(".opening-title")
+            if not title_el:
+                # fallback: first text node inside op
+                title_el = op.find(text=True, recursive=False)
+
+            if not title_el:
                 continue
 
-            job_url = urljoin(GH_URL, href)
+            title = title_el.get_text(strip=True) if hasattr(title_el, "get_text") else title_el.strip()
 
-            # GO INSIDE THE JOB PAGE
-            try:
-                jr = requests.get(job_url, headers=headers, timeout=20)
-                jsoup = BeautifulSoup(jr.text, "lxml")
+            # 2. Apply link (the REAL job link)
+            apply_a = op.find("a", href=True)
+            if not apply_a:
+                continue
 
-                # real title
-                title_el = jsoup.select_one("h1.app-title")
-                title = title_el.get_text(strip=True) if title_el else ""
+            job_url = urljoin(GH_URL, apply_a["href"])
 
-                # real location
-                loc_el = jsoup.select_one("div.location")
-                location = loc_el.get_text(strip=True) if loc_el else ""
+            # Output must match your scraper: (link, title)
+            out.append((job_url, title))
 
-                # full description (used later for relevance score)
-                desc_el = jsoup.select_one("div.section-wrapper")
-                description = desc_el.get_text(" ", strip=True) if desc_el else ""
-
-                if title:
-                    out.append((job_url, title))  # this matches your scraper format
-
-            except Exception as je:
-                print("[Collibra job detail error]", je)
+        return out
 
     except Exception as e:
         print("[Collibra extractor error]", e)
-
-    return out
+        return []
