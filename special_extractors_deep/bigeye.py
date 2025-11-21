@@ -1,5 +1,5 @@
-# bigeye.py — UPDATED for Gem jobs board
-# Deep extractor for BigEye (Gem ATS)
+# bigeye.py — FINAL WORKING VERSION for jobs.gem.com
+# Gem job boards require JS hydration before DOM appears.
 
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
@@ -10,21 +10,25 @@ def extract_bigeye(soup, page, base_url):
     results = []
     seen = set()
 
+    # 1) Load real Gem job board
     try:
         page.goto(GEM_URL, timeout=45000, wait_until="networkidle")
-        page.wait_for_timeout(900)
-        html = page.content()
-    except Exception:
+        page.wait_for_selector("a[href*='/bigeye/']", timeout=15000)  # CRITICAL
+        html = page.inner_html("body")  # Use DOM, NOT page.content()
+    except Exception as e:
+        print("[BIGEYE-EXTRACTOR] Failed:", e)
         return results
 
     s = BeautifulSoup(html, "lxml")
 
-    # Gem job cards typically use <a href="/bigeye/xxxxx">Title</a>
-    for a in s.select("a[href*='/bigeye/']"):
+    # 2) Extract hydrated job cards
+    cards = s.select("a[href*='/bigeye/']")
+    for a in cards:
         href = a.get("href", "").strip()
         if not href:
             continue
 
+        # Normalize link
         if href.startswith("/"):
             link = urljoin(GEM_URL, href)
         else:
