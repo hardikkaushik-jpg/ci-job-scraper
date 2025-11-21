@@ -1,44 +1,77 @@
-# informatica.py — FINAL CLEAN VERSION
+# special_extractors_deep/extract_informatica.py
 
 from bs4 import BeautifulSoup
+import json, re
 from urllib.parse import urljoin
-
-GR8_URL = "https://informatica.gr8people.com/jobs"
 
 def extract_informatica(soup, page, main_url):
     """
-    Informatica deep extractor
-    Always bypass marketing site and load GR8People job board.
-    Returns clean (link, title, element) tuples.
+    Deep Informatica extractor.
+    Supports:
+        - https://informatica.gr8people.com/jobs
+        - https://www.informatica.com/us/careers.html (iframe with GR8People)
+    Returns: list of (link, title, el)
     """
 
     results = []
 
-    # 1) Always fetch real job board
-    try:
-        page.goto(GR8_URL, timeout=45000, wait_until="networkidle")
-        page.wait_for_timeout(900)
-        html = page.content()
-    except Exception:
+    # -------------------------
+    # CASE 1: GR8People direct
+    # -------------------------
+    if "gr8people.com" in main_url:
+        cards = soup.select("section.search-results article, div.search-result")
+        for c in cards:
+            a = c.find("a", href=True)
+            if not a:
+                continue
+
+            link = urljoin(main_url, a["href"])
+            title = a.get_text(" ", strip=True)
+            if not title:
+                continue
+
+            results.append((link, title, c))
+
         return results
 
-    s = BeautifulSoup(html, "lxml")
+    # -------------------------------------------------------
+    # CASE 2: Marketing page → iframe containing ATS
+    # -------------------------------------------------------
+    # Look for iframe with GR8People job listings
+    iframe = soup.find("iframe", src=True)
+    if iframe and ("gr8people" in iframe["src"].lower()):
+        iframe_url = urljoin(main_url, iframe["src"])
+        try:
+            page.goto(iframe_url, timeout=30000, wait_until="networkidle")
+            page.wait_for_timeout(600)
+            iframe_html = page.content()
+        except:
+            return results
 
-    # 2) GR8People job cards
-    cards = s.select("section.search-results article, div.search-result")
+        iframe_soup = BeautifulSoup(iframe_html, "lxml")
 
-    for c in cards:
-        a = c.find("a", href=True)
-        if not a:
-            continue
+        cards = iframe_soup.select("section.search-results article, div.search-result")
+        for c in cards:
+            a = c.find("a", href=True)
+            if not a:
+                continue
+            link = urljoin(iframe_url, a["href"])
+            title = a.get_text(" ", strip=True)
+            if not title:
+                continue
+            results.append((link, title, c))
 
-        link = urljoin(GR8_URL, a["href"])
-        title = a.get_text(" ", strip=True)
+        return results
 
-        # skip garbage rows
-        if not title or len(title) < 3:
-            continue
-
-        results.append((link, title, c))
+    # -------------------------------------------------------
+    # Fallback: Look for any anchor pointing to Informatica ATS
+    # -------------------------------------------------------
+    for a in soup.find_all("a", href=True):
+        h = a["href"].lower()
+        if "gr8people" in h or "informatica" in h:
+            link = urljoin(main_url, a["href"])
+            title = a.get_text(" ", strip=True)
+            if title:
+                results.append((link, title, a))
 
     return results
