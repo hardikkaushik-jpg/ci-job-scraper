@@ -1,38 +1,49 @@
-import requests
+# special_extractors_deep/datadog.py
+
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-CATEGORY_URLS = {
-    "Engineering": "https://careers.datadoghq.com/all-jobs/?parent_department_Engineering[0]=Engineering",
-    "Technical Solutions": "https://careers.datadoghq.com/all-jobs/?parent_department_TechnicalSolutions[0]=Technical%20Solutions",
-    "Product Management": "https://careers.datadoghq.com/all-jobs/?parent_department_ProductManagement[0]=Product%20Management",
-}
+BASE = "https://careers.datadoghq.com"
 
-def extract_datadog(soup, page, main_url):
-    headers = {"User-Agent": "Mozilla/5.0"}
-    jobs = []
+def extract_jobs(html, url):
+    """
+    Extract jobs from Datadog filtered or unfiltered lists.
+    Extracts: title, url, location, department/team, employment type.
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    results = []
 
-    for team, url in CATEGORY_URLS.items():
-        try:
-            r = requests.get(url, headers=headers, timeout=20)
-            html = r.text
-            s = BeautifulSoup(html, "lxml")
+    # Datadog job cards are in <a role="link"> tags
+    cards = soup.select("a[href*='/detail/'][role='link']")
 
-            # Job cards
-            cards = s.select("a[href*='/job/']")
-            for c in cards:
-                href = c.get("href")
-                if not href: 
-                    continue
+    if not cards:
+        return []  # no jobs found (filter empty)
 
-                title = c.get_text(" ", strip=True)
-                if not title:
-                    continue
+    for c in cards:
+        job = {}
 
-                full_url = urljoin("https://careers.datadoghq.com", href)
-                jobs.append((full_url, f"{title} ({team})"))
+        # URL
+        href = c.get("href")
+        job_url = urljoin(BASE, href)
+        job["url"] = job_url
 
-        except Exception as e:
-            print("[Datadog extractor error]", e)
+        # Title
+        title_el = c.select_one("h3, h4, .JobCard-title, .styles_jobTitle__")
+        job["title"] = title_el.get_text(strip=True) if title_el else ""
 
-    return jobs
+        # Department / Team
+        dept_el = c.select_one("[class*=department], .JobCard-team, .styles_jobTeam__")
+        job["team"] = dept_el.get_text(strip=True) if dept_el else ""
+
+        # Location
+        loc_el = c.select_one("[class*=location], .JobCard-location, .styles_jobLocation__")
+        job["location"] = loc_el.get_text(strip=True) if loc_el else ""
+
+        # Employment type (FT/PT)
+        type_el = c.select_one(".JobCard-employment, [class*=employmentType]")
+        job["employment_type"] = type_el.get_text(strip=True) if type_el else ""
+
+        # Add to results
+        results.append(job)
+
+    return results
