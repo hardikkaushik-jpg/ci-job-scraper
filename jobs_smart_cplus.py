@@ -11,7 +11,11 @@ import re, csv, time, sys, json, os
 from datetime import datetime, date, timedelta
 
 # import deep site-specific extractors (created separately)
-from special_extractors_deep import SPECIAL_EXTRACTORS_DEEP
+# Ensure this file exists in the same directory or handle the ImportWarning
+try:
+    from special_extractors_deep import SPECIAL_EXTRACTORS_DEEP
+except ImportError:
+    SPECIAL_EXTRACTORS_DEEP = {}
 
 # ---------- CONFIG ----------
 COMPANIES = {
@@ -286,7 +290,7 @@ def scrape():
                 # ====================================================
                 # 1) SPECIAL EXTRACTORS -> DIRECT ROWS (TRUSTED PATH)
                 # ====================================================
-                            if company in SPECIAL_EXTRACTORS_DEEP:
+                if company in SPECIAL_EXTRACTORS_DEEP:
                     print(f"[DEBUG] Running special extractor for {company}")
                     try:
                         special = SPECIAL_EXTRACTORS_DEEP[company](soup, page, main_url)
