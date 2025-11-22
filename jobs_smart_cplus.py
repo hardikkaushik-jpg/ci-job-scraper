@@ -15,7 +15,8 @@ from special_extractors_deep import SPECIAL_EXTRACTORS_DEEP
 
 # ---------- CONFIG ----------
 COMPANIES = {
-    "BigEye": ["https://www.bigeye.com/careers#positions"],
+    "BigEye": ["https://www.bigeye.com/careers#positions"], 
+    "Datadog": ["https://careers.datadoghq.com/all-jobs/"],
 }
 
 PAGE_NAV_TIMEOUT = 40000
