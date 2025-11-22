@@ -401,10 +401,6 @@ def scrape():
 
                     except Exception as e:
                         print(f"[DEBUG] SPECIAL EXTRACTOR ERROR for {company} -> {e}")
-                        if company.lower() == "alation":
-                            print("[INFO] Alation extractor returned 0/failed — continuing with generic pipeline.")
-                        # fall through to generic pipeline
-
                 else:
                     print(f"[DEBUG] Special extractor NOT found for {company}")
 
