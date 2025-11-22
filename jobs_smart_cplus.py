@@ -19,7 +19,47 @@ except ImportError:
 
 # ---------- CONFIG ----------
 COMPANIES = {
+    "Airtable": ["https://airtable.com/careers#open-positions"],
     "Alation": ["https://www.alation.com/careers/all-careers/"],
+    "Alteryx": ["https://alteryx.wd108.myworkdayjobs.com/AlteryxCareers"],
+    "Ataccama": ["https://jobs.ataccama.com/#one-team"],
+    "Atlan": ["https://atlan.com/careers"],
+    "Anomalo": ["https://boards.greenhouse.io/anomalojobs"],
+    "BigEye": ["https://www.bigeye.com/careers#positions"],
+    "Boomi": ["https://boomi.com/company/careers/#greenhouseapp"],
+    "CastorDoc (Coalesce)": ["https://jobs.ashbyhq.com/coalesce"],
+    "Cloudera": ["https://cloudera.wd5.myworkdayjobs.com/External_Career"],
+    "Collibra": ["https://www.collibra.com/company/careers#sub-menu-find-jobs"],
+    "Couchbase": ["https://www.couchbase.com/careers/"],
+    "Data.World": ["https://data.world/company/careers/#careers-list"],
+    "Databricks": ["https://www.databricks.com/company/careers/open-positions"],
+    "Datadog": ["https://careers.datadoghq.com/all-jobs/"],
+    "DataGalaxy": ["https://www.welcometothejungle.com/en/companies/datagalaxy/jobs"],
+    "Decube": ["https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41"],
+    "Exasol": ["https://careers.exasol.com/en/jobs"],
+    "Firebolt": ["https://www.firebolt.io/careers"],
+    "Fivetran": ["https://www.fivetran.com/careers#jobs"],
+    "InfluxData": ["https://www.influxdata.com/careers/#jobs"],
+    "Informatica": ["https://informatica.gr8people.com/jobs", "https://www.informatica.com/us/careers.html"],
+    "Matillion": ["https://jobs.lever.co/matillion"],
+    "MongoDB": ["https://www.mongodb.com/company/careers/teams/engineering",
+        "https://www.mongodb.com/company/careers/teams/product-management-and-design"],
+    "Monte Carlo": ["https://jobs.ashbyhq.com/montecarlodata"],
+    "Oracle": ["https://careers.oracle.com/en/sites/jobsearch/jobs"],
+    "Precisely": ["https://www.precisely.com/careers-and-culture/us-jobs",
+        "https://www.precisely.com/careers-and-culture/international-jobs"],
+    "Pentaho": ["https://www.hitachivantara.com/en-us/company/careers/job-search","https://www.hitachivantara.com/en-us/careers.html"],
+    "Qlik": ["http://careerhub.qlik.com/careers"],
+    "Sifflet": ["https://www.welcometothejungle.com/en/companies/sifflet/jobs"],
+    "Snowflake": ["https://careers.snowflake.com/global/en/search-results"],
+    "Syniti": ["https://careers.syniti.com/go/Explore-Our-Roles/8777900/"],
+    "Teradata": ["https://careers.teradata.com/jobs"],
+    "Vertica": ["https://careers.opentext.com/us/en/home"],
+    # large noisy portals
+    "Salesforce": ["https://careers.salesforce.com/en/jobs/"],
+    "Amazon": ["https://www.amazon.jobs/en/"],
+    "IBM": ["https://www.ibm.com/careers/search"],
+    "SAP": ["https://jobs.sap.com/"],
 }
 PAGE_NAV_TIMEOUT = 40000
 PAGE_DOM_TIMEOUT = 15000
@@ -499,6 +539,32 @@ def scrape():
                     # --- Continue with standard cleanup ---
                     title_clean, location_candidate = extract_location_from_text(title_candidate)
                     title_clean = clean_title(title_clean or title_candidate)
+
+                    # === PATCH: Reject non-technical Product roles by title pattern ===
+                    NON_TECH_PRODUCT_PATTERNS = [
+                        r'product\s+marketing',
+                        r'product\s+marketer',
+                        r'product\s+g?tm',
+                        r'product\s+operations',
+                        r'product\s+ops',
+                        r'product\s+design',
+                        r'product\s+growth',
+                        r'product\s+strategy',
+                        r'product\s+enablement',
+                        r'product\s+commercial'
+                    ]
+
+                    title_low = title_clean.lower()
+                    should_skip = False
+                    if "product" in title_low:
+                        for patt in NON_TECH_PRODUCT_PATTERNS:
+                            if re.search(patt, title_low):
+                                print(f"[DROP-PRODUCT-TITLE] Non-technical product role dropped -> {title_clean}")
+                                should_skip = True
+                                break
+                    if should_skip:
+                        continue
+
                     card_loc = try_extract_location_from_card(el)
                     if card_loc and not location_candidate:
                         location_candidate = card_loc
@@ -507,6 +573,12 @@ def scrape():
                     posting_date = ""
                     must_detail = False
                     must_reasons = []
+
+                    # === PATCH 1: PRODUCT FILTER (EARLY FORCE DETAIL) ===
+                    # Moved slightly down to ensure must_detail is initialized
+                    if "product" in (title_clean or "").lower():
+                        must_detail = True
+                        must_reasons.append("product_role_force_detail")
 
                     if company.lower() in CRITICAL_COMPANIES:
                         must_detail = True
@@ -602,6 +674,19 @@ def scrape():
 
                                 except Exception as e:
                                     print(f"[WARN] detail parse fail {link} -> {e}")
+                        
+                        # === PATCH 2: PRODUCT FILTER (DESCRIPTION-BASED STRICT CHECK) ===
+                        PRODUCT_TECH_KEYWORDS = [
+                            "etl", "pipeline", "connector", "integration", "api", "sdk",
+                            "snowflake", "databricks", "warehouse", "lakehouse",
+                            "airflow", "spark", "bigquery", "postgres", "mysql",
+                            "orchestration", "kafka", "kubernetes", "observability"
+                        ]
+                        if "product" in (title_clean or "").lower():
+                            desc_blob = (detail_html or "").lower()
+                            if not any(k in desc_blob for k in PRODUCT_TECH_KEYWORDS):
+                                print(f"[DROP-PRODUCT] Irrelevant product role -> {company} | {title_clean}")
+                                continue
 
                         final_score = score_title_desc(title_clean or title_candidate, detail_html or "", company)
                         print(f"[FINAL_SCORE] {company} {link} final_score={final_score} (light={light_score})")
@@ -618,6 +703,13 @@ def scrape():
 
                     final_location = (location_candidate or loc_from_title or "").strip()
                     posting_date_final = posting_date or ""
+
+                    # === PATCH 3: PRODUCT FINAL CHECK (AFTER CLEANUP) ===
+                    if "product" in final_title.lower():
+                        desc_blob = (detail_html or "").lower()
+                        if not any(k in desc_blob for k in PRODUCT_TECH_KEYWORDS):
+                            print(f"[DROP-PRODUCT-FINAL] Product role failed final tech filter -> {final_title}")
+                            continue
 
                     if not should_drop_by_title(final_title):
                         rows.append({
