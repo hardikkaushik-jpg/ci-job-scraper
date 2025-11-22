@@ -1,49 +1,63 @@
-# special_extractors_deep/datadog.py
+# datadog.py
+# Deep extractor for Datadog careers page
 
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-BASE = "https://careers.datadoghq.com"
-
-def extract_datadog(html, url):
-    """
-    Extract jobs from Datadog filtered or unfiltered lists.
-    Extracts: title, url, location, department/team, employment type.
-    """
-    soup = BeautifulSoup(html, "html.parser")
+def extract_datadog(soup, page, base_url):
     results = []
+    seen = set()
 
-    # Datadog job cards are in <a role="link"> tags
-    cards = soup.select("a[href*='/detail/'][role='link']")
+    # Datadog jobs always have anchors linking to /job/<slug>
+    for a in soup.select("a[href*='/job/']"):
+        href = a.get("href", "").strip()
+        if not href:
+            continue
 
-    if not cards:
-        return []  # no jobs found (filter empty)
+        link = urljoin(base_url, href)
 
-    for c in cards:
-        job = {}
+        if link in seen:
+            continue
+        seen.add(link)
 
-        # URL
-        href = c.get("href")
-        job_url = urljoin(BASE, href)
-        job["url"] = job_url
+        # Title extraction: <a> text OR child <h2>
+        text = a.get_text(" ", strip=True)
+        if not text:
+            h2 = a.find("h2")
+            if h2:
+                text = h2.get_text(" ", strip=True)
 
-        # Title
-        title_el = c.select_one("h3, h4, .JobCard-title, .styles_jobTitle__")
-        job["title"] = title_el.get_text(strip=True) if title_el else ""
+        if not text:
+            continue
 
-        # Department / Team
-        dept_el = c.select_one("[class*=department], .JobCard-team, .styles_jobTeam__")
-        job["team"] = dept_el.get_text(strip=True) if dept_el else ""
+        # Try to find location from nearby elements
+        loc = ""
 
-        # Location
-        loc_el = c.select_one("[class*=location], .JobCard-location, .styles_jobLocation__")
-        job["location"] = loc_el.get_text(strip=True) if loc_el else ""
+        parent = a.parent
+        if parent:
+            # Several Datadog builds place location in sibling spans
+            possible = parent.find_all(["span", "div"])
+            for el in possible:
+                t = el.get_text(" ", strip=True)
+                if (
+                    t
+                    and any(k in t.lower() for k in [
+                        "remote", "germany", "usa", "france",
+                        "new york", "london", "singapore",
+                        "india", "poland", "canada"
+                    ])
+                ):
+                    loc = t
+                    break
 
-        # Employment type (FT/PT)
-        type_el = c.select_one(".JobCard-employment, [class*=employmentType]")
-        job["employment_type"] = type_el.get_text(strip=True) if type_el else ""
+        # fallback: look for data-qa='location'
+        if not loc:
+            loc_el = soup.find("span", {"data-qa": "location"})
+            if loc_el:
+                loc = loc_el.get_text(" ", strip=True)
 
-        # Add to results
-        results.append(job)
+        label = f"{text} ({loc})" if loc else text
+
+        results.append((link, label))
 
     return results
