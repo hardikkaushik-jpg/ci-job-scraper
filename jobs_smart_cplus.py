@@ -286,7 +286,7 @@ def scrape():
                 # ====================================================
                 # 1) SPECIAL EXTRACTORS -> DIRECT ROWS (TRUSTED PATH)
                 # ====================================================
-                if company in SPECIAL_EXTRACTORS_DEEP:
+                                if company in SPECIAL_EXTRACTORS_DEEP:
                     print(f"[DEBUG] Running special extractor for {company}")
                     try:
                         special = SPECIAL_EXTRACTORS_DEEP[company](soup, page, main_url)
@@ -397,6 +397,10 @@ def scrape():
 
                     except Exception as e:
                         print(f"[DEBUG] SPECIAL EXTRACTOR ERROR for {company} -> {e}")
+                        if company.lower() == "alation":
+                            print("[INFO] Alation extractor returned 0/failed — continuing with generic pipeline.")
+                        # fall through to generic pipeline
+
                 else:
                     print(f"[DEBUG] Special extractor NOT found for {company}")
 
@@ -486,6 +490,7 @@ def scrape():
                         location_candidate = card_loc
 
                     light_score = score_title_desc(title_candidate, "", company)
+                    
                     posting_date = ""
                     must_detail = False
                     must_reasons = []
@@ -591,49 +596,27 @@ def scrape():
                             print(f"[DROP-FINAL] Dropping after detail fetch -> score={final_score} | {company} | title='{title_clean or title_candidate}'")
                             continue
 
-                    title_final = clean_title(title_clean or anchor_text or "")
-                    location_candidate = location_candidate or ""
+                    # --- GLOBAL TITLE + LOCATION CLEANING ---
+                    final_title, loc_from_title = extract_location_from_text(title_clean)
+                    final_title = clean_title(final_title)
+
+                    if loc_from_title and not location_candidate:
+                        location_candidate = loc_from_title
+
+                    final_location = (location_candidate or loc_from_title or "").strip()
                     posting_date_final = posting_date or ""
 
-                    if not location_candidate and detail_html:
-                        m = re.search(r'"addressLocality"\s*:\s*"([^"]+)"', detail_html)
-                        if m:
-                            city = m.group(1)
-                            m2 = re.search(r'"addressCountry"\s*:\s*"([^"]+)"', detail_html)
-                            country = m2.group(1) if m2 else ""
-                            loc = f"{city}, {country}".strip(", ")
-                            if loc:
-                                location_candidate = loc
-                        if not location_candidate:
-                            mm = re.search(r'"additionalLocations"\s*:\s*\[(.+?)\]', detail_html, re.S)
-                            if mm:
-                                locs_raw = mm.group(1)
-                                locs = re.findall(r'\"([^"]+)\"', locs_raw)
-                                if locs:
-                                    location_candidate = locs[0]
-
-                    if not location_candidate:
-                        mloc = re.search(r'/(remote|new[-_]york|london|berlin|singapore|bengaluru)[/\-]?', link or "", re.I)
-                        if mloc:
-                            location_candidate = mloc.group(1).replace('-', ' ').title()
-
-                    if not posting_date_final:
-                        posted_from_anchor = re.search(r'posted\s+(\d+)\s+days?\s+ago', anchor_text or "", re.I)
-                        if posted_from_anchor:
-                            d = date.today() - timedelta(days=int(posted_from_anchor.group(1)))
-                            posting_date_final = d.isoformat()
-
-                    if not should_drop_by_title(title_final):
+                    if not should_drop_by_title(final_title):
                         rows.append({
                             "Company": company,
-                            "Job Title": title_final,
+                            "Job Title": final_title,
                             "Job Link": link,
-                            "Location": (location_candidate or "").strip(),
+                            "Location": final_location,
                             "Posting Date": posting_date_final,
                             "Days Since Posted": ""
                         })
                     else:
-                        print(f"[DROP] Dropping non-job row -> {company} | {title_final} | {link}")
+                        print(f"[DROP] Dropping non-job row -> {company} | {final_title} | {link}")
 
         browser.close()
     return rows
