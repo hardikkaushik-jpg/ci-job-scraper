@@ -286,7 +286,7 @@ def scrape():
                 # ====================================================
                 # 1) SPECIAL EXTRACTORS -> DIRECT ROWS (TRUSTED PATH)
                 # ====================================================
-                                if company in SPECIAL_EXTRACTORS_DEEP:
+                            if company in SPECIAL_EXTRACTORS_DEEP:
                     print(f"[DEBUG] Running special extractor for {company}")
                     try:
                         special = SPECIAL_EXTRACTORS_DEEP[company](soup, page, main_url)
