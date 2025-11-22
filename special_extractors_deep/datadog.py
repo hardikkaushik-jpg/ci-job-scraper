@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 
 BASE = "https://careers.datadoghq.com"
 
-def extract_jobs(html, url):
+def extract_datadog(html, url):
     """
     Extract jobs from Datadog filtered or unfiltered lists.
     Extracts: title, url, location, department/team, employment type.
