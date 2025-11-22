@@ -1,63 +1,38 @@
-# datadog.py
-# Deep extractor for Datadog careers page
-
+import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-def extract_datadog(soup, page, base_url):
-    results = []
-    seen = set()
+CATEGORY_URLS = {
+    "Engineering": "https://careers.datadoghq.com/all-jobs/?parent_department_Engineering[0]=Engineering",
+    "Technical Solutions": "https://careers.datadoghq.com/all-jobs/?parent_department_TechnicalSolutions[0]=Technical%20Solutions",
+    "Product Management": "https://careers.datadoghq.com/all-jobs/?parent_department_ProductManagement[0]=Product%20Management",
+}
 
-    # Datadog jobs always have anchors linking to /job/<slug>
-    for a in soup.select("a[href*='/job/']"):
-        href = a.get("href", "").strip()
-        if not href:
-            continue
+def extract_datadog(soup, page, main_url):
+    headers = {"User-Agent": "Mozilla/5.0"}
+    jobs = []
 
-        link = urljoin(base_url, href)
+    for team, url in CATEGORY_URLS.items():
+        try:
+            r = requests.get(url, headers=headers, timeout=20)
+            html = r.text
+            s = BeautifulSoup(html, "lxml")
 
-        if link in seen:
-            continue
-        seen.add(link)
+            # Job cards
+            cards = s.select("a[href*='/job/']")
+            for c in cards:
+                href = c.get("href")
+                if not href: 
+                    continue
 
-        # Title extraction: <a> text OR child <h2>
-        text = a.get_text(" ", strip=True)
-        if not text:
-            h2 = a.find("h2")
-            if h2:
-                text = h2.get_text(" ", strip=True)
+                title = c.get_text(" ", strip=True)
+                if not title:
+                    continue
 
-        if not text:
-            continue
+                full_url = urljoin("https://careers.datadoghq.com", href)
+                jobs.append((full_url, f"{title} ({team})"))
 
-        # Try to find location from nearby elements
-        loc = ""
+        except Exception as e:
+            print("[Datadog extractor error]", e)
 
-        parent = a.parent
-        if parent:
-            # Several Datadog builds place location in sibling spans
-            possible = parent.find_all(["span", "div"])
-            for el in possible:
-                t = el.get_text(" ", strip=True)
-                if (
-                    t
-                    and any(k in t.lower() for k in [
-                        "remote", "germany", "usa", "france",
-                        "new york", "london", "singapore",
-                        "india", "poland", "canada"
-                    ])
-                ):
-                    loc = t
-                    break
-
-        # fallback: look for data-qa='location'
-        if not loc:
-            loc_el = soup.find("span", {"data-qa": "location"})
-            if loc_el:
-                loc = loc_el.get_text(" ", strip=True)
-
-        label = f"{text} ({loc})" if loc else text
-
-        results.append((link, label))
-
-    return results
+    return jobs
