@@ -15,8 +15,7 @@ from special_extractors_deep import SPECIAL_EXTRACTORS_DEEP
 
 # ---------- CONFIG ----------
 COMPANIES = {
-    "BigEye": ["https://www.bigeye.com/careers#positions"],
-    "Collibra": ["https://www.collibra.com/company/careers#sub-menu-find-jobs"],
+    "BigEye": ["https://www.bigeye.com/careers#positions"],,
 }
 
 PAGE_NAV_TIMEOUT = 40000
