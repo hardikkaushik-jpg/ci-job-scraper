@@ -1,17 +1,17 @@
 Company,Job Title,Job Link,Location,Posting Date,Days Since Posted,Function,Seniority,Skills_in_Title,Company_Group,Product_Focus,Product_Focus_Tokens,Primary_Skill,Extracted_Skills,Relevancy_to_Actian,Trend_Score
 Airtable,Data Engineer,https://boards.greenhouse.io/airtable/jobs/8124953002,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-Airtable,"Data Scientist, GTM Analytics",https://boards.greenhouse.io/airtable/jobs/8169952002,San Francisco,,,Data/Analytics,Unknown,,Other,Other,[],,[],0.3,0
+Airtable,Data Scientist,https://boards.greenhouse.io/airtable/jobs/8169952002,San Francisco,,,Data/Analytics,Unknown,,Other,Other,[],,[],0.3,0
 Airtable,Field Marketing Manager,https://boards.greenhouse.io/airtable/jobs/8170126002,New York,,,Marketing,Manager,,Other,Other,[],,[],1.8,0
 Airtable,Internal Airtable Solution Architect,https://boards.greenhouse.io/airtable/jobs/8227686002,US,,,Other,Intern,,Other,ML/AI infra,"[""ML/AI infra""]",,[],0.1,2
-Airtable,"People Systems Engineer, Airtable Specialist",https://boards.greenhouse.io/airtable/jobs/8222508002,San Francisco,,,Engineering,Unknown,,Other,ML/AI infra,"[""ML/AI infra""]",,[],0.3,2
-Airtable,Program Manager EMEA | Services,https://boards.greenhouse.io/airtable/jobs/8236018002,Services London,,,Other,Manager,,Other,Other,[],,[],1.8,0
-Airtable,Senior Endpoint Engineer (Jamf/Intune),https://boards.greenhouse.io/airtable/jobs/8237820002,San Francisco,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-Airtable,"Senior Growth Marketing Manager, Builders",https://boards.greenhouse.io/airtable/jobs/8077213002,San Francisco,,,Marketing,Senior,,Other,Other,[],,[],2.1,1.0
+Airtable,People Systems Engineer,https://boards.greenhouse.io/airtable/jobs/8222508002,San Francisco,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
+Airtable,Program Manager EMEA,https://boards.greenhouse.io/airtable/jobs/8236018002,Services London,,,Other,Manager,,Other,Other,[],,[],1.8,0
+Airtable,Senior Endpoint Engineer,https://boards.greenhouse.io/airtable/jobs/8237820002,San Francisco,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
+Airtable,Senior Growth Marketing Manager,https://boards.greenhouse.io/airtable/jobs/8077213002,San Francisco,,,Marketing,Senior,,Other,Other,[],,[],2.1,1.0
 Airtable,"Senior Integrations Engineer, Enterprise Integrations & Agentic AI",https://boards.greenhouse.io/airtable/jobs/8117292002,San Francisco,,,Engineering,Senior,AI,Other,ETL/Integration,"[""ETL/Integration"", ""ML/AI infra""]",AI,"[""AI""]",40.1,3.0
-Airtable,"Senior Manager, Finance Systems",https://boards.greenhouse.io/airtable/jobs/8229185002,Finance Systems San Francisco,,,Other,Senior,,Other,Other,[],,[],2.1,1.0
-Airtable,"Senior Manager, People Systems",https://boards.greenhouse.io/airtable/jobs/8235618002,People Systems San Francisco,,,Other,Senior,,Other,Other,[],,[],2.1,1.0
-Airtable,"Senior Software Engineer, Observability",https://boards.greenhouse.io/airtable/jobs/7906014002,San Francisco,,,Engineering,Senior,OBSERVABILITY,Other,Data Observability,"[""Data Observability""]",OBSERVABILITY,"[""OBSERVABILITY""]",32.1,2.5
-Airtable,"Senior Solutions Architect EMEA, Services",https://boards.greenhouse.io/airtable/jobs/8192619002,Services London,,,Other,Senior,,Other,Other,[],,[],2.1,1.0
+Airtable,Senior Manager,https://boards.greenhouse.io/airtable/jobs/8229185002,Finance Systems San Francisco,,,Other,Senior,,Other,Other,[],,[],2.1,1.0
+Airtable,Senior Manager,https://boards.greenhouse.io/airtable/jobs/8235618002,People Systems San Francisco,,,Other,Senior,,Other,Other,[],,[],2.1,1.0
+Airtable,Senior Software Engineer,https://boards.greenhouse.io/airtable/jobs/7906014002,San Francisco,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
+Airtable,Senior Solutions Architect EMEA,https://boards.greenhouse.io/airtable/jobs/8192619002,Services London,,,Other,Senior,,Other,Other,[],,[],2.1,1.0
 Alteryx,GRC Engineer,https://alteryx.wd108.myworkdayjobs.com/en-US/AlteryxCareers/job/Bangalore-India/GRC-Engineer---Compliance-Automation_R11451,"Bengaluru, India, India",2025-11-20,2,Engineering,Unknown,,Other,Other,[],,[],6.3,0
 Alteryx,Integrated Campaign Manager,https://alteryx.wd108.myworkdayjobs.com/en-US/AlteryxCareers/job/Southern-California-USA---Remote/Integrated-Campaign-Manager--Partner-Campaigns_R11490,"Southern California, USA - Remote, United States of America",2025-11-19,3,Other,Manager,,Other,ETL/Integration,"[""ETL/Integration"", ""ML/AI infra""]",,[],37.8,2
 Alteryx,Sales Engineer,https://alteryx.wd108.myworkdayjobs.com/en-US/AlteryxCareers/job/North-Carolina-USA---Remote/Sales-Engineer_R11460,"North Carolina, USA - Remote, United States of America",2025-11-21,1,Engineering,Unknown,,Other,Other,[],,[],6.3,0
@@ -20,7 +20,7 @@ Alteryx,Solutions Marketing Manager,https://alteryx.wd108.myworkdayjobs.com/en-U
 Alteryx,Sr. Software Engineer,https://alteryx.wd108.myworkdayjobs.com/en-US/AlteryxCareers/job/Bangalore-India/Sr-Software-Engineer_R11483,"Bengaluru, India, India",2025-11-19,3,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
 Anomalo,Senior Business Development Manager,https://job-boards.greenhouse.io/anomalojobs/jobs/4612604005,United States,,,Other,Senior,,Data Observability,Other,[],,[],8.1,1.0
 Anomalo,Senior Full Stack Software Engineer,https://job-boards.greenhouse.io/anomalojobs/jobs/4604208005,United States,,,Engineering,Senior,,Data Observability,Other,[],,[],8.1,1.0
-Ataccama,Senior Backend Engineer (Data Lineage),https://jobs.ataccama.com/84d241b5-7553-4d87-b535-108029701beb/bratislava/data-catalog/,Data Lineage,,,Engineering,Senior,LINEAGE,Other,Data Governance,"[""Data Governance""]",LINEAGE,"[""LINEAGE""]",32.1,1.0
+Ataccama,Senior Backend Engineer,https://jobs.ataccama.com/84d241b5-7553-4d87-b535-108029701beb/bratislava/data-catalog/,Data Lineage,,,Engineering,Senior,,Other,Data Governance,"[""Data Governance""]",,[],32.1,1.0
 Ataccama,Senior Platform Engineer,https://jobs.ataccama.com/14e05d68-835a-4397-8667-69d4f954c014/prague/cloud/,,,,Engineering,Senior,,Other,Platform / Infra,"[""Platform / Infra""]",,[],2.1,1.0
 Atlan,Compliance / Tax Manager,https://jobs.ashbyhq.com/atlan/80415fbe-6bae-415c-a93f-f2a4f64f1496?embed=js,India,2025-02-17,278,Other,Manager,,Data Intelligence,Other,[],,[],7.8,0
 Atlan,Compliance / Tax Manager Finance India Full time,https://jobs.ashbyhq.com/atlan/80415fbe-6bae-415c-a93f-f2a4f64f1496,Remote,2025-02-17,278,Other,Manager,,Data Intelligence,Other,[],,[],1.8,0
@@ -28,25 +28,25 @@ Atlan,Creative Director,https://jobs.ashbyhq.com/atlan/c249f6b3-f052-43e1-8031-8
 Atlan,Creative Director Marketing India Full time,https://jobs.ashbyhq.com/atlan/c249f6b3-f052-43e1-8031-89d577351727,Remote,2025-11-20,2,Marketing,Director+,,Data Intelligence,Other,[],,[],3.0,1.0
 Atlan,Customer Solutions Architect,https://jobs.ashbyhq.com/atlan/6d1158fe-7901-461b-9a98-4174216ccb2f?embed=js,India,2025-10-07,46,Other,Unknown,,Data Intelligence,Other,[],,[],6.3,0
 Atlan,Customer Solutions Architect Customer Experience India Full time,https://jobs.ashbyhq.com/atlan/6d1158fe-7901-461b-9a98-4174216ccb2f,Remote,2025-10-07,46,Other,Unknown,,Data Intelligence,Other,[],,[],0.3,0
-Atlan,Customer Success Manager - Enterprise,https://jobs.ashbyhq.com/atlan/667bd3d1-554a-4188-8ac6-00b2d4788999?embed=js,India,2025-09-19,64,Other,Manager,,Data Intelligence,Other,[],,[],7.8,0
-Atlan,Customer Success Manager - Enterprise,https://jobs.ashbyhq.com/atlan/be21d016-27b1-484c-8ca9-7b107ed222be?embed=js,United States,2025-10-21,32,Other,Manager,,Data Intelligence,Other,[],,[],7.8,0
-Atlan,Customer Success Manager DACH - Enterprise,https://jobs.ashbyhq.com/atlan/293b8bf1-7bf4-413c-9a16-6f9fb3ed7594?embed=js,United Kingdom,2025-10-31,22,Other,Manager,,Data Intelligence,Other,[],,[],1.8,0
+Atlan,Customer Success Manager,https://jobs.ashbyhq.com/atlan/667bd3d1-554a-4188-8ac6-00b2d4788999?embed=js,India,2025-09-19,64,Other,Manager,,Data Intelligence,Other,[],,[],7.8,0
+Atlan,Customer Success Manager,https://jobs.ashbyhq.com/atlan/be21d016-27b1-484c-8ca9-7b107ed222be?embed=js,United States,2025-10-21,32,Other,Manager,,Data Intelligence,Other,[],,[],7.8,0
+Atlan,Customer Success Manager DACH,https://jobs.ashbyhq.com/atlan/293b8bf1-7bf4-413c-9a16-6f9fb3ed7594?embed=js,United Kingdom,2025-10-31,22,Other,Manager,,Data Intelligence,Other,[],,[],1.8,0
 Atlan,Customer Success Manager DACH Enterprise Customer Experience United Kingdom; Ireland; Germany Full time,https://jobs.ashbyhq.com/atlan/293b8bf1-7bf4-413c-9a16-6f9fb3ed7594,Remote,2025-10-31,22,Other,Manager,,Data Intelligence,Other,[],,[],1.8,0
 Atlan,Customer Success Manager Enterprise Customer Experience India Full time,https://jobs.ashbyhq.com/atlan/667bd3d1-554a-4188-8ac6-00b2d4788999,Remote,2025-09-19,64,Other,Manager,,Data Intelligence,Other,[],,[],1.8,0
 Atlan,Customer Success Manager Enterprise Customer Experience United States,https://jobs.ashbyhq.com/atlan/be21d016-27b1-484c-8ca9-7b107ed222be,Full time,2025-10-21,32,Other,Manager,,Data Intelligence,Other,[],,[],1.8,0
 Atlan,Director Product Management Product Management United States; Canada Full time,https://jobs.ashbyhq.com/atlan/f1bf5b3d-9ee4-47e3-8b87-01caf02679b8,Remote,2025-11-10,12,Product,Director+,,Data Intelligence,Other,[],,[],3.0,1.0
 Atlan,GTM Engineer,https://jobs.ashbyhq.com/atlan/c8d15162-d128-4eeb-9c12-e2d61875a793?embed=js,United States,2025-05-29,177,Engineering,Unknown,,Data Intelligence,Other,[],,[],6.3,0
 Atlan,GTM Engineer Marketing United States,https://jobs.ashbyhq.com/atlan/c8d15162-d128-4eeb-9c12-e2d61875a793,Full time,2025-05-29,177,Engineering,Unknown,,Data Intelligence,Other,[],,[],0.3,0
-Atlan,Implementation Engineer - On-Prem Specialist,https://jobs.ashbyhq.com/atlan/0fef5fbf-b4d6-47ff-942d-71082152cd95?embed=js,India,2025-09-03,80,Engineering,Unknown,,Data Intelligence,Other,[],,[],6.3,0
+Atlan,Implementation Engineer,https://jobs.ashbyhq.com/atlan/0fef5fbf-b4d6-47ff-942d-71082152cd95?embed=js,India,2025-09-03,80,Engineering,Unknown,,Data Intelligence,Other,[],,[],6.3,0
 Atlan,Implementation Engineer On-Prem Specialist Customer Experience India Full time,https://jobs.ashbyhq.com/atlan/0fef5fbf-b4d6-47ff-942d-71082152cd95,Remote,2025-09-03,80,Engineering,Unknown,,Data Intelligence,Other,[],,[],0.3,0
+Atlan,Manager,https://jobs.ashbyhq.com/atlan/da21a275-84e4-4c89-aa29-b604f3b19965?embed=js,India,2025-11-20,2,Other,Manager,,Data Intelligence,Other,[],,[],7.8,0
+Atlan,Manager,https://jobs.ashbyhq.com/atlan/f1150baa-60e8-4cfb-9d56-5dd7c0cdc48c?embed=js,United Kingdom,2025-11-13,9,Other,Manager,,Data Intelligence,Other,[],,[],1.8,0
 Atlan,Manager Customer Success Customer Experience India Full time,https://jobs.ashbyhq.com/atlan/da21a275-84e4-4c89-aa29-b604f3b19965,Remote,2025-11-20,2,Other,Manager,,Data Intelligence,Other,[],,[],1.8,0
 Atlan,Manager Global Compensation & Benefits People United Kingdom Full time,https://jobs.ashbyhq.com/atlan/f1150baa-60e8-4cfb-9d56-5dd7c0cdc48c,Remote,2025-11-13,9,Other,Manager,,Data Intelligence,Other,[],,[],1.8,0
-Atlan,"Manager, Customer Success",https://jobs.ashbyhq.com/atlan/da21a275-84e4-4c89-aa29-b604f3b19965?embed=js,India,2025-11-20,2,Other,Manager,,Data Intelligence,Other,[],,[],7.8,0
-Atlan,"Manager, Global Compensation & Benefits",https://jobs.ashbyhq.com/atlan/f1150baa-60e8-4cfb-9d56-5dd7c0cdc48c?embed=js,United Kingdom,2025-11-13,9,Other,Manager,,Data Intelligence,Other,[],,[],1.8,0
 Atlan,Marketing Operations Manager,https://jobs.ashbyhq.com/atlan/2d5faea1-c0ed-46de-a2fa-831d8e4cb520?embed=js,United States,2025-11-11,11,Marketing,Manager,,Data Intelligence,Other,[],,[],7.8,0
 Atlan,Marketing Operations Manager Sales United States; United Kingdom Full time,https://jobs.ashbyhq.com/atlan/2d5faea1-c0ed-46de-a2fa-831d8e4cb520,Remote,2025-11-11,11,Sales,Manager,,Data Intelligence,Other,[],,[],1.8,0
+Atlan,Partner Manager,https://jobs.ashbyhq.com/atlan/f3a032d1-7abf-458a-a4d3-e41fe49fa6d5?embed=js,United States,2025-10-10,43,Other,Manager,,Data Intelligence,Other,[],,[],7.8,0
 Atlan,Partner Manager Cloud Alliances Sales United States,https://jobs.ashbyhq.com/atlan/f3a032d1-7abf-458a-a4d3-e41fe49fa6d5,Full time,2025-10-10,43,Sales,Manager,,Data Intelligence,Other,[],,[],1.8,0
-Atlan,"Partner Manager, Cloud Alliances",https://jobs.ashbyhq.com/atlan/f3a032d1-7abf-458a-a4d3-e41fe49fa6d5?embed=js,United States,2025-10-10,43,Other,Manager,,Data Intelligence,Other,[],,[],7.8,0
 Atlan,Principal Customer Success Manager,https://jobs.ashbyhq.com/atlan/cc0e1742-3cb4-42d8-ab5e-1f7b911e167e?embed=js,"New York, New York State, United States",2025-11-14,8,Other,Principal/Staff,,Data Intelligence,Other,[],,[],8.7,1.0
 Atlan,Principal Customer Success Manager Customer Experience New York Full time,https://jobs.ashbyhq.com/atlan/cc0e1742-3cb4-42d8-ab5e-1f7b911e167e,Remote,2025-11-14,8,Other,Principal/Staff,,Data Intelligence,Other,[],,[],2.7,1.0
 Atlan,Senior Application Security Engineer,https://jobs.ashbyhq.com/atlan/d628d8f5-65bb-46c0-bfcb-6df3875ccfcd?embed=js,India,2025-11-05,17,Engineering,Senior,,Data Intelligence,Other,[],,[],8.1,1.0
@@ -55,11 +55,11 @@ Atlan,Senior Cybersecurity Engineer,https://jobs.ashbyhq.com/atlan/254c1250-953b
 Atlan,Senior Cybersecurity Engineer IT & Security India Full time,https://jobs.ashbyhq.com/atlan/254c1250-953b-4323-8d18-9fe5e41d8d7d,Remote,2025-11-04,18,Engineering,Senior,,Data Intelligence,Other,[],,[],2.1,1.0
 Atlan,Senior Engineering Manager,https://jobs.ashbyhq.com/atlan/aea0a9e5-6555-4e35-9753-3a443bcf2624?embed=js,India,2025-08-06,108,Engineering,Senior,,Data Intelligence,Other,[],,[],8.1,1.0
 Atlan,Senior Engineering Manager Engineering India Full time,https://jobs.ashbyhq.com/atlan/aea0a9e5-6555-4e35-9753-3a443bcf2624,Remote,2025-08-06,108,Engineering,Senior,,Data Intelligence,Other,[],,[],2.1,1.0
-Atlan,Senior Sales Engineer - West,https://jobs.ashbyhq.com/atlan/52e43e9c-a539-40b2-ba50-6435c3393b66?embed=js,United States,2025-09-09,74,Engineering,Senior,,Data Intelligence,Other,[],,[],8.1,1.0
+Atlan,Senior Sales Engineer,https://jobs.ashbyhq.com/atlan/52e43e9c-a539-40b2-ba50-6435c3393b66?embed=js,United States,2025-09-09,74,Engineering,Senior,,Data Intelligence,Other,[],,[],8.1,1.0
 Atlan,Senior Sales Engineer West Sales United States; San Francisco; Texas Full time,https://jobs.ashbyhq.com/atlan/52e43e9c-a539-40b2-ba50-6435c3393b66,Remote,2025-09-09,74,Engineering,Senior,,Data Intelligence,Other,[],,[],2.1,1.0
 Atlan,Senior Software Engineer,https://jobs.ashbyhq.com/atlan/5ebb678a-1e68-4255-b589-f77954a199f2?embed=js,India,2025-11-12,10,Engineering,Senior,,Data Intelligence,Other,[],,[],8.1,1.0
-Atlan,Senior Software Engineer - Apps,https://jobs.ashbyhq.com/atlan/77d15ca0-b464-423d-a5f5-5fc241f59586?embed=js,United States,2025-09-16,67,Engineering,Senior,,Data Intelligence,Other,[],,[],8.1,1.0
-Atlan,Senior Software Engineer - Frontend,https://jobs.ashbyhq.com/atlan/6078c9aa-39c9-48dd-87ae-d9efb9656e42?embed=js,India,2025-11-05,17,Engineering,Senior,,Data Intelligence,Other,[],,[],8.1,1.0
+Atlan,Senior Software Engineer,https://jobs.ashbyhq.com/atlan/77d15ca0-b464-423d-a5f5-5fc241f59586?embed=js,United States,2025-09-16,67,Engineering,Senior,,Data Intelligence,Other,[],,[],8.1,1.0
+Atlan,Senior Software Engineer,https://jobs.ashbyhq.com/atlan/6078c9aa-39c9-48dd-87ae-d9efb9656e42?embed=js,India,2025-11-05,17,Engineering,Senior,,Data Intelligence,Other,[],,[],8.1,1.0
 Atlan,Senior Software Engineer Apps Engineering United States; Canada,https://jobs.ashbyhq.com/atlan/77d15ca0-b464-423d-a5f5-5fc241f59586,Full time,2025-09-16,67,Engineering,Senior,,Data Intelligence,Other,[],,[],2.1,1.0
 Atlan,Senior Software Engineer Engineering India Full time,https://jobs.ashbyhq.com/atlan/5ebb678a-1e68-4255-b589-f77954a199f2,Remote,2025-11-12,10,Engineering,Senior,,Data Intelligence,Other,[],,[],2.1,1.0
 Atlan,Senior Software Engineer Frontend Engineering India Full time,https://jobs.ashbyhq.com/atlan/6078c9aa-39c9-48dd-87ae-d9efb9656e42,Remote,2025-11-05,17,Engineering,Senior,,Data Intelligence,Other,[],,[],2.1,1.0
@@ -68,17 +68,15 @@ Atlan,Site Reliability Engineer II Customer Experience India Full time,https://j
 Atlan,Sr. Product Analyst Forward Deployed Engineer Engineering Canada; United States Full time,https://jobs.ashbyhq.com/atlan/46004f18-4fcd-4e0f-93a9-a55e52a1e214,Remote,2025-11-11,11,Engineering,Senior,,Data Intelligence,Other,[],,[],2.1,1.0
 Atlan,Staff Product Manager Product Management India Full time,https://jobs.ashbyhq.com/atlan/7443fd12-cd74-445b-8a06-c8ac2024c58e,Remote,2025-03-14,253,Product,Manager,,Data Intelligence,Other,[],,[],1.8,0
 Atlan,Staff Product Manager Product Management United States; Canada Full time,https://jobs.ashbyhq.com/atlan/fe768bf1-8b75-4e3b-90bf-fbe758db1f23,Remote,2025-04-16,220,Product,Manager,,Data Intelligence,Other,[],,[],1.8,0
-Atlan,Staff Software Engineer - Platform,https://jobs.ashbyhq.com/atlan/4d8d2681-88b7-4b0a-8104-e5970e1506c2?embed=js,United States,2025-08-25,89,Engineering,Unknown,,Data Intelligence,Platform / Infra,"[""Platform / Infra""]",,[],6.3,0
+Atlan,Staff Software Engineer,https://jobs.ashbyhq.com/atlan/4d8d2681-88b7-4b0a-8104-e5970e1506c2?embed=js,United States,2025-08-25,89,Engineering,Unknown,,Data Intelligence,Other,[],,[],6.3,0
 Atlan,Staff Software Engineer Platform Engineering United States; Canada,https://jobs.ashbyhq.com/atlan/4d8d2681-88b7-4b0a-8104-e5970e1506c2,Full time,2025-08-25,89,Engineering,Unknown,,Data Intelligence,Platform / Infra,"[""Platform / Infra""]",,[],0.3,0
 Atlan,Technical  Engineer Customer Experience India Full time,https://jobs.ashbyhq.com/atlan/3a118ddc-cb3c-462a-a2d2-d9df83cb3434,Remote,2025-10-15,38,Engineering,Unknown,,Data Intelligence,Other,[],,[],0.3,0
 Atlan,Technical  Engineer Customer Experience United States; Canada,https://jobs.ashbyhq.com/atlan/13394a9a-35f6-40b0-b770-e29b1f84c143,Full time,2025-11-06,16,Engineering,Unknown,,Data Intelligence,Other,[],,[],0.3,0
-Atlan,Technical Engineer,https://jobs.ashbyhq.com/atlan/13394a9a-35f6-40b0-b770-e29b1f84c143?embed=js,United States,2025-11-06,16,Engineering,Unknown,,Data Intelligence,Other,[],,[],6.3,0
-Atlan,Technical Engineer,https://jobs.ashbyhq.com/atlan/3a118ddc-cb3c-462a-a2d2-d9df83cb3434?embed=js,India,2025-10-15,38,Engineering,Unknown,,Data Intelligence,Other,[],,[],6.3,0
 Boomi,Boomi Developer,https://boomi.com/boomi-jobs/?gh_jid=5693232004,ServiceNow integration,,,Engineering,Unknown,,Etl/Connectors,ETL/Integration,"[""ETL/Integration""]",,[],30.3,0
 Boomi,Corporate Account Manager,https://boomi.com/boomi-jobs/?gh_jid=5698181004,Hybrid Vancouver,2024-12-06,351,Other,Manager,,Etl/Connectors,Other,[],,[],1.8,0
 Boomi,Customer Success Analyst,https://boomi.com/boomi-jobs/?gh_jid=5702377004,,2024-12-06,351,Other,Unknown,,Etl/Connectors,Other,[],,[],0.3,0
 Boomi,Customer Success Manager,https://boomi.com/boomi-jobs/?gh_jid=5687253004,,2024-12-06,351,Other,Manager,,Etl/Connectors,Other,[],,[],1.8,0
-Boomi,Developer Explore Boomi’s APIs SDKs,https://developer.boomi.com/,and technical integration guides,,,Engineering,Unknown,,Etl/Connectors,ETL/Integration,"[""ETL/Integration""]",,[],30.3,0
+Boomi,Developer,https://developer.boomi.com/,and technical integration guides,,,Engineering,Unknown,,Etl/Connectors,ETL/Integration,"[""ETL/Integration""]",,[],30.3,0
 Boomi,DevOps Engineer,https://boomi.com/boomi-jobs/?gh_jid=5636662004,,2024-12-06,351,Engineering,Unknown,,Etl/Connectors,Other,[],,[],0.3,0
 Boomi,Enterprise Account Manager,https://boomi.com/boomi-jobs/?gh_jid=5710593004,,2024-12-06,351,Other,Manager,,Etl/Connectors,Other,[],,[],1.8,0
 Boomi,Field Marketing Manager META Region- Dubai,https://boomi.com/boomi-jobs/?gh_jid=5687697004,Hybrid,2024-12-06,351,Marketing,Manager,,Etl/Connectors,ML/AI infra,"[""ML/AI infra""]",,[],1.8,2
@@ -90,14 +88,14 @@ Boomi,Presales Solutions Engineer,https://boomi.com/boomi-jobs/?gh_jid=543075200
 Boomi,Principal DevOps Engineer,https://boomi.com/boomi-jobs/?gh_jid=5687678004,,2024-12-06,351,Engineering,Principal/Staff,,Etl/Connectors,Other,[],,[],2.7,1.0
 Boomi,Scaled Customer Success Manager,https://boomi.com/boomi-jobs/?gh_jid=5675923004,"Hybrid, Vancouver",2024-12-06,351,Other,Manager,,Etl/Connectors,Other,[],,[],1.8,0
 Boomi,Scaled Customer Success Manager German Speaking- Barcelona,https://boomi.com/boomi-jobs/?gh_jid=5703746004,Hybrid,2024-12-06,351,Other,Manager,,Etl/Connectors,Other,[],,[],1.8,0
-Boomi,"Senior Manager, Revenue Operations – Enterprise Sales Strategy",https://boomi.com/boomi-jobs/?gh_jid=5632357004,Hybrid Vancouver,2024-12-06,351,Sales,Senior,,Etl/Connectors,Other,[],,[],2.1,1.0
+Boomi,Senior Manager Revenue Operations,https://boomi.com/boomi-jobs/?gh_jid=5632357004,Hybrid Vancouver,2024-12-06,351,Other,Senior,,Etl/Connectors,Other,[],,[],2.1,1.0
 Boomi,Senior Performance Engineer,https://boomi.com/boomi-jobs/?gh_jid=5634062004,,2024-12-06,351,Engineering,Senior,,Etl/Connectors,Other,[],,[],2.1,1.0
 Boomi,Site Reliability Engineer,https://boomi.com/boomi-jobs/?gh_jid=5670129004,,2024-12-06,351,Engineering,Unknown,,Etl/Connectors,Other,[],,[],0.3,0
 Boomi,Software Engineer 2,https://boomi.com/boomi-jobs/?gh_jid=5701160004,,2024-12-06,351,Engineering,Unknown,,Etl/Connectors,Other,[],,[],0.3,0
 Boomi,Software Engineer 2 -Fullstack,https://boomi.com/boomi-jobs/?gh_jid=5505535004,,2024-12-06,351,Engineering,Unknown,,Etl/Connectors,Other,[],,[],0.3,0
 Boomi,Software Principal Engineer,https://boomi.com/boomi-jobs/?gh_jid=5617156004,Integration,,,Engineering,Principal/Staff,,Etl/Connectors,ETL/Integration,"[""ETL/Integration""]",,[],32.7,1.0
 Boomi,Software Quality Engineer 2,https://boomi.com/boomi-jobs/?gh_jid=5445768004,,2024-12-06,351,Engineering,Unknown,,Etl/Connectors,Other,[],,[],0.3,0
-Boomi,"Sr. Manager, Sales Operations",https://boomi.com/boomi-jobs/?gh_jid=5646990004,Hybrid Vancouver,2024-12-06,351,Sales,Senior,,Etl/Connectors,Other,[],,[],2.1,1.0
+Boomi,Sr. Manager,https://boomi.com/boomi-jobs/?gh_jid=5646990004,Hybrid Vancouver,2024-12-06,351,Other,Senior,,Etl/Connectors,Other,[],,[],2.1,1.0
 Cloudera,Engineering Manager,https://cloudera.wd5.myworkdayjobs.com/en-US/External_Career/job/Hungary--Budapest/Engineering-Manager--Enterprise-AI-Platform_251395-1,Enterprise AI Platform,2025-11-21,1,Engineering,Manager,,Other,ML/AI infra,"[""ML/AI infra"", ""Platform / Infra""]",,[],1.8,0
 Cloudera,"Field Marketing Manager, Greater China & Hong Kong",https://cloudera.wd5.myworkdayjobs.com/en-US/External_Career/job/China--Shanghai/Field-Marketing-Manager--Greater-China---Hong-Kong_251384-1,"China-Shanghai, China",2025-11-19,3,Marketing,Manager,,Other,ML/AI infra,"[""ML/AI infra""]",,[],1.8,0
 Cloudera,Iceberg Core Engineer,https://cloudera.wd5.myworkdayjobs.com/en-US/External_Career/job/Canada--Ontario--Toronto/Iceberg-Core-Engineer---Tech-Lead_251437,Tech Lead,2025-11-21,1,Engineering,Unknown,,Other,Other,[],,[],0.3,0
@@ -181,224 +179,198 @@ Couchbase,Sr Software Engineer Bangalore,https://boards.greenhouse.io/couchbasei
 Couchbase,Technical  Engineer Bangalore,https://boards.greenhouse.io/couchbaseinc/jobs/4583397006?gh_jid=4583397006,India,,,Engineering,Unknown,,Other,Other,[],,[],6.3,0
 Datadog,Enterprise Sales Engineer - Ohio Valley Technical Solutions Locations,https://careers.datadoghq.com/detail/7409026/?gh_jid=7409026,,,,Engineering,Unknown,,Monitoring/Platforms,Other,[],,[],0.3,0
 Datadog,Manager I,https://careers.datadoghq.com/detail/7414003/?gh_jid=7414003,Developer Advocacy Engineering Locations,,,Other,Manager,,Monitoring/Platforms,Other,[],,[],1.8,0
-Datadog,Marketing Analytics Engineer Marketing New York New York,https://careers.datadoghq.com/detail/7369285/?gh_jid=7369285,USA,,,Engineering,Unknown,,Monitoring/Platforms,Other,[],,[],0.3,0
-Datadog,Senior AI Engineer APM Experiences Engineering New York New York,https://careers.datadoghq.com/detail/7415266/?gh_jid=7415266,USA,,,Engineering,Senior,AI,Monitoring/Platforms,ML/AI infra,"[""ML/AI infra""]",AI,"[""AI""]",10.1,3.0
-Datadog,Senior Sales Engineer Majors Northeast Technical Solutions New Jersey USA,https://careers.datadoghq.com/detail/7393792/?gh_jid=7393792,Remote,,,Engineering,Senior,,Monitoring/Platforms,Other,[],,[],2.1,1.0
-Datadog,Senior Software Engineer Language Tools Engineering New York New York,https://careers.datadoghq.com/detail/7415262/?gh_jid=7415262,USA,,,Engineering,Senior,,Monitoring/Platforms,Other,[],,[],2.1,1.0
+Datadog,Marketing Analytics Engineer Marketing,https://careers.datadoghq.com/detail/7369285/?gh_jid=7369285,USA,,,Engineering,Unknown,,Monitoring/Platforms,Other,[],,[],0.3,0
+Datadog,Senior AI Engineer APM Experiences Engineering,https://careers.datadoghq.com/detail/7415266/?gh_jid=7415266,USA,,,Engineering,Senior,AI,Monitoring/Platforms,ML/AI infra,"[""ML/AI infra""]",AI,"[""AI""]",10.1,3.0
+Datadog,Senior Sales Engineer Majors Northeast Technical Solutions New Jersey,https://careers.datadoghq.com/detail/7393792/?gh_jid=7393792,Remote,,,Engineering,Senior,,Monitoring/Platforms,Other,[],,[],2.1,1.0
+Datadog,Senior Software Engineer Language Tools Engineering,https://careers.datadoghq.com/detail/7415262/?gh_jid=7415262,USA,,,Engineering,Senior,,Monitoring/Platforms,Other,[],,[],2.1,1.0
 DataGalaxy,Account Manager SaaS,https://www.welcometothejungle.com/en/companies/datagalaxy/jobs/account-manager-saas_paris,"Paris, Paris, FR, 75002",2025-11-18,4,Other,Manager,,Data Intelligence,Other,[],,[],1.8,0
-DataGalaxy,Digital Marketing Manager (Agency Lead),https://www.welcometothejungle.com/en/companies/datagalaxy/jobs/digital-marketing-manager-agency-lead-us-based_lyon,"Lyon, Rhône, FR, 69003",2025-11-06,16,Marketing,Manager,,Data Intelligence,Other,[],,[],1.8,0
+DataGalaxy,Digital Marketing Manager,https://www.welcometothejungle.com/en/companies/datagalaxy/jobs/digital-marketing-manager-agency-lead-us-based_lyon,"Lyon, Rhône, FR, 69003",2025-11-06,16,Marketing,Manager,,Data Intelligence,Other,[],,[],1.8,0
 Decube,Engineer,https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41/details/691e96928be4250008de6304,Malaysia,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
 Decube,Frontend Engineer,https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41/details/68f6f902f3690e0007f31d2b,Malaysia,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
 Decube,Senior Frontend Engineer,https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41/details/6912674beb784e0008d044ce,Malaysia,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
 Decube,Software Engineer,https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41/details/68f6e635d5d0e1000816bbfc,Malaysia,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-Fivetran,Customer Engineer II,https://www.fivetran.com/careers/job?gh_jid=6656747003,India,,,Engineering,Mid,,Etl/Connectors,Other,[],,[],7.2,0
 Fivetran,Customer Success Manager,https://www.fivetran.com/careers/job?gh_jid=7527963003,Ireland,,,Other,Manager,,Etl/Connectors,Other,[],,[],1.8,0
 Fivetran,DevOps Manager,https://www.fivetran.com/careers/job?gh_jid=7495991003,Serbia,,,Engineering,Manager,,Etl/Connectors,Other,[],,[],1.8,0
-Fivetran,"Director, Assistant General Counsel - Commercial",https://www.fivetran.com/careers/job?gh_jid=7494382003,United States,,,Other,Director+,,Etl/Connectors,Other,[],,[],9.0,1.0
+Fivetran,Director Assistant General Counsel,https://www.fivetran.com/careers/job?gh_jid=7494382003,United States,,,Other,Director+,,Etl/Connectors,Other,[],,[],9.0,1.0
 Fivetran,"Director, Global HR Operations & Compliance",https://www.fivetran.com/careers/job?gh_jid=7500002003,United States,,,People/HR,Director+,,Etl/Connectors,Other,[],,[],9.0,1.0
 Fivetran,"Director, Global HR Operations & Compliance",https://www.fivetran.com/careers/job?gh_jid=7499142003,United States,,,People/HR,Director+,,Etl/Connectors,Other,[],,[],9.0,1.0
-Fivetran,Engineering Manager - Backend,https://www.fivetran.com/careers/job?gh_jid=7339760003,India,,,Engineering,Manager,,Etl/Connectors,Other,[],,[],7.8,0
-Fivetran,Full Stack Engineer II - Dashboard,https://www.fivetran.com/careers/job?gh_jid=7527357003,Serbia,,,Engineering,Mid,,Etl/Connectors,Other,[],,[],1.2,0
+Fivetran,Engineering Manager,https://www.fivetran.com/careers/job?gh_jid=7339760003,India,,,Engineering,Manager,,Etl/Connectors,Other,[],,[],7.8,0
+Fivetran,Full Stack Engineer II,https://www.fivetran.com/careers/job?gh_jid=7527357003,Serbia,,,Engineering,Mid,,Etl/Connectors,Other,[],,[],1.2,0
 Fivetran,GTM Finance & Strategy Senior Manager,https://www.fivetran.com/careers/job?gh_jid=6663552003,United States,,,Other,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
 Fivetran,GTM Finance & Strategy Senior Manager,https://www.fivetran.com/careers/job?gh_jid=6652082003,United States,,,Other,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,Lead Customer Engineer,https://www.fivetran.com/careers/job?gh_jid=7340385003,Ireland,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],2.1,1.0
-Fivetran,Manager - Global Customer Engineering,https://www.fivetran.com/careers/job?gh_jid=7511761003,India,,,Engineering,Manager,,Etl/Connectors,Other,[],,[],7.8,0
-Fivetran,"Manager, Enterprise Sales Engineering",https://www.fivetran.com/careers/job?gh_jid=7505615003,United States,,,Engineering,Manager,,Etl/Connectors,Other,[],,[],7.8,0
-Fivetran,"Manager, Enterprise Sales Engineering",https://www.fivetran.com/careers/job?gh_jid=7505798003,AMER,,,Engineering,Manager,,Etl/Connectors,Other,[],,[],1.8,0
-Fivetran,"Manager, Enterprise Sales Engineering",https://www.fivetran.com/careers/job?gh_jid=7494011003,United States,,,Engineering,Manager,,Etl/Connectors,Other,[],,[],7.8,0
-Fivetran,"Manager, Enterprise Sales Engineering",https://www.fivetran.com/careers/job?gh_jid=7505722003,United States,,,Engineering,Manager,,Etl/Connectors,Other,[],,[],7.8,0
-Fivetran,"Manager, Site Reliability Engineering",https://www.fivetran.com/careers/job?gh_jid=7481813003,Serbia,,,Engineering,Manager,,Etl/Connectors,Other,[],,[],1.8,0
+Fivetran,Manager,https://www.fivetran.com/careers/job?gh_jid=7481813003,Serbia,,,Other,Manager,,Etl/Connectors,Other,[],,[],1.8,0
+Fivetran,Manager,https://www.fivetran.com/careers/job?gh_jid=7505615003,United States,,,Other,Manager,,Etl/Connectors,Other,[],,[],7.8,0
+Fivetran,Manager,https://www.fivetran.com/careers/job?gh_jid=7505798003,AMER,,,Other,Manager,,Etl/Connectors,Other,[],,[],1.8,0
+Fivetran,Manager,https://www.fivetran.com/careers/job?gh_jid=7494011003,United States,,,Other,Manager,,Etl/Connectors,Other,[],,[],7.8,0
+Fivetran,Manager,https://www.fivetran.com/careers/job?gh_jid=7505722003,United States,,,Other,Manager,,Etl/Connectors,Other,[],,[],7.8,0
+Fivetran,Manager Global Customer,https://www.fivetran.com/careers/job?gh_jid=7511761003,India,,,Other,Manager,,Etl/Connectors,Other,[],,[],7.8,0
 Fivetran,Principal Software Engineer,https://www.fivetran.com/careers/job?gh_jid=6266323003,India,,,Engineering,Principal/Staff,,Etl/Connectors,Other,[],,[],8.7,1.0
-Fivetran,Principal Software Engineer - AI Tooling & Adoption,https://www.fivetran.com/careers/job?gh_jid=6664139003,United States,,,Engineering,Principal/Staff,AI,Etl/Connectors,ML/AI infra,"[""ML/AI infra""]",AI,"[""AI""]",16.7,3.0
-Fivetran,Principal Software Engineer - Data Lakes,https://www.fivetran.com/careers/job?gh_jid=6692465003,Germany,,,Engineering,Principal/Staff,,Etl/Connectors,Other,[],,[],8.7,1.0
+Fivetran,Principal Software Engineer,https://www.fivetran.com/careers/job?gh_jid=6664139003,United States,,,Engineering,Principal/Staff,,Etl/Connectors,Other,[],,[],8.7,1.0
+Fivetran,Principal Software Engineer,https://www.fivetran.com/careers/job?gh_jid=6692465003,Germany,,,Engineering,Principal/Staff,,Etl/Connectors,Other,[],,[],8.7,1.0
 Fivetran,Product Growth Partner,https://www.fivetran.com/careers/job?gh_jid=7522520003,United States,,,Product,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
 Fivetran,Product Growth Partner,https://www.fivetran.com/careers/job?gh_jid=7526802003,United States,,,Product,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
-Fivetran,Product Manager III - Technical - SaaS Connectors,https://www.fivetran.com/careers/job?gh_jid=6557029003,India,,,Product,Director+,,Etl/Connectors,ETL/Integration,"[""ETL/Integration""]",,[],39.0,1.0
+Fivetran,Product Manager III Technical,https://www.fivetran.com/careers/job?gh_jid=6557029003,India,,,Product,Manager,,Etl/Connectors,Other,[],,[],7.8,0
 Fivetran,Product Operations Manager,https://www.fivetran.com/careers/job?gh_jid=7512627003,United States,,,Product,Manager,,Etl/Connectors,Other,[],,[],7.8,0
 Fivetran,Product Operations Manager,https://www.fivetran.com/careers/job?gh_jid=7507189003,United States,,,Product,Manager,,Etl/Connectors,Other,[],,[],7.8,0
 Fivetran,Renewals Manager,https://www.fivetran.com/careers/job?gh_jid=7512722003,United States,,,Other,Manager,,Etl/Connectors,Other,[],,[],7.8,0
-Fivetran,Sales Engineer - Commercial,https://www.fivetran.com/careers/job?gh_jid=7512414003,Singapore,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
-Fivetran,Sales Engineer - Enterprise,https://www.fivetran.com/careers/job?gh_jid=6657870003,India,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
-Fivetran,Sales Engineer - Enterprise,https://www.fivetran.com/careers/job?gh_jid=7511759003,New Zealand,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],0.3,0
-Fivetran,Sales Engineer - French Speaking,https://www.fivetran.com/careers/job?gh_jid=7512897003,France,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],0.3,0
-Fivetran,Sales Engineer - French Speaking,https://www.fivetran.com/careers/job?gh_jid=7512294003,Ireland,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],0.3,0
-Fivetran,Sales Engineer - French Speaking,https://www.fivetran.com/careers/job?gh_jid=7512900003,United Kingdom,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],0.3,0
-Fivetran,Sales Manager - Commercial,https://www.fivetran.com/careers/job?gh_jid=7489921003,United States,,,Sales,Manager,,Etl/Connectors,Other,[],,[],7.8,0
+Fivetran,Sales Engineer,https://www.fivetran.com/careers/job?gh_jid=7512414003,Singapore,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
+Fivetran,Sales Engineer,https://www.fivetran.com/careers/job?gh_jid=6657870003,India,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
+Fivetran,Sales Engineer,https://www.fivetran.com/careers/job?gh_jid=7511759003,New Zealand,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],0.3,0
+Fivetran,Sales Engineer,https://www.fivetran.com/careers/job?gh_jid=7512897003,France,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],0.3,0
+Fivetran,Sales Engineer,https://www.fivetran.com/careers/job?gh_jid=7512294003,Ireland,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],0.3,0
+Fivetran,Sales Engineer,https://www.fivetran.com/careers/job?gh_jid=7512900003,United Kingdom,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],0.3,0
+Fivetran,Sales Manager,https://www.fivetran.com/careers/job?gh_jid=7489921003,United States,,,Sales,Manager,,Etl/Connectors,Other,[],,[],7.8,0
 Fivetran,Senior Data Analyst,https://www.fivetran.com/careers/job?gh_jid=6690047003,United States,,,Data/Analytics,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,Senior Financial Analyst - GTM III,https://www.fivetran.com/careers/job?gh_jid=6936060003,United States,,,Other,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,Senior Financial Analyst - GTM III,https://www.fivetran.com/careers/job?gh_jid=6689996003,United States,,,Other,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Financial Analyst,https://www.fivetran.com/careers/job?gh_jid=6936060003,United States,,,Other,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Financial Analyst,https://www.fivetran.com/careers/job?gh_jid=6689996003,United States,,,Other,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
 Fivetran,Senior Marketing Data Analyst,https://www.fivetran.com/careers/job?gh_jid=7492882003,United States,,,Data/Analytics,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Product Manager,https://www.fivetran.com/careers/job?gh_jid=7524547003,United States,,,Product,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Product Manager,https://www.fivetran.com/careers/job?gh_jid=7524543003,United States,,,Product,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Product Manager,https://www.fivetran.com/careers/job?gh_jid=7512393003,United States,,,Product,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Product Manager,https://www.fivetran.com/careers/job?gh_jid=7511763003,United States,,,Product,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Product Manager,https://www.fivetran.com/careers/job?gh_jid=6648548003,United States,,,Product,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Product Manager,https://www.fivetran.com/careers/job?gh_jid=6645141003,United States,,,Product,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Product Manager,https://www.fivetran.com/careers/job?gh_jid=6666499003,United States,,,Product,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Product Manager,https://www.fivetran.com/careers/job?gh_jid=6648720003,United States,,,Product,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Product Manager,https://www.fivetran.com/careers/job?gh_jid=6626331003,United States,,,Product,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Product Manager,https://www.fivetran.com/careers/job?gh_jid=6609923003,United States,,,Product,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Product Manager,https://www.fivetran.com/careers/job?gh_jid=6614070003,Canada,,,Product,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
 Fivetran,"Senior Product Manager, AI Developer Tools & SDK",https://www.fivetran.com/careers/job?gh_jid=6672076003,United States,,,Engineering,Senior,AI,Etl/Connectors,ML/AI infra,"[""ML/AI infra""]",AI,"[""AI""]",16.1,3.0
 Fivetran,"Senior Product Manager, AI Developer Tools & SDK",https://www.fivetran.com/careers/job?gh_jid=6672069003,United States,,,Engineering,Senior,AI,Etl/Connectors,ML/AI infra,"[""ML/AI infra""]",AI,"[""AI""]",16.1,3.0
 Fivetran,"Senior Product Manager, AI Developer Tools & SDK",https://www.fivetran.com/careers/job?gh_jid=6672078003,Canada,,,Engineering,Senior,AI,Etl/Connectors,ML/AI infra,"[""ML/AI infra""]",AI,"[""AI""]",16.1,3.0
-Fivetran,"Senior Product Manager, Data & Integrations",https://www.fivetran.com/careers/job?gh_jid=7524547003,United States,,,Data/Analytics,Senior,,Etl/Connectors,ETL/Integration,"[""ETL/Integration""]",,[],38.1,1.0
-Fivetran,"Senior Product Manager, Data & Integrations",https://www.fivetran.com/careers/job?gh_jid=7524543003,United States,,,Data/Analytics,Senior,,Etl/Connectors,ETL/Integration,"[""ETL/Integration""]",,[],38.1,1.0
-Fivetran,"Senior Product Manager, Growth",https://www.fivetran.com/careers/job?gh_jid=7512393003,United States,,,Product,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,"Senior Product Manager, Growth",https://www.fivetran.com/careers/job?gh_jid=7511763003,United States,,,Product,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,"Senior Product Manager, Observability & Monitoring",https://www.fivetran.com/careers/job?gh_jid=6648548003,United States,,,Product,Senior,OBSERVABILITY,Etl/Connectors,Data Observability,"[""Data Observability""]",OBSERVABILITY,"[""OBSERVABILITY""]",38.1,2.5
-Fivetran,"Senior Product Manager, Observability & Monitoring",https://www.fivetran.com/careers/job?gh_jid=6645141003,United States,,,Product,Senior,OBSERVABILITY,Etl/Connectors,Data Observability,"[""Data Observability""]",OBSERVABILITY,"[""OBSERVABILITY""]",38.1,2.5
-Fivetran,"Senior Product Manager, Reverse ETL",https://www.fivetran.com/careers/job?gh_jid=6666499003,United States,,,Product,Senior,ETL,Etl/Connectors,ETL/Integration,"[""ETL/Integration""]",ETL,"[""ETL""]",58.1,1.0
-Fivetran,"Senior Product Manager, Reverse ETL",https://www.fivetran.com/careers/job?gh_jid=6648720003,United States,,,Product,Senior,ETL,Etl/Connectors,ETL/Integration,"[""ETL/Integration""]",ETL,"[""ETL""]",58.1,1.0
-Fivetran,"Senior Product Manager, SDK & AI",https://www.fivetran.com/careers/job?gh_jid=6626331003,United States,,,Product,Senior,AI,Etl/Connectors,ML/AI infra,"[""ML/AI infra""]",AI,"[""AI""]",16.1,3.0
-Fivetran,"Senior Product Manager, SDK & AI",https://www.fivetran.com/careers/job?gh_jid=6609923003,United States,,,Product,Senior,AI,Etl/Connectors,ML/AI infra,"[""ML/AI infra""]",AI,"[""AI""]",16.1,3.0
-Fivetran,"Senior Product Manager, SDK & AI",https://www.fivetran.com/careers/job?gh_jid=6614070003,Canada,,,Product,Senior,AI,Etl/Connectors,ML/AI infra,"[""ML/AI infra""]",AI,"[""AI""]",16.1,3.0
 Fivetran,Senior Program Manager,https://www.fivetran.com/careers/job?gh_jid=7484292003,India,,,Other,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
 Fivetran,Senior Program Manager,https://www.fivetran.com/careers/job?gh_jid=7494054003,Canada,,,Other,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,"Senior Sales Engineer, Commercial",https://www.fivetran.com/careers/job?gh_jid=7493999003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,"Senior Sales Engineer, Commercial",https://www.fivetran.com/careers/job?gh_jid=7513591003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,"Senior Sales Engineer, Enterprise",https://www.fivetran.com/careers/job?gh_jid=7493989003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,"Senior Sales Engineer, Enterprise",https://www.fivetran.com/careers/job?gh_jid=7494019003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,Senior Sales Manager - Commercial,https://www.fivetran.com/careers/job?gh_jid=7535170003,United States,,,Sales,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Sales Engineer,https://www.fivetran.com/careers/job?gh_jid=7493999003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Sales Engineer,https://www.fivetran.com/careers/job?gh_jid=7513591003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Sales Engineer,https://www.fivetran.com/careers/job?gh_jid=7493989003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Sales Engineer,https://www.fivetran.com/careers/job?gh_jid=7494019003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Sales Manager,https://www.fivetran.com/careers/job?gh_jid=7535170003,United States,,,Sales,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
 Fivetran,Senior Site Reliability Engineer,https://www.fivetran.com/careers/job?gh_jid=6614646003,Ireland,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],2.1,1.0
 Fivetran,Senior Software Development Engineer in Test,https://www.fivetran.com/careers/job?gh_jid=6645552003,India,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
 Fivetran,Senior Software Development Engineer in Test,https://www.fivetran.com/careers/job?gh_jid=7486033003,Serbia,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],2.1,1.0
-Fivetran,Senior Software Development Engineer in Test - Database Automation,https://www.fivetran.com/careers/job?gh_jid=7410837003,India,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Software Development Engineer in Test,https://www.fivetran.com/careers/job?gh_jid=7410837003,India,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
 Fivetran,Senior Software Engineer,https://www.fivetran.com/careers/job?gh_jid=6570492003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
 Fivetran,Senior Software Engineer,https://www.fivetran.com/careers/job?gh_jid=6483952003,India,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,Senior Software Engineer - Automations,https://www.fivetran.com/careers/job?gh_jid=6561660003,Serbia,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],2.1,1.0
-Fivetran,Senior Software Engineer - Connectors,https://www.fivetran.com/careers/job?gh_jid=6606298003,India,,,Engineering,Director+,,Etl/Connectors,ETL/Integration,"[""ETL/Integration""]",,[],39.0,1.0
-Fivetran,Senior Software Engineer - Core Databases,https://www.fivetran.com/careers/job?gh_jid=7518076003,Ireland,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],2.1,1.0
-Fivetran,Senior Software Engineer - Databases,https://www.fivetran.com/careers/job?gh_jid=7159432003,Canada,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,Senior Software Engineer - Oracle Database,https://www.fivetran.com/careers/job?gh_jid=7503642003,India,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,Senior Software Engineer - Product Business Systems,https://www.fivetran.com/careers/job?gh_jid=7482538003,Serbia,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],2.1,1.0
+Fivetran,Senior Software Engineer,https://www.fivetran.com/careers/job?gh_jid=6606298003,India,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Software Engineer,https://www.fivetran.com/careers/job?gh_jid=7518076003,Ireland,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],2.1,1.0
+Fivetran,Senior Software Engineer,https://www.fivetran.com/careers/job?gh_jid=6655969003,Canada,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Software Engineer,https://www.fivetran.com/careers/job?gh_jid=7503642003,India,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Software Engineer,https://www.fivetran.com/careers/job?gh_jid=7482538003,Serbia,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],2.1,1.0
+Fivetran,Senior Software Engineer,https://www.fivetran.com/careers/job?gh_jid=6561660003,Serbia,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],2.1,1.0
 Fivetran,Senior Staff GTM Engineer,https://www.fivetran.com/careers/job?gh_jid=6660393003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
 Fivetran,Senior Staff GTM Engineer,https://www.fivetran.com/careers/job?gh_jid=6650807003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
 Fivetran,Senior Staff SDET Engineer,https://www.fivetran.com/careers/job?gh_jid=7451701003,India,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
 Fivetran,Senior Staff Site Reliability Engineer,https://www.fivetran.com/careers/job?gh_jid=7486167003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,Senior Staff Software Engineer - Binary Log Data Replication,https://www.fivetran.com/careers/job?gh_jid=7483663003,United States,,,Engineering,Senior,,Etl/Connectors,ETL/Integration,"[""ETL/Integration""]",,[],38.1,1.0
-Fivetran,Senior Staff Software Engineer - Binary Log Data Replication,https://www.fivetran.com/careers/job?gh_jid=7393532003,United States,,,Engineering,Senior,,Etl/Connectors,ETL/Integration,"[""ETL/Integration""]",,[],38.1,1.0
-Fivetran,Senior Staff Software Engineer - Data Lakes,https://www.fivetran.com/careers/job?gh_jid=6692463003,Germany,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,"Senior Staff Systems Engineer, GTM",https://www.fivetran.com/careers/job?gh_jid=7353012003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,"Senior Staff Systems Engineer, GTM",https://www.fivetran.com/careers/job?gh_jid=7155856003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
-Fivetran,Software Engineer II - Data Validation,https://www.fivetran.com/careers/job?gh_jid=7492878003,United States,,,Engineering,Mid,,Etl/Connectors,Other,[],,[],7.2,0
-Fivetran,Software Engineer II - DB2 Connectors,https://www.fivetran.com/careers/job?gh_jid=7502958003,Serbia,,,Engineering,Director+,,Etl/Connectors,ETL/Integration,"[""ETL/Integration""]",,[],33.0,1.0
-Fivetran,"Staff Program Manager, Engineering Strategic Initiatives",https://www.fivetran.com/careers/job?gh_jid=7505848003,United States,,,Engineering,Manager,,Etl/Connectors,Other,[],,[],7.8,0
-Fivetran,"Staff Program Manager, Engineering Strategic Initiatives",https://www.fivetran.com/careers/job?gh_jid=7503096003,United States,,,Engineering,Manager,,Etl/Connectors,Other,[],,[],7.8,0
+Fivetran,Senior Staff Software Engineer,https://www.fivetran.com/careers/job?gh_jid=7483663003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Staff Software Engineer,https://www.fivetran.com/careers/job?gh_jid=7393532003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Staff Software Engineer,https://www.fivetran.com/careers/job?gh_jid=6692463003,Germany,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Staff Systems Engineer,https://www.fivetran.com/careers/job?gh_jid=7353012003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Senior Staff Systems Engineer,https://www.fivetran.com/careers/job?gh_jid=7155856003,United States,,,Engineering,Senior,,Etl/Connectors,Other,[],,[],8.1,1.0
+Fivetran,Software Engineer II,https://www.fivetran.com/careers/job?gh_jid=7492878003,United States,,,Engineering,Mid,,Etl/Connectors,Other,[],,[],7.2,0
+Fivetran,Software Engineer II,https://www.fivetran.com/careers/job?gh_jid=7502958003,Serbia,,,Engineering,Mid,,Etl/Connectors,Other,[],,[],1.2,0
+Fivetran,Staff Program Manager,https://www.fivetran.com/careers/job?gh_jid=7505848003,United States,,,Other,Manager,,Etl/Connectors,Other,[],,[],7.8,0
+Fivetran,Staff Program Manager,https://www.fivetran.com/careers/job?gh_jid=7503096003,United States,,,Other,Manager,,Etl/Connectors,Other,[],,[],7.8,0
 Fivetran,Staff Site Reliability Engineer,https://www.fivetran.com/careers/job?gh_jid=6565180003,United States,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
+Fivetran,Staff Site Reliability Engineer,https://www.fivetran.com/careers/job?gh_jid=6302903003,United States,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
 Fivetran,Staff Site Reliability Engineer,https://www.fivetran.com/careers/job?gh_jid=6247446003,United States,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
-Fivetran,"Staff Site Reliability Engineer, Kubernetes",https://www.fivetran.com/careers/job?gh_jid=6302903003,United States,,,Engineering,Unknown,,Etl/Connectors,Platform / Infra,"[""Platform / Infra""]",,[],6.3,0
 Fivetran,Staff Software Development Engineer in Test,https://www.fivetran.com/careers/job?gh_jid=7504884003,India,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
 Fivetran,Staff Software Engineer,https://www.fivetran.com/careers/job?gh_jid=6598497003,United States,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
-Fivetran,Staff Software Engineer,https://www.fivetran.com/careers/job?gh_jid=6677618003,India,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
-Fivetran,Staff Software Engineer - Data Lakes,https://www.fivetran.com/careers/job?gh_jid=7209402003,Germany,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
-Fivetran,"Staff Systems Engineer, GTM",https://www.fivetran.com/careers/job?gh_jid=7160110003,United States,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
-Fivetran,"Staff Systems Engineer, GTM",https://www.fivetran.com/careers/job?gh_jid=7331440003,United States,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
-IBM,Application Architect Professional Armonk,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=73055&source=WEB_Search_NA,US,,,Other,Unknown,,Other,Other,[],,[],0.3,0
-IBM,Consulting Senior SOC Analyst Professional BUDAPEST,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=65941&source=WEB_Search_NA,HU,,,Other,Senior,,Other,Other,[],,[],2.1,1.0
-IBM,Data & Analytics Data Scientist-Artificial Intelligence Professional BANGALORE,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=65724&source=WEB_Search_NA,IN,,,Data/Analytics,Unknown,,Other,Other,[],,[],0.3,0
-IBM,Infrastructure & Technology Senior Staff Software Engineer Professional Hyderabad,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=63165&source=WEB_Search_NA,IN,,,Engineering,Senior,,Other,Platform / Infra,"[""Platform / Infra""]",,[],2.1,1.0
-IBM,Infrastructure & Technology Software Architect Professional Multiple Cities,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=33585&source=WEB_Search_NA,,,,Engineering,Unknown,,Other,Platform / Infra,"[""Platform / Infra""]",,[],0.3,0
-IBM,Project Management Project Manager (Storage) Professional Tokyo,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=30299&source=WEB_Search_NA,JP,,,Other,Manager,,Other,Other,[],,[],1.8,2
-IBM,Research Design Intern - Advanced Integrated Circuits Research Internship Multiple Cities,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=63363&source=WEB_Search_NA,,,,Other,Intern,,Other,ETL/Integration,"[""ETL/Integration""]",,[],30.2,0
-IBM,Software Engineering Application Developer-Adobe Experience Manager Professional BANGALORE,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=63303&source=WEB_Search_NA,IN,,,Engineering,Manager,,Other,Other,[],,[],1.8,0
-IBM,Software Engineering Application Developer-Azure Cloud FullStack Professional Kolkata,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=64781&source=WEB_Search_NA,IN,,,Engineering,Unknown,,Other,Platform / Infra,"[""Platform / Infra""]",,[],0.3,0
-IBM,Software Engineering Application Developer-Cloud FullStack Professional BANGALORE,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=67175&source=WEB_Search_NA,IN,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-IBM,Software Engineering Application Developer-Cloud FullStack Professional Pune,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=36993&source=WEB_Search_NA,IN,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-IBM,Software Engineering Java Developer (m/w/d) Professional Multiple Cities,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=62900&source=WEB_Search_NA,,,,Engineering,Unknown,JAVA,Other,Other,[],JAVA,"[""JAVA""]",0.3,0
-IBM,Software Engineering Quality Engineer-Automation Professional BANGALORE,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=72898&source=WEB_Search_NA,IN,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
+Fivetran,Staff Software Engineer,https://www.fivetran.com/careers/job?gh_jid=6668702003,India,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
+Fivetran,Staff Software Engineer,https://www.fivetran.com/careers/job?gh_jid=7209402003,Germany,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
+Fivetran,Staff Systems Engineer,https://www.fivetran.com/careers/job?gh_jid=7160110003,United States,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
+Fivetran,Staff Systems Engineer,https://www.fivetran.com/careers/job?gh_jid=7331440003,United States,,,Engineering,Unknown,,Etl/Connectors,Other,[],,[],6.3,0
+IBM,Consulting Senior SOC Analyst Professional BUDAPEST,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=65951&source=WEB_Search_NA,HU,,,Other,Senior,,Other,Other,[],,[],2.1,1.0
+IBM,Data & Analytics Data Engineer with Python Professional Multiple Cities,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=73613&source=WEB_Search_NA,,,,Engineering,Unknown,PYTHON,Other,Other,[],PYTHON,"[""PYTHON""]",0.3,0
+IBM,Data & Analytics Data Scientist - Artificial Intelligence Professional Multiple Cities,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=74900&source=WEB_Search_NA,,,,Data/Analytics,Unknown,,Other,Other,[],,[],0.3,0
+IBM,Sales AI Specialist Intern – Entry Level Sales Program 2026 Internship Multiple Cities,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=61993&source=WEB_Search_NA,,,,Sales,Entry,AI,Other,ML/AI infra,"[""ML/AI infra""]",AI,"[""AI""]",8.6,2
+IBM,Software Engineering Application Developer-AWS Cloud FullStack Professional BANGALORE,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=66739&source=WEB_Search_NA,IN,,,Engineering,Unknown,,Other,Platform / Infra,"[""Platform / Infra""]",,[],0.3,0
+IBM,Software Engineering Application Developer-Cloud FullStack Professional Pune,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=75149&source=WEB_Search_NA,IN,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
+IBM,Software Engineering Application Developer-Cloud FullStack Professional Pune,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=75146&source=WEB_Search_NA,IN,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
+IBM,Software Engineering Application Developer-Oracle eBS Professional Mumbai,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=66761&source=WEB_Search_NA,IN,,,Engineering,Unknown,,Other,ML/AI infra,"[""ML/AI infra""]",,[],0.3,2
+IBM,Software Engineering DevOps Cloud Engineer Professional Kosice,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=74024&source=WEB_Search_NA,SK,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
+IBM,Software Engineering Fullstack Developer + AWS Cloud (Guadalajara) Professional GUADALAJARA,https://ibmglobal.avature.net/en_US/careers/JobDetail?jobId=62101&source=WEB_Search_NA,MX,,,Engineering,Unknown,AWS,Other,Platform / Infra,"[""Platform / Infra""]",AWS,"[""AWS""]",20.3,0
 Informatica,Data Architect,https://www.informatica.com/departments/data-architect.html,,,,Data/Analytics,Unknown,,Data Intelligence,Other,[],,[],0.3,0
 Informatica,Principal Customer Success Architect,https://informatica.gr8people.com/jobs/38790/principal-customer-success-architect?j_idx=5,"Austin, Texas, United States",2025-11-18,4,Other,Principal/Staff,,Data Intelligence,Other,[],,[],8.7,1.0
 Informatica,Principal Software Engineer,https://informatica.gr8people.com/jobs/38717/principal-software-engineer?j_idx=2,"Bengaluru, Karnataka, India",2025-11-21,1,Engineering,Principal/Staff,,Data Intelligence,Other,[],,[],8.7,1.0
 Informatica,Principal Software Engineer Full Stack,https://informatica.gr8people.com/jobs/38704/principal-software-engineer-full-stack?j_idx=6,"Redwood City, California, United States",2025-11-18,4,Engineering,Principal/Staff,,Data Intelligence,Other,[],,[],8.7,1.0
 Informatica,Senior Regional Sales Director Nordics,https://informatica.gr8people.com/jobs/38786/senior-regional-sales-director-nordics?j_idx=4,"Stockholm, Stockholm County, Sweden",2025-11-19,3,Sales,Director+,,Data Intelligence,Other,[],,[],3.0,1.0
 Informatica,Senior Solutions Architect,https://informatica.gr8people.com/jobs/38743/senior-solutions-architect?j_idx=3,"Austin, Texas, United States",2025-11-20,2,Other,Senior,,Data Intelligence,Other,[],,[],8.1,1.0
-Informatica,Software Engineer- Technical (IDMC CAI CDI),https://informatica.gr8people.com/jobs/38782/software-engineer-technical-support-idmccaicdi?j_idx=8,"Bengaluru, Karnataka, India",2025-11-17,5,Engineering,Unknown,,Data Intelligence,ML/AI infra,"[""ML/AI infra""]",,[],6.3,2
-Informatica,Technical Architect,https://informatica.gr8people.com/jobs/38758/technical-support-architect?j_idx=0,"Austin, Texas, United States",2025-11-21,1,Other,Unknown,,Data Intelligence,Other,[],,[],6.3,0
-MongoDB,"Director, Engineering C2C Dublin",https://www.mongodb.com/careers/job/?gh_jid=7380930,,,,Engineering,Director+,,Other,Other,[],,[],3.0,1.0
-MongoDB,"Director, Escalation Management Bengaluru; Gurugram",https://www.mongodb.com/careers/job/?gh_jid=7301901,Escalation Management location Bengaluru; Gurugram suitcase Full-time chevron-right,,,Other,Director+,,Other,Other,[],,[],3.0,1.0
-MongoDB,"Director, IT New York City; San Francisco",https://www.mongodb.com/careers/job/?gh_jid=7103182,IT location New York City; San Francisco suitcase Full-time chevron-right,,,Other,Director+,,Other,Other,[],,[],3.0,1.0
-MongoDB,"Director, Storage Engines Sydney",https://www.mongodb.com/careers/job/?gh_jid=7355907,,,,Other,Director+,,Other,Other,[],,[],3.0,3.0
-MongoDB,EMEA PMO Manager Dublin,https://www.mongodb.com/careers/job/?gh_jid=6527524,,,,Other,Manager,,Other,Other,[],,[],1.8,0
-MongoDB,"Engineering Manager, Atlas Search San Francisco",https://www.mongodb.com/careers/job/?gh_jid=7201364,,,,Engineering,Manager,,Other,Other,[],,[],1.8,0
-MongoDB,"Engineering Manager, Query Toronto; Vancouver",https://www.mongodb.com/careers/job/?gh_jid=7229701,,,,Engineering,Manager,,Other,Other,[],,[],1.8,0
-MongoDB,"Engineering Manager, Query United States",https://www.mongodb.com/careers/job/?gh_jid=7229699,Query location United States suitcase Full-time chevron-right,,,Engineering,Manager,,Other,Other,[],,[],7.8,0
-MongoDB,"Engineering Manager, Stream Processing New York City; United States",https://www.mongodb.com/careers/job/?gh_jid=7336498,Stream Processing location New York City; United States suitcase Full-time chevron-right,,,Engineering,Manager,,Other,Streaming / Real-time,"[""Streaming / Real-time""]",,[],37.8,1.5
+Informatica,Software Engineer- Technical,https://informatica.gr8people.com/jobs/38782/software-engineer-technical-support-idmccaicdi?j_idx=8,"Bengaluru, Karnataka, India",2025-11-17,5,Engineering,Unknown,,Data Intelligence,Other,[],,[],6.3,0
+MongoDB,Director,https://www.mongodb.com/careers/job/?gh_jid=7380930,Engineering C2C Dublin,,,Other,Director+,,Other,Other,[],,[],3.0,1.0
+MongoDB,Director,https://www.mongodb.com/careers/job/?gh_jid=7103182,IT location New York City; San Francisco suitcase Full-time chevron-right,,,Other,Director+,,Other,Other,[],,[],3.0,1.0
+MongoDB,Director,https://www.mongodb.com/careers/job/?gh_jid=7355907,Storage Engines Sydney,,,Other,Director+,,Other,Other,[],,[],3.0,1.0
+MongoDB,Engineering Manager,https://www.mongodb.com/careers/job/?gh_jid=7201364,Atlas Search San Francisco,,,Engineering,Manager,,Other,Other,[],,[],1.8,0
+MongoDB,Engineering Manager,https://www.mongodb.com/careers/job/?gh_jid=7229699,Query location United States suitcase Full-time chevron-right,,,Engineering,Manager,,Other,Other,[],,[],7.8,0
+MongoDB,Engineering Manager,https://www.mongodb.com/careers/job/?gh_jid=7229701,Query Toronto; Vancouver,,,Engineering,Manager,,Other,Other,[],,[],1.8,0
+MongoDB,Engineering Manager,https://www.mongodb.com/careers/job/?gh_jid=7336498,Stream Processing location New York City; United States suitcase Full-time chevron-right,,,Engineering,Manager,,Other,Streaming / Real-time,"[""Streaming / Real-time""]",,[],37.8,0
+MongoDB,Escalation Engineer,https://www.mongodb.com/careers/job/?gh_jid=7209916,New York City; United States suitcase Full-time chevron-right,,,Engineering,Unknown,,Other,Other,[],,[],6.3,0
 MongoDB,Escalation Engineer Alberta; British Columbia; Manitoba; Nova Scotia; Ontario; Quebec; Toronto,https://www.mongodb.com/careers/job/?gh_jid=7209918,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-MongoDB,InfoSec Engineer II Dublin,https://www.mongodb.com/careers/job/?gh_jid=7248114,,,,Engineering,Mid,,Other,Other,[],,[],1.2,0
-MongoDB,"Lead Engineer, Atlas Clusters New York City",https://www.mongodb.com/careers/job/?gh_jid=7271659,Atlas Clusters location New York City suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Lead Engineer, Atlas Dedicated Dublin",https://www.mongodb.com/careers/job/?gh_jid=7259791,,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
+MongoDB,Lead Engineer,https://www.mongodb.com/careers/job/?gh_jid=7271659,Atlas Clusters location New York City suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
+MongoDB,Lead Engineer,https://www.mongodb.com/careers/job/?gh_jid=7195895,Inference Platform Palo Alto,,,Engineering,Senior,,Other,Platform / Infra,"[""Platform / Infra""]",,[],2.1,1.0
+MongoDB,Lead Engineer,https://www.mongodb.com/careers/job/?gh_jid=7316445,Online Archive Storage Systems location New York City; San Francisco; Seattle suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
+MongoDB,Lead Engineer,https://www.mongodb.com/careers/job/?gh_jid=7201997,Server Programmability location United States suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
 MongoDB,"Lead Engineer, Identity and Access Management Toronto",https://www.mongodb.com/careers/job/?gh_jid=7069039,,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Lead Engineer, Inference Platform Palo Alto",https://www.mongodb.com/careers/job/?gh_jid=7195895,,,,Engineering,Senior,,Other,Platform / Infra,"[""Platform / Infra""]",,[],2.1,1.0
-MongoDB,"Lead Engineer, Online Archive Storage Systems New York City; San Francisco; Seattle",https://www.mongodb.com/careers/job/?gh_jid=7316445,Online Archive Storage Systems location New York City; San Francisco; Seattle suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],2.1,3.0
-MongoDB,"Lead Engineer, Server Programmability Alberta; British Columbia; Manitoba; Nova Scotia; Ontario; Quebec",https://www.mongodb.com/careers/job/?gh_jid=7201999,,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Lead Engineer, Server Programmability United States",https://www.mongodb.com/careers/job/?gh_jid=7201997,Server Programmability location United States suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
-MongoDB,"Lead Platform Engineer, Application Modernization Gurugram",https://www.mongodb.com/careers/job/?gh_jid=7410596,,,,Engineering,Senior,,Other,Platform / Infra,"[""Platform / Infra""]",,[],2.1,1.0
-MongoDB,"Lead Software Engineer, Modernisation Platform Gurugram",https://www.mongodb.com/careers/job/?gh_jid=7310369,,,,Engineering,Senior,,Other,Platform / Infra,"[""Platform / Infra""]",,[],2.1,1.0
-MongoDB,Manager of Crisis Management and IT Disaster Recovery United States,https://www.mongodb.com/careers/job/?gh_jid=7365604,United States suitcase Full-time chevron-right,,,Other,Manager,,Other,Other,[],,[],7.8,0
-MongoDB,"Principal Research Scientist, Database Systems New York City; Palo Alto",https://www.mongodb.com/careers/job/?gh_jid=6819978,Database Systems location New York City; Palo Alto suitcase Full-time chevron-right,,,Data/Analytics,Principal/Staff,,Other,Other,[],,[],2.7,1.0
+MongoDB,Lead Platform Engineer,https://www.mongodb.com/careers/job/?gh_jid=7410596,Application Modernization Gurugram,,,Engineering,Senior,,Other,Platform / Infra,"[""Platform / Infra""]",,[],2.1,1.0
+MongoDB,Manager of Crisis Management and IT Disaster Recovery,https://www.mongodb.com/careers/job/?gh_jid=7365604,United States suitcase Full-time chevron-right,,,Other,Manager,,Other,Other,[],,[],7.8,0
+MongoDB,Principal Research Scientist,https://www.mongodb.com/careers/job/?gh_jid=6819978,Database Systems location New York City; Palo Alto suitcase Full-time chevron-right,,,Other,Principal/Staff,,Other,Other,[],,[],2.7,1.0
 MongoDB,Research Engineer Palo Alto,https://www.mongodb.com/careers/job/?gh_jid=7275322,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-MongoDB,"Senior Business Analyst, Technical Services New York City",https://www.mongodb.com/careers/job/?gh_jid=6841436,Technical Services location New York City suitcase Full-time chevron-right,,,Other,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Senior Engineer, Coupa & P2P Processes Bengaluru; Gurugram",https://www.mongodb.com/careers/job/?gh_jid=7257748,Coupa & P2P Processes location Bengaluru; Gurugram suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Senior Engineer, Storage Layer Services Canada",https://www.mongodb.com/careers/job/?gh_jid=6484467,,,,Engineering,Senior,,Other,Other,[],,[],2.1,3.0
-MongoDB,"Senior Engineer, Storage Layer Services United States",https://www.mongodb.com/careers/job/?gh_jid=6477783,Storage Layer Services location United States suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,3.0
-MongoDB,"Senior InfoSec Engineer, Red Team New York City; San Francisco; Seattle; United States",https://www.mongodb.com/careers/job/?gh_jid=7280331,Red Team location New York City; San Francisco; Seattle; United States suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
-MongoDB,"Senior Java Software Engineer, Client Libraries Toronto; Vancouver",https://www.mongodb.com/careers/job/?gh_jid=7194687,,,,Engineering,Senior,JAVA,Other,Other,[],JAVA,"[""JAVA""]",2.1,1.0
+MongoDB,Senior Business Analyst,https://www.mongodb.com/careers/job/?gh_jid=6841436,Technical Services location New York City suitcase Full-time chevron-right,,,Other,Senior,,Other,Other,[],,[],2.1,1.0
+MongoDB,Senior Engineer,https://www.mongodb.com/careers/job/?gh_jid=7257748,Coupa & P2P Processes location Bengaluru; Gurugram suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
+MongoDB,Senior Engineer,https://www.mongodb.com/careers/job/?gh_jid=6477783,Storage Layer Services location United States suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
+MongoDB,Senior InfoSec Engineer,https://www.mongodb.com/careers/job/?gh_jid=7280331,Red Team location New York City; San Francisco; Seattle; United States suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
 MongoDB,Senior Research Scientist Palo Alto,https://www.mongodb.com/careers/job/?gh_jid=7365646,,,,Other,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Senior Senior Software Engineer, Catalog & Routing Dublin",https://www.mongodb.com/careers/job/?gh_jid=7391511,,,,Engineering,Senior,,Other,Data Governance,"[""Data Governance""]",,[],32.1,1.0
-MongoDB,"Senior Software Engineer, Atlas Clusters Automation Dublin",https://www.mongodb.com/careers/job/?gh_jid=7156016,,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Senior Software Engineer, Atlas Clusters Security New York City",https://www.mongodb.com/careers/job/?gh_jid=7254433,Atlas Clusters Security location New York City suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Senior Software Engineer, Atlas Search Query San Francisco",https://www.mongodb.com/careers/job/?gh_jid=7263533,,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Senior Software Engineer, Deployments Boston; New York City; Pittsburgh; United States; Washington DC",https://www.mongodb.com/careers/job/?gh_jid=7364854,Deployments location Boston; New York City; Pittsburgh; United States; Washington DC suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
-MongoDB,"Senior Software Engineer, Developer Tools Dublin",https://www.mongodb.com/careers/job/?gh_jid=7346405,,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Senior Software Engineer, Education AI Dublin",https://www.mongodb.com/careers/job/?gh_jid=7388640,,,,Engineering,Senior,AI,Other,ML/AI infra,"[""ML/AI infra""]",AI,"[""AI""]",10.1,3.0
-MongoDB,"Senior Software Engineer, Enterprise Advanced Gurugram",https://www.mongodb.com/careers/job/?gh_jid=6683531,,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Senior Software Engineer, Frontend and AI New York City",https://www.mongodb.com/careers/job/?gh_jid=7304325,Frontend and AI location New York City suitcase Full-time chevron-right,,,Engineering,Senior,AI,Other,ML/AI infra,"[""ML/AI infra""]",AI,"[""AI""]",10.1,3.0
+MongoDB,Senior Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7391511,Catalog & Routing Dublin,,,Engineering,Senior,,Other,Data Governance,"[""Data Governance""]",,[],32.1,1.0
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7156016,Atlas Clusters Automation Dublin,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7254433,Atlas Clusters Security location New York City suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6720794,Cloud Payments location United States suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7364854,Deployments location Boston; New York City; Pittsburgh; United States; Washington DC suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6683531,Enterprise Advanced Gurugram,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7304325,Frontend and AI location New York City suitcase Full-time chevron-right,,,Engineering,Senior,,Other,ML/AI infra,"[""ML/AI infra""]",,[],2.1,1.0
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7392427,Inference Platform Palo Alto,,,Engineering,Senior,,Other,Platform / Infra,"[""Platform / Infra""]",,[],2.1,1.0
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6749138,MongoDB Server Clusters and Interfaces location United States suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7111375,Observability Dublin,,,Engineering,Senior,,Other,Data Observability,"[""Data Observability""]",,[],32.1,1.0
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6866771,Storage Layer Services Sydney,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
+MongoDB,Senior Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7388640,Education AI Dublin,,,Engineering,Senior,,Other,ML/AI infra,"[""ML/AI infra""]",,[],2.1,1.0
+MongoDB,Senior Software Engineer Dublin,https://www.mongodb.com/careers/job/?gh_jid=7380085,,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
 MongoDB,"Senior Software Engineer, Identity and Access Management Toronto",https://www.mongodb.com/careers/job/?gh_jid=7059646,,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Senior Software Engineer, Inference Platform Palo Alto",https://www.mongodb.com/careers/job/?gh_jid=7392427,,,,Engineering,Senior,,Other,Platform / Infra,"[""Platform / Infra""]",,[],2.1,1.0
 MongoDB,"Senior Software Engineer, MongoDB Server Clusters and Interfaces Toronto",https://www.mongodb.com/careers/job/?gh_jid=6749360,,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Senior Software Engineer, MongoDB Server Clusters and Interfaces United States",https://www.mongodb.com/careers/job/?gh_jid=6749138,MongoDB Server Clusters and Interfaces location United States suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
-MongoDB,"Senior Software Engineer, Search Systems Toronto",https://www.mongodb.com/careers/job/?gh_jid=7345260,,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Senior Software Engineer, Storage Layer Services Sydney",https://www.mongodb.com/careers/job/?gh_jid=6866771,,,,Engineering,Senior,,Other,Other,[],,[],2.1,3.0
+MongoDB,Senior Staff Engineer,https://www.mongodb.com/careers/job/?gh_jid=6713492,Server Networking & Observability location United States suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Data Observability,"[""Data Observability""]",,[],38.1,1.0
+MongoDB,Senior Staff Engineer,https://www.mongodb.com/careers/job/?gh_jid=6659380,Server Networking & Observability location New York City suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Data Observability,"[""Data Observability""]",,[],32.1,1.0
 MongoDB,"Senior Staff Engineer, Cluster Scalability Montreal; Quebec; Toronto; Vancouver",https://www.mongodb.com/careers/job/?gh_jid=6394601,,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Senior Staff Engineer, Cluster Scalability United States",https://www.mongodb.com/careers/job/?gh_jid=6394590,Cluster Scalability location United States suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
-MongoDB,"Senior Staff Engineer, Server Networking & Observability New York City",https://www.mongodb.com/careers/job/?gh_jid=6659380,Server Networking & Observability location New York City suitcase Full-time chevron-right,,,Engineering,Senior,OBSERVABILITY,Other,Data Observability,"[""Data Observability""]",OBSERVABILITY,"[""OBSERVABILITY""]",32.1,2.5
 MongoDB,"Senior Staff Engineer, Server Networking & Observability Palo Alto",https://www.mongodb.com/careers/job/?gh_jid=6661887,,,,Engineering,Senior,OBSERVABILITY,Other,Data Observability,"[""Data Observability""]",OBSERVABILITY,"[""OBSERVABILITY""]",32.1,2.5
-MongoDB,"Senior Staff Engineer, Server Networking & Observability Seattle",https://www.mongodb.com/careers/job/?gh_jid=6661893,,,,Engineering,Senior,OBSERVABILITY,Other,Data Observability,"[""Data Observability""]",OBSERVABILITY,"[""OBSERVABILITY""]",32.1,2.5
-MongoDB,"Senior Staff Engineer, Server Networking & Observability Toronto",https://www.mongodb.com/careers/job/?gh_jid=6659382,,,,Engineering,Senior,OBSERVABILITY,Other,Data Observability,"[""Data Observability""]",OBSERVABILITY,"[""OBSERVABILITY""]",32.1,2.5
-MongoDB,"Senior Staff Engineer, Server Networking & Observability United States",https://www.mongodb.com/careers/job/?gh_jid=6713492,Server Networking & Observability location United States suitcase Full-time chevron-right,,,Engineering,Senior,OBSERVABILITY,Other,Data Observability,"[""Data Observability""]",OBSERVABILITY,"[""OBSERVABILITY""]",38.1,2.5
-MongoDB,Senior Staff Technical Program Manager Dublin,https://www.mongodb.com/careers/job/?gh_jid=7340968,,,,Other,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,Senior Technical Program Manager - HR Tech United States,https://www.mongodb.com/careers/job/?gh_jid=7287421,HR Tech location United States suitcase Full-time chevron-right,,,People/HR,Senior,,Other,Other,[],,[],8.1,1.0
+MongoDB,Senior Technical Program Manager,https://www.mongodb.com/careers/job/?gh_jid=7287421,HR Tech location United States suitcase Full-time chevron-right,,,Other,Senior,,Other,Other,[],,[],8.1,1.0
 MongoDB,Senior Technical Services Engineer- Weekends Palo Alto,https://www.mongodb.com/careers/job/?gh_jid=7368213,,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Site Reliability Engineer (Senior or Staff), Atlas Austin; Boston; Chicago; New York City; Pittsburgh; United States",https://www.mongodb.com/careers/job/?gh_jid=6984809,Atlas location Austin; Boston; Chicago; New York City; Pittsburgh; United States suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
-MongoDB,"Site Reliability Engineer (Senior or Staff), Deployments Boston; New York City; Pittsburgh; United States; Washington DC",https://www.mongodb.com/careers/job/?gh_jid=6932221,Deployments location Boston; New York City; Pittsburgh; United States; Washington DC suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
-MongoDB,"Site Reliability Engineer (Senior or Staff), Deployments Dublin; Ireland",https://www.mongodb.com/careers/job/?gh_jid=7360537,,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Site Reliability Engineer (Senior or Staff), Fabric Alberta; British Columbia; Manitoba; Ontario; Quebec",https://www.mongodb.com/careers/job/?gh_jid=6987335,,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-MongoDB,"Site Reliability Engineer (Senior or Staff), Fabric Austin; Boston; Los Angeles; New York City; Raleigh; San Francisco; United States",https://www.mongodb.com/careers/job/?gh_jid=6987333,Fabric location Austin; Boston; Los Angeles; New York City; Raleigh; San Francisco; United States suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
-MongoDB,"Site Reliability Engineer (Senior or Staff), Infrastructure Security Austin; Chicago; New York City; San Francisco; United States",https://www.mongodb.com/careers/job/?gh_jid=6601882,Infrastructure Security location Austin; Chicago; New York City; San Francisco; United States suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Platform / Infra,"[""Platform / Infra""]",,[],8.1,1.0
-MongoDB,"Site Reliability Engineer (Senior or Staff), Infrastructure Security Ireland",https://www.mongodb.com/careers/job/?gh_jid=6865004,,,,Engineering,Senior,,Other,Platform / Infra,"[""Platform / Infra""]",,[],2.1,1.0
-MongoDB,"Site Reliability Engineer (Senior or Staff), Infrastructure Security Ontario; Quebec",https://www.mongodb.com/careers/job/?gh_jid=6864997,,,,Engineering,Senior,,Other,Platform / Infra,"[""Platform / Infra""]",,[],2.1,1.0
-MongoDB,"Site Reliability Engineer (Senior or Staff), Observability Austin; Boston; Chicago; New York City; Pittsburgh; United States; Washington DC",https://www.mongodb.com/careers/job/?gh_jid=6711349,Observability location Austin; Boston; Chicago; New York City; Pittsburgh; United States; Washington DC suitcase Full-time chevron-right,,,Engineering,Senior,OBSERVABILITY,Other,Data Observability,"[""Data Observability""]",OBSERVABILITY,"[""OBSERVABILITY""]",38.1,2.5
-MongoDB,"Site Reliability Engineer (Senior or Staff), Observability Ireland",https://www.mongodb.com/careers/job/?gh_jid=7192648,,,,Engineering,Senior,OBSERVABILITY,Other,Data Observability,"[""Data Observability""]",OBSERVABILITY,"[""OBSERVABILITY""]",32.1,2.5
+MongoDB,Site Reliability Engineer (Senior or Staff),https://www.mongodb.com/careers/job/?gh_jid=6984809,Atlas location Austin; Boston; Chicago; New York City; Pittsburgh; United States suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
+MongoDB,Site Reliability Engineer (Senior or Staff),https://www.mongodb.com/careers/job/?gh_jid=7360537,Deployments Dublin; Ireland,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
+MongoDB,Site Reliability Engineer (Senior or Staff),https://www.mongodb.com/careers/job/?gh_jid=6932221,Deployments location Boston; New York City; Pittsburgh; United States; Washington DC suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
+MongoDB,Site Reliability Engineer (Senior or Staff),https://www.mongodb.com/careers/job/?gh_jid=6987333,Fabric location Austin; Boston; Los Angeles; New York City; Raleigh; San Francisco; United States suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Other,[],,[],8.1,1.0
+MongoDB,Site Reliability Engineer (Senior or Staff),https://www.mongodb.com/careers/job/?gh_jid=6865004,Infrastructure Security Ireland,,,Engineering,Senior,,Other,Platform / Infra,"[""Platform / Infra""]",,[],2.1,1.0
+MongoDB,Site Reliability Engineer (Senior or Staff),https://www.mongodb.com/careers/job/?gh_jid=6711349,Observability location Austin; Boston; Chicago; New York City; Pittsburgh; United States; Washington DC suitcase Full-time chevron-right,,,Engineering,Senior,,Other,Data Observability,"[""Data Observability""]",,[],38.1,1.0
+MongoDB,Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6677731,Catalog and Routing Dublin,,,Engineering,Unknown,,Other,Data Governance,"[""Data Governance""]",,[],30.3,0
+MongoDB,Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7389031,Diagnostics location San Francisco; United States suitcase Full-time chevron-right,,,Engineering,Unknown,,Other,Other,[],,[],6.3,0
+MongoDB,Software Engineer 3,https://www.mongodb.com/careers/job/?gh_jid=7156025,Atlas Clusters Automation Dublin,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
+MongoDB,Software Engineer 3,https://www.mongodb.com/careers/job/?gh_jid=7397285,Atlas Dedicated Ireland,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
+MongoDB,Software Engineer 3,https://www.mongodb.com/careers/job/?gh_jid=7373899,Identity and Access Management location New York City suitcase Full-time chevron-right,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
+MongoDB,Software Engineer 3,https://www.mongodb.com/careers/job/?gh_jid=7253772,Storage Engines Sydney,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
 MongoDB,Software Engineer 3 Gurugram,https://www.mongodb.com/careers/job/?gh_jid=6815693,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-MongoDB,"Software Engineer 3, Atlas Clusters Automation Dublin",https://www.mongodb.com/careers/job/?gh_jid=7156025,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-MongoDB,"Software Engineer 3, Atlas Dedicated Dublin",https://www.mongodb.com/careers/job/?gh_jid=7386438,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-MongoDB,"Software Engineer 3, Atlas Dedicated Ireland",https://www.mongodb.com/careers/job/?gh_jid=7397285,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-MongoDB,"Software Engineer 3, Identity and Access Management New York City",https://www.mongodb.com/careers/job/?gh_jid=7373899,Identity and Access Management location New York City suitcase Full-time chevron-right,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-MongoDB,"Software Engineer 3, Query Dublin",https://www.mongodb.com/careers/job/?gh_jid=7193367,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
 MongoDB,"Software Engineer 3, Search Systems Replication & Routing San Francisco",https://www.mongodb.com/careers/job/?gh_jid=7235322,,,,Engineering,Unknown,,Other,ETL/Integration,"[""ETL/Integration""]",,[],30.3,0
 MongoDB,"Software Engineer 3, Search Web Platform Alberta; British Columbia; Ontario; Quebec; Toronto; Vancouver",https://www.mongodb.com/careers/job/?gh_jid=7355902,,,,Engineering,Unknown,,Other,Platform / Infra,"[""Platform / Infra""]",,[],0.3,0
-MongoDB,"Software Engineer 3, Storage Engines Sydney",https://www.mongodb.com/careers/job/?gh_jid=7253772,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,2
-MongoDB,"Software Engineer, Catalog and Routing Dublin",https://www.mongodb.com/careers/job/?gh_jid=6677731,,,,Engineering,Unknown,,Other,Data Governance,"[""Data Governance""]",,[],30.3,0
-MongoDB,"Software Engineer, Diagnostics San Francisco; United States",https://www.mongodb.com/careers/job/?gh_jid=7389031,Diagnostics location San Francisco; United States suitcase Full-time chevron-right,,,Engineering,Unknown,,Other,Other,[],,[],6.3,0
-MongoDB,Staff Engineer Dublin,https://www.mongodb.com/careers/job/?gh_jid=7409529,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-MongoDB,"Staff Engineer, APIx Dublin",https://www.mongodb.com/careers/job/?gh_jid=7079365,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-MongoDB,"Staff Engineer, Search Systems Toronto",https://www.mongodb.com/careers/job/?gh_jid=7094786,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-MongoDB,Staff Research Scientist Palo Alto; United States,https://www.mongodb.com/careers/job/?gh_jid=7280132,United States suitcase Full-time chevron-right,,,Other,Unknown,,Other,Other,[],,[],6.3,0
+MongoDB,Staff Engineer,https://www.mongodb.com/careers/job/?gh_jid=7079365,APIx Dublin,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
+MongoDB,Staff NetSuite Engineer Palo Alto,https://www.mongodb.com/careers/job/?gh_jid=7274598,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
+MongoDB,Staff Research Scientist Palo Alto;,https://www.mongodb.com/careers/job/?gh_jid=7280132,United States suitcase Full-time chevron-right,,,Other,Unknown,,Other,Other,[],,[],6.3,0
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7264736,Networking & Observability location Seattle; United States suitcase Full-time chevron-right,,,Engineering,Unknown,,Other,Data Observability,"[""Data Observability""]",,[],36.3,0
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7221902,Query location New York City; United States suitcase Full-time chevron-right,,,Engineering,Unknown,,Other,Other,[],,[],6.3,0
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7364866,Query Execution Bulgaria,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7100856,Query Execution Rome,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7100842,Query Execution Great Britain,,,Engineering,Unknown,,Other,ML/AI infra,"[""ML/AI infra""]",,[],0.3,0
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=7100825,Query Execution Netherlands,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6515209,Server Security location United States suitcase Full-time chevron-right,,,Engineering,Unknown,,Other,Other,[],,[],6.3,0
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6352682,Server Security location New York City suitcase Full-time chevron-right,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
+MongoDB,Staff Software Engineer,https://www.mongodb.com/careers/job/?gh_jid=6352684,Server Security Canada,,,Engineering,Unknown,,Other,Other,[],,[],6.3,0
 MongoDB,"Staff Software Engineer, Networking & Observability Alberta; British Columbia; Manitoba; Nova Scotia; Ontario; Quebec",https://www.mongodb.com/careers/job/?gh_jid=7264738,,,,Engineering,Unknown,OBSERVABILITY,Other,Data Observability,"[""Data Observability""]",OBSERVABILITY,"[""OBSERVABILITY""]",30.3,1.5
-MongoDB,"Staff Software Engineer, Networking & Observability Seattle; United States",https://www.mongodb.com/careers/job/?gh_jid=7264736,Networking & Observability location Seattle; United States suitcase Full-time chevron-right,,,Engineering,Unknown,OBSERVABILITY,Other,Data Observability,"[""Data Observability""]",OBSERVABILITY,"[""OBSERVABILITY""]",36.3,1.5
-MongoDB,"Staff Software Engineer, Query Execution Bulgaria",https://www.mongodb.com/careers/job/?gh_jid=7364866,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-MongoDB,"Staff Software Engineer, Query Execution France",https://www.mongodb.com/careers/job/?gh_jid=7100860,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-MongoDB,"Staff Software Engineer, Query Execution Germany",https://www.mongodb.com/careers/job/?gh_jid=7100859,Query Execution location Germany suitcase Full-time chevron-right,,,Engineering,Unknown,,Other,Other,[],,[],6.3,0
-MongoDB,"Staff Software Engineer, Query Execution Great Britain",https://www.mongodb.com/careers/job/?gh_jid=7100842,,,,Engineering,Unknown,,Other,ML/AI infra,"[""ML/AI infra""]",,[],0.3,2
-MongoDB,"Staff Software Engineer, Query Execution Ireland",https://www.mongodb.com/careers/job/?gh_jid=7092947,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-MongoDB,"Staff Software Engineer, Query Execution Netherlands",https://www.mongodb.com/careers/job/?gh_jid=7100825,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-MongoDB,"Staff Software Engineer, Query New York City; United States",https://www.mongodb.com/careers/job/?gh_jid=7221902,Query location New York City; United States suitcase Full-time chevron-right,,,Engineering,Unknown,,Other,Other,[],,[],6.3,0
-MongoDB,"Staff Software Engineer, Server Security Canada",https://www.mongodb.com/careers/job/?gh_jid=6352684,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-MongoDB,"Staff Software Engineer, Server Security New York City",https://www.mongodb.com/careers/job/?gh_jid=6352682,Server Security location New York City suitcase Full-time chevron-right,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
-MongoDB,"Staff Software Engineer, Server Security United States",https://www.mongodb.com/careers/job/?gh_jid=6515209,Server Security location United States suitcase Full-time chevron-right,,,Engineering,Unknown,,Other,Other,[],,[],6.3,0
+MongoDB,Staff Technical Program Manager,https://www.mongodb.com/careers/job/?gh_jid=6771131,New York City; San Francisco; United States suitcase Full-time chevron-right,,,Other,Manager,,Other,Other,[],,[],7.8,0
 MongoDB,Staff Technical Program Manager Dublin,https://www.mongodb.com/careers/job/?gh_jid=6765245,,,,Other,Manager,,Other,Other,[],,[],1.8,0
 MongoDB,Staff Technical Program Manager Dublin,https://www.mongodb.com/careers/job/?gh_jid=7391474,,,,Other,Manager,,Other,Other,[],,[],1.8,0
-MongoDB,Staff Technical Program Manager New York City; San Francisco; United States,https://www.mongodb.com/careers/job/?gh_jid=6771131,New York City; San Francisco; United States suitcase Full-time chevron-right,,,Other,Manager,,Other,Other,[],,[],7.8,0
 MongoDB,Technical Services Engineer Dublin,https://www.mongodb.com/careers/job/?gh_jid=7077137,,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
 Monte Carlo,Director Strategic Sales East Sales New York; Boston; Baltimore; Philadelphia; Washington DC Full time,https://jobs.ashbyhq.com/montecarlodata/57d1f0c4-1bda-43b1-831c-d89b8da26d4e,Remote,2025-09-24,59,Sales,Director+,,Data Observability,Other,[],,[],3.0,1.0
 Monte Carlo,Head of Product Marketing & Content Marketing Remote US Full time,https://jobs.ashbyhq.com/montecarlodata/b66c0609-c7aa-4565-9b34-f85e8cc8d3c3,Remote,2025-10-16,37,Product,Director+,,Data Observability,Other,[],,[],3.0,1.0
@@ -414,19 +386,21 @@ Precisely,Data Integrity Suite Developer Portal,https://developer.cloud.precisel
 Qlik,Enterprise Resource Planning (ERP) Architect Ottawa ON,http://careerhub.qlik.com/careers/job/1133910302799,CA Remote Posted 3 days ago,1970-01-01,20414,Other,Unknown,,Other,Other,[],,[],0.3,0
 Qlik,Manager Business Intelligence & Analytics GTM Ottawa ON,http://careerhub.qlik.com/careers/job/1133910116415,CA + 2 more Hybrid Posted 10 days ago,1970-01-01,20414,Other,Manager,,Other,Other,[],,[],1.8,0
 Qlik,Senior QA Automation Engineer São Paulo SP,http://careerhub.qlik.com/careers/job/1133910118996,BR Hybrid Posted 2 days ago,1970-01-01,20414,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
-Salesforce,"Director, Delivery - MuleSoft",https://careers.salesforce.com/en/jobs/jr318372/director-delivery-mulesoft/,"Hyderabad, Telangana, India",2025-11-20,2,Other,Director+,,Other,Other,[],,[],9.0,1.0
+Salesforce,Director Delivery,https://careers.salesforce.com/en/jobs/jr318372/director-delivery-mulesoft/,"Hyderabad, Telangana, India",2025-11-20,2,Other,Director+,,Other,Other,[],,[],9.0,1.0
 Salesforce,Field Marketing Senior Analyst,https://careers.salesforce.com/en/jobs/jr318296/field-marketing-senior-analyst/,"Remote, Texas, United States of America",2025-11-20,2,Marketing,Senior,,Other,Other,[],,[],8.1,1.0
-Salesforce,"Senior Software Engineer, Network Service Mesh - Slack",https://careers.salesforce.com/en/jobs/jr318234/senior-software-engineer-network-service-mesh-slack/,"Dublin, Dublin, Ireland",2025-11-20,2,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
+Salesforce,Senior Software Engineer Network Service Mesh,https://careers.salesforce.com/en/jobs/jr318234/senior-software-engineer-network-service-mesh-slack/,"Dublin, Dublin, Ireland",2025-11-20,2,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
 Salesforce,Success Architect,https://careers.salesforce.com/en/jobs/jr318654/success-architect/,"Remote, Taiwan, Taichung City, Taiwan",2025-11-20,2,Other,Unknown,,Other,ML/AI infra,"[""ML/AI infra""]",,[],0.3,0
 Sifflet,AI Product Manager – Agentic Capabilities,https://www.welcometothejungle.com/en/companies/sifflet/jobs/ai-product-manager-agentic-capabilities_paris,last month,2025-10-01,52,Product,Manager,AI,Other,ML/AI infra,"[""ML/AI infra""]",AI,"[""AI""]",9.8,2
 Sifflet,Applied ML/AI Engineer - Monitoring,https://www.welcometothejungle.com/en/companies/sifflet/jobs/applied-ml-ai-engineer-monitoring_paris,15 days ago,2025-11-07,15,Engineering,Unknown,,Other,Data Observability,"[""Data Observability"", ""ML/AI infra""]",,[],30.3,3.5
-Snowflake,Senior Practice Manager,https://careers.snowflake.com/us/en/job/SNCOUSD17CEDDE179940568098CAA7375DD3BFEXTERNALENUSCF9D7F3D81194E479A4E0589E019C573/Senior-Practice-Manager-Financial-Services,"Location Remote, New York, United States",2025-11-11,11,Other,Senior,,Warehouse/Processing,Other,[],,[],8.1,1.0
-Snowflake,"Senior Practice Manager, Financial Services",https://jobs.ashbyhq.com/snowflake/cf9d7f3d-8119-4e47-9a4e-0589e019c573,"Remote, New York, United States",2025-07-14,131,Other,Senior,,Warehouse/Processing,Other,[],,[],8.1,1.0
-Snowflake,Senior Product Marketing Manager,https://careers.snowflake.com/us/en/job/SNCOUSC19D63382F224DD389B4E0B083148735EXTERNALENUSA2927D5DD65A46998381737A36C486A3/Senior-Product-Marketing-Manager-Platform,Available in 3 locations,2025-11-21,1,Product,Senior,,Warehouse/Processing,ML/AI infra,"[""ML/AI infra""]",,[],2.1,1.0
-Snowflake,Solution Engineer,https://careers.snowflake.com/us/en/job/SNCOUS5F8FA962905D47F3B7561898BD42B27CEXTERNALENUSDEE24F7610CF407CA2A9B943F84C109E/Solution-Engineer,"Location Remote, California, United States",2025-11-15,7,Engineering,Unknown,,Warehouse/Processing,Other,[],,[],6.3,0
-Snowflake,Solution Engineer,https://jobs.ashbyhq.com/snowflake/dee24f76-10cf-407c-a2a9-b943f84c109e,"Remote, California, United States",2025-07-10,135,Engineering,Unknown,,Warehouse/Processing,Other,[],,[],6.3,0
-Snowflake,Technical Account Manager,https://careers.snowflake.com/us/en/job/SNCOUSD09FA2A907DE408E906F06B0D5CF0762EXTERNALENUS304B99EE5D3B4C4FBE7247D438123911/Technical-Account-Manager-Japan,"Location Tokyo, Japan",2025-11-16,6,Other,Manager,,Warehouse/Processing,Other,[],,[],1.8,0
-Snowflake,"Technical Account Manager, Japan",https://jobs.ashbyhq.com/snowflake/304b99ee-5d3b-4c4f-be72-47d438123911,"Tokyo, Japan",2025-07-07,138,Other,Manager,,Warehouse/Processing,Other,[],,[],1.8,0
+Snowflake,Senior Product Manager,https://careers.snowflake.com/us/en/job/SNCOUSA2F8DA9C336F45329D25EEB09143857FEXTERNALENUSD26025483D484E43A66482984F48A7F9/Senior-Product-Manager-AI-Sales-Assistant,"Location Menlo Park, California, United States",2025-11-11,11,Product,Senior,,Warehouse/Processing,Other,[],,[],8.1,1.0
+Snowflake,Solutions Architect,https://careers.snowflake.com/us/en/job/SNCOUS75F1671D3D4141CAB440F58C2100FCD1EXTERNALENUS1D432849B20E46FBB37944FB3ACA29B5/Solutions-Architect-Migrations,"Location Melbourne, Victoria, Australia",2025-11-21,1,Other,Unknown,,Warehouse/Processing,Other,[],,[],6.3,0
+Snowflake,Solutions Architect,https://careers.snowflake.com/us/en/job/SNCOUS75F1671D3D4141CAB440F58C2100FCD1EXTERNALENUS71A0C16C38E9420496735C45647B9828/Solutions-Architect-Migrations,"Location Sydney, Australia",2025-11-17,5,Other,Unknown,,Warehouse/Processing,Other,[],,[],6.3,0
+Snowflake,Solutions Architect,https://careers.snowflake.com/us/en/job/SNCOUS75F1671D3D4141CAB440F58C2100FCD1EXTERNALENUS3EC688A1A06A44FCB8395A4B6FBB80CA/Solutions-Architect-Migrations,"Location Remote, Victoria, Australia",2025-11-17,5,Other,Unknown,,Warehouse/Processing,Other,[],,[],6.3,0
+Snowflake,Solutions Architect,https://jobs.ashbyhq.com/snowflake/1d432849-b20e-46fb-b379-44fb3aca29b5,"Melbourne, Victoria, Australia",2025-11-10,12,Other,Unknown,,Warehouse/Processing,Other,[],,[],6.3,0
+Snowflake,Solutions Architect,https://jobs.ashbyhq.com/snowflake/71a0c16c-38e9-4204-9673-5c45647b9828,"Sydney, Australia",2025-11-10,12,Other,Unknown,,Warehouse/Processing,Other,[],,[],6.3,0
+Snowflake,Solutions Architect,https://jobs.ashbyhq.com/snowflake/3ec688a1-a06a-44fc-b839-5a4b6fbb80ca,"Remote, Victoria, Australia",2025-11-10,12,Other,Unknown,,Warehouse/Processing,Other,[],,[],6.3,0
+Snowflake,Staff Cloud  Engineer,https://careers.snowflake.com/us/en/job/SNCOUSCF8365B3107647D1A907EE1FD484CC32EXTERNALENUSCA5EB7D72E344CEFA068C80A50A8E513/Staff-Cloud-Support-Engineer-SQL,SQL,2025-11-17,5,Engineering,Unknown,,Warehouse/Processing,Other,[],,[],0.3,0
+Snowflake,Staff Cloud Engineer,https://jobs.ashbyhq.com/snowflake/ca5eb7d7-2e34-4cef-a068-c80a50a8e513,"Atlanta, Georgia, United States",2025-11-10,12,Engineering,Unknown,,Warehouse/Processing,Other,[],,[],6.3,0
 Syniti,Engineer I,https://careers.syniti.com/job/Remote-Engineer-I%2C-Software/1302707500/,Software,,,Engineering,Unknown,,Other,Other,[],,[],0.3,0
 Syniti,Lead Engineer,https://careers.syniti.com/job/Remote-Lead-Engineer%2C-Client-Success/1344170200/,Client Success,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
 Syniti,Manager,https://careers.syniti.com/job/Remote-Manager%2C-Network-Information-Security/1318079800/,Network Information Security,,,Other,Manager,,Other,Other,[],,[],1.8,0
@@ -446,6 +420,7 @@ Syniti,Sr. Engineer,https://careers.syniti.com/job/Remote-Sr_-Engineer%2C-Site-R
 Syniti,Sr. Manager,https://careers.syniti.com/job/Remote-Sr_-Manager%2C-SRE/1318081400/,SRE,,,Other,Senior,,Other,Platform / Infra,"[""Platform / Infra""]",,[],2.1,1.0
 Syniti,Sr. Manager Engineering,https://careers.syniti.com/job/Remote-Sr_-Manager-Engineering/1327456400/,,,,Engineering,Senior,,Other,Other,[],,[],2.1,1.0
 Teradata,Artificial Intelligence Engineer,https://careers.teradata.com/jobs/219452/artificial-intelligence-engineer?j_idx=4,"Hyderabad, Telangana, India",2025-11-21,1,Engineering,Unknown,,Warehouse/Processing,Other,[],,[],6.3,0
+Teradata,Enterprise Technology Certinia Developer,https://careers.teradata.com/jobs/219340/enterprise-technology-certinia-developer?j_idx=12,"Hyderabad, Telangana, India",2025-11-19,3,Engineering,Unknown,,Warehouse/Processing,Other,[],,[],6.3,0
 Teradata,Enterprise Technology QA Engineer,https://careers.teradata.com/jobs/219319/enterprise-technology-qa-engineer?j_idx=5,"Hyderabad, Telangana, India",2025-11-20,2,Engineering,Unknown,,Warehouse/Processing,Other,[],,[],6.3,0
 Teradata,Enterprise Technology Senior Service Now Developer,https://careers.teradata.com/jobs/219341/enterprise-technology-senior-service-now-developer?j_idx=6,"Hyderabad, Telangana, India",2025-11-20,2,Engineering,Senior,,Warehouse/Processing,Other,[],,[],8.1,1.0
 Teradata,Oracle Fusion CX Functional Analyst,https://careers.teradata.com/jobs/219370/oracle-fusion-cx-functional-analyst?j_idx=1,"Airoli Navi Mumbai, Maharashtra, India",2025-11-21,1,Other,Unknown,,Warehouse/Processing,ML/AI infra,"[""ML/AI infra""]",,[],6.3,0
@@ -453,6 +428,11 @@ Teradata,Oracle Fusion ERP Techno Functional Analyst,https://careers.teradata.co
 Teradata,Oracle Fusion Technical Engineer,https://careers.teradata.com/jobs/219380/oracle-fusion-technical-engineer?j_idx=0,"Airoli Navi Mumbai, Maharashtra, India",2025-11-21,1,Engineering,Unknown,,Warehouse/Processing,ML/AI infra,"[""ML/AI infra""]",,[],6.3,0
 Teradata,Oracle SCM Functional Analyst,https://careers.teradata.com/jobs/219362/oracle-scm-functional-analyst?j_idx=3,"Airoli Navi Mumbai, Maharashtra, India",2025-11-21,1,Other,Unknown,,Warehouse/Processing,ML/AI infra,"[""ML/AI infra""]",,[],6.3,0
 Teradata,Principal Architect Autonomous and Knowledge Platform,https://careers.teradata.com/jobs/219593/principal-architect-autonomous-and-knowledge-platform?j_idx=7,"San Diego, California, United States",2025-11-20,2,Other,Principal/Staff,,Warehouse/Processing,Platform / Infra,"[""Platform / Infra""]",,[],8.7,1.0
+Teradata,Senior Fullstack Engineer AI Platform,https://careers.teradata.com/jobs/219566/senior-fullstack-engineer-ai-platform?j_idx=14,"Hyderabad, Telangana, India",2025-11-18,4,Engineering,Senior,AI,Warehouse/Processing,ML/AI infra,"[""ML/AI infra"", ""Platform / Infra""]",AI,"[""AI""]",16.1,3.0
+Teradata,Senior Manager UI/UX and Full Stack Engineering AI Platforms,https://careers.teradata.com/jobs/219578/senior-manager-uiux-and-full-stack-engineering-ai-platforms?j_idx=13,"San Diego, California, United States",2025-11-18,4,Engineering,Senior,AI,Warehouse/Processing,ML/AI infra,"[""ML/AI infra"", ""Platform / Infra""]",AI,"[""AI""]",16.1,3.0
+Teradata,Senior Software Engineer Automation,https://careers.teradata.com/jobs/219579/senior-software-engineer-automation?j_idx=19,"Hyderabad, Telangana, India",2025-11-17,5,Engineering,Senior,,Warehouse/Processing,Other,[],,[],8.1,1.0
 Teradata,Senior Software Engineer Observability & Telemetry,https://careers.teradata.com/jobs/219580/senior-software-engineer-observability-and-telemetry?j_idx=9,"Hyderabad, Telangana, India",2025-11-19,3,Engineering,Senior,OBSERVABILITY,Warehouse/Processing,Data Observability,"[""Data Observability""]",OBSERVABILITY,"[""OBSERVABILITY""]",38.1,2.5
+Teradata,Service Experience Manager,https://careers.teradata.com/jobs/219587/service-experience-manager?j_idx=18,"Prague, Prague, Czechia",2025-11-17,5,Other,Manager,,Warehouse/Processing,Other,[],,[],1.8,0
 Teradata,Software Engineer Python Automation Cloud & AI,https://careers.teradata.com/jobs/219581/software-engineer-python-automation-cloud-and-ai?j_idx=8,"Hyderabad, Telangana, India",2025-11-19,3,Engineering,Unknown,"PYTHON,AI",Warehouse/Processing,ML/AI infra,"[""ML/AI infra""]",PYTHON,"[""PYTHON"", ""AI""]",14.3,2
-Vertica,Senior Software Engineer Java,https://careers.opentext.com/us/en/job/46746/Senior-Software-Engineer-Java,"Location: Cluj-Napoca, ROU, 400604",2025-11-18,4,Engineering,Senior,JAVA,Warehouse/Processing,Other,[],JAVA,"[""JAVA""]",2.1,1.0
+Teradata,Staff Full Stack Engineer– AI Platform,https://careers.teradata.com/jobs/219569/staff-full-stack-engineer-ai-platform?j_idx=15,"Hyderabad, Telangana, India",2025-11-18,4,Engineering,Unknown,AI,Warehouse/Processing,ML/AI infra,"[""ML/AI infra"", ""Platform / Infra""]",AI,"[""AI""]",14.3,2
+Vertica,Sr. Software Developer SDET,https://careers.opentext.com/us/en/job/46223/Sr-Software-Developer-SDET,"Location: Waterloo, Ontario, CAN, N2L 0A1",2025-11-18,4,Engineering,Senior,,Warehouse/Processing,Other,[],,[],2.1,1.0
