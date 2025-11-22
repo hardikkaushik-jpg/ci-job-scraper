@@ -1,73 +1,41 @@
-# alation.py — FINAL WORKDAY EXTRACTOR (stable & correct)
+# special_extractors_deep/alation.py
 
-import json
-from urllib.parse import urljoin
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 
 def extract_alation(soup, page, base_url):
     results = []
     seen = set()
 
-    # -------------------------------
-    # 1) Build API root safely
-    # -------------------------------
-    # Example:
-    # https://alation.wd503.myworkdayjobs.com/ExternalSite
-    try:
-        domain = base_url.split(".com/")[0] + ".com"
-        site = base_url.rstrip("/").split("/")[-1]   # "ExternalSite"
-        api_root = f"{domain}/wday/cxs/alation/{site}/jobs"
-    except Exception:
+    # The jobs are inside: div.job-result or div.career-item
+    job_cards = soup.select("div.job-result, div.career-item, li.careers-listing__item")
+
+    if not job_cards:
+        print("[ALATION] No job cards found on page")
         return results
 
-    # -------------------------------
-    # 2) Pagination
-    # -------------------------------
-    offset = 0
-    limit = 20
+    for card in job_cards:
+        # Title
+        title_el = card.select_one("a, h3, .careers-listing__title")
+        if not title_el:
+            continue
+        title = title_el.get_text(strip=True)
 
-    while True:
-        api_url = f"{api_root}?offset={offset}&limit={limit}"
+        # Link
+        href = title_el.get("href", "").strip()
+        if not href:
+            continue
+        link = urljoin(base_url, href)
 
-        try:
-            page.goto(api_url, timeout=25000, wait_until="networkidle")
-            raw_html = page.content()
-        except Exception:
-            break
+        # Location
+        loc_el = card.select_one(".location, .careers-listing__location, .job-location")
+        location = loc_el.get_text(strip=True) if loc_el else ""
 
-        # Extract JSON from <pre> safely
-        try:
-            s = BeautifulSoup(raw_html, "lxml")
-            pre = s.find("pre")
-            if not pre:
-                break
-            data = json.loads(pre.get_text())
-        except Exception:
-            break
+        key = (link, title)
+        if key in seen:
+            continue
+        seen.add(key)
 
-        postings = data.get("jobPostings", [])
-        if not postings:
-            break
-
-        # -------------------------------
-        # 3) Parse each job
-        # -------------------------------
-        for job in postings:
-            link = job.get("externalPath") or job.get("externalUrl")
-            title = job.get("title")
-
-            if not link or not title:
-                continue
-
-            # Normalize URL
-            link = urljoin(base_url, link)
-
-            if link in seen:
-                continue
-            seen.add(link)
-
-            results.append((link, title.strip()))
-
-        offset += limit
+        results.append((link, title, location))
 
     return results
