@@ -479,16 +479,29 @@ def scrape():
                         continue
                     filtered.append((href, text, el))
 
-                # parse filtered candidates (unchanged generic logic)
+             # parse filtered candidates (unchanged generic logic)
                 for link, anchor_text, el in filtered:
                     time.sleep(SLEEP_BETWEEN_REQUESTS)
-                    title_candidate = re.sub(r'\s+', ' ', (anchor_text or "")).strip()
+                    
+                    # --- Workday real title override (CRITICAL FIX FOR ALATION) ---
+                    job_title_div = None
+                    try:
+                        job_title_div = el.select_one("[data-automation-id='jobTitle']")
+                    except Exception:
+                        job_title_div = None
+
+                    if job_title_div:
+                        # Use Workday's real job title instead of "Alation Careers"
+                        title_candidate = job_title_div.get_text(" ", strip=True)
+                    else:
+                        title_candidate = re.sub(r'\s+', ' ', (anchor_text or "")).strip()
+
+                    # --- Continue with standard cleanup ---
                     title_clean, location_candidate = extract_location_from_text(title_candidate)
                     title_clean = clean_title(title_clean or title_candidate)
                     card_loc = try_extract_location_from_card(el)
                     if card_loc and not location_candidate:
                         location_candidate = card_loc
-
                     light_score = score_title_desc(title_candidate, "", company)
                     
                     posting_date = ""
