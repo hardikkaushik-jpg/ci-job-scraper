@@ -519,7 +519,7 @@ def scrape():
                         continue
                     filtered.append((href, text, el))
 
-             # parse filtered candidates (unchanged generic logic)
+                # parse filtered candidates (unchanged generic logic)
                 for link, anchor_text, el in filtered:
                     time.sleep(SLEEP_BETWEEN_REQUESTS)
                     
@@ -537,48 +537,52 @@ def scrape():
                         title_candidate = re.sub(r'\s+', ' ', (anchor_text or "")).strip()
 
                     # --- Continue with standard cleanup ---
-title_clean, location_candidate = extract_location_from_text(title_candidate)
-title_clean = clean_title(title_clean or title_candidate)
+                    title_clean, location_candidate = extract_location_from_text(title_candidate)
+                    title_clean = clean_title(title_clean or title_candidate)
 
-title_low = title_clean.lower()
+                    title_low = title_clean.lower()
 
-# ============================================================
-# SMART PRODUCT FILTER LOGIC (TITLE + DESCRIPTION)
-# ============================================================
+                    # ============================================================
+                    # SMART PRODUCT FILTER LOGIC (TITLE + DESCRIPTION)
+                    # ============================================================
 
-# 1) Non-technical PRODUCT patterns → DROP immediately (title is obvious)
-NON_TECH_PRODUCT_PATTERNS = [
-    r'product\s+marketing',
-    r'product\s+marketer',
-    r'product\s+g?tm',
-    r'product\s+operations',
-    r'product\s+ops',
-    r'product\s+design(er)?',
-    r'product\s+growth',
-    r'product\s+strategy',
-    r'product\s+enablement',
-    r'product\s+commercial',
-    r'marketing\s+product'
-]
+                    # 1) Non-technical PRODUCT patterns → DROP immediately (title is obvious)
+                    NON_TECH_PRODUCT_PATTERNS = [
+                        r'product\s+marketing',
+                        r'product\s+marketer',
+                        r'product\s+g?tm',
+                        r'product\s+operations',
+                        r'product\s+ops',
+                        r'product\s+design(er)?',
+                        r'product\s+growth',
+                        r'product\s+strategy',
+                        r'product\s+enablement',
+                        r'product\s+commercial',
+                        r'marketing\s+product'
+                    ]
+                    
+                    # Initialize must_reasons for the block below
+                    must_reasons = []
 
-if "product" in title_low:
-    if any(re.search(p, title_low) for p in NON_TECH_PRODUCT_PATTERNS):
-        print(f"[DROP-PRODUCT-TITLE] Non-technical product role dropped -> {title_clean}")
-        continue
+                    if "product" in title_low:
+                        if any(re.search(p, title_low) for p in NON_TECH_PRODUCT_PATTERNS):
+                            print(f"[DROP-PRODUCT-TITLE] Non-technical product role dropped -> {title_clean}")
+                            continue
 
-# 2) Clear technical signals → treat normally (no force-detail)
-TECH_HINTS_IN_TITLE = [
-    "data", "platform", "api", "sdk",
-    "integration", "integrations", "etl",
-    "pipeline", "pipelines", "connect", "connector",
-    "warehouse", "lakehouse", "snowflake", "databricks"
-]
-is_clear_tech_product = any(t in title_low for t in TECH_HINTS_IN_TITLE)
+                    # 2) Clear technical signals → treat normally (no force-detail)
+                    TECH_HINTS_IN_TITLE = [
+                        "data", "platform", "api", "sdk",
+                        "integration", "integrations", "etl",
+                        "pipeline", "pipelines", "connect", "connector",
+                        "warehouse", "lakehouse", "snowflake", "databricks"
+                    ]
+                    is_clear_tech_product = any(t in title_low for t in TECH_HINTS_IN_TITLE)
 
-# 3) Ambiguous product roles (just says "Product Manager") → must detail
-if "product" in title_low and not is_clear_tech_product:
-    must_detail = True
-    must_reasons.append("product_ambiguous_force_detail")
+                    # 3) Ambiguous product roles (just says "Product Manager") → must detail
+                    must_detail = False
+                    if "product" in title_low and not is_clear_tech_product:
+                        must_detail = True
+                        must_reasons.append("product_ambiguous_force_detail")
 
                     card_loc = try_extract_location_from_card(el)
                     if card_loc and not location_candidate:
@@ -586,12 +590,11 @@ if "product" in title_low and not is_clear_tech_product:
                     light_score = score_title_desc(title_candidate, "", company)
                     
                     posting_date = ""
-                    must_detail = False
-                    must_reasons = []
 
                     # === PATCH 1: PRODUCT FILTER (EARLY FORCE DETAIL) ===
-                    # Moved slightly down to ensure must_detail is initialized
-                    if "product" in (title_clean or "").lower():
+                    # This section appears to be a duplicate/repetition from above, 
+                    # but I'll maintain the logic flow and correct indentation.
+                    if "product" in (title_clean or "").lower() and "product_role_force_detail" not in must_reasons:
                         must_detail = True
                         must_reasons.append("product_role_force_detail")
 
