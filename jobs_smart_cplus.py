@@ -537,33 +537,48 @@ def scrape():
                         title_candidate = re.sub(r'\s+', ' ', (anchor_text or "")).strip()
 
                     # --- Continue with standard cleanup ---
-                    title_clean, location_candidate = extract_location_from_text(title_candidate)
-                    title_clean = clean_title(title_clean or title_candidate)
+title_clean, location_candidate = extract_location_from_text(title_candidate)
+title_clean = clean_title(title_clean or title_candidate)
 
-                    # === PATCH: Reject non-technical Product roles by title pattern ===
-                    NON_TECH_PRODUCT_PATTERNS = [
-                        r'product\s+marketing',
-                        r'product\s+marketer',
-                        r'product\s+g?tm',
-                        r'product\s+operations',
-                        r'product\s+ops',
-                        r'product\s+design',
-                        r'product\s+growth',
-                        r'product\s+strategy',
-                        r'product\s+enablement',
-                        r'product\s+commercial'
-                    ]
+title_low = title_clean.lower()
 
-                    title_low = title_clean.lower()
-                    should_skip = False
-                    if "product" in title_low:
-                        for patt in NON_TECH_PRODUCT_PATTERNS:
-                            if re.search(patt, title_low):
-                                print(f"[DROP-PRODUCT-TITLE] Non-technical product role dropped -> {title_clean}")
-                                should_skip = True
-                                break
-                    if should_skip:
-                        continue
+# ============================================================
+# SMART PRODUCT FILTER LOGIC (TITLE + DESCRIPTION)
+# ============================================================
+
+# 1) Non-technical PRODUCT patterns → DROP immediately (title is obvious)
+NON_TECH_PRODUCT_PATTERNS = [
+    r'product\s+marketing',
+    r'product\s+marketer',
+    r'product\s+g?tm',
+    r'product\s+operations',
+    r'product\s+ops',
+    r'product\s+design(er)?',
+    r'product\s+growth',
+    r'product\s+strategy',
+    r'product\s+enablement',
+    r'product\s+commercial',
+    r'marketing\s+product'
+]
+
+if "product" in title_low:
+    if any(re.search(p, title_low) for p in NON_TECH_PRODUCT_PATTERNS):
+        print(f"[DROP-PRODUCT-TITLE] Non-technical product role dropped -> {title_clean}")
+        continue
+
+# 2) Clear technical signals → treat normally (no force-detail)
+TECH_HINTS_IN_TITLE = [
+    "data", "platform", "api", "sdk",
+    "integration", "integrations", "etl",
+    "pipeline", "pipelines", "connect", "connector",
+    "warehouse", "lakehouse", "snowflake", "databricks"
+]
+is_clear_tech_product = any(t in title_low for t in TECH_HINTS_IN_TITLE)
+
+# 3) Ambiguous product roles (just says "Product Manager") → must detail
+if "product" in title_low and not is_clear_tech_product:
+    must_detail = True
+    must_reasons.append("product_ambiguous_force_detail")
 
                     card_loc = try_extract_location_from_card(el)
                     if card_loc and not location_candidate:
