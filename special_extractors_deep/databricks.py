@@ -22,6 +22,3 @@ def extract_databricks(soup, page, main_url):
 
     print(f"[Databricks API] Extracted {len(out)} jobs")
     return out
-
-
-SPECIAL_EXTRACTORS_DEEP["Databricks"] = extract_databricks
