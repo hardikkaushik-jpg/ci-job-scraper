@@ -11,6 +11,7 @@ from .cloudera import extract_cloudera
 from .collibra import extract_collibra
 from .couchbase import extract_couchbase
 from .dataworld import extract_dataworld
+from .databricks import extract_bricks
 from .datadog import extract_datadog
 from .decube import extract_decube
 from .exasol import extract_exasol
