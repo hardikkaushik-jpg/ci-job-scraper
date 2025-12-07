@@ -47,6 +47,7 @@ SPECIAL_EXTRACTORS_DEEP = {
     "Collibra": extract_collibra,
     "Couchbase": extract_couchbase,
     "Data.World": extract_dataworld,
+    "Databricks": extract_databricks,
     "Datadog": extract_datadog,
     "Decube": extract_decube,
     "Exasol": extract_exasol,
