@@ -290,7 +290,7 @@ def extract_date_from_html(html_text):
         except Exception:
             pass
 
-    m2 = re.search(r'<time[^>]+datetime=["\']([^"\\']+)["\']', html_text, re.I)
+    m2 = re.search(r'<time[^>]+datetime=["\']([^"\']+)["\']', html_text, re.I)
     if m2:
         raw = m2.group(1)
         try:
