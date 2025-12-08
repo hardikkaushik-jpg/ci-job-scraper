@@ -178,8 +178,7 @@ def try_extract_location_from_card(el):
         if v and isinstance(v, str):
             return v
     return ""
-
-
+    
 def detect_seniority(title):
     if not title:
         return "Unknown"
@@ -336,23 +335,37 @@ def scrape():
                         print(f"[DEBUG] SPECIAL RETURNED FOR {company}: {len(special)} items")
 
                         for item in special:
-                            # item can be (link, title) or (link, title, el)
-                            if not item:
-                                continue
-                            if len(item) == 3:
-                                link, text, el = item
-                            elif len(item) == 2:
-                                link, text = item
-                                el = None
-                            else:
-                                # Fallback if extractor shape is odd
-                                link = item[0]
-                                text = item[1] if len(item) > 1 else ""
-                                el = None
+    if not item:
+        continue
 
-                            link = normalize_link(main_url, link)
-                            if not link:
-                                continue
+    # Databricks full extractor: (link, title, desc_text, loc_text, post_date)
+    if len(item) == 5:
+        link, text, desc_text, loc_text, post_date = item
+        el = None
+
+    # Normal special extractors (old format)
+    elif len(item) == 3:
+        link, text, el = item
+        desc_text = ""
+        loc_text = ""
+        post_date = ""
+
+    elif len(item) == 2:
+        link, text = item
+        el = None
+        desc_text = ""
+        loc_text = ""
+        post_date = ""
+
+    else:
+        # Fallback for weird tuples
+        link = item[0]
+        text = item[1] if len(item) > 1 else ""
+        el = None
+        desc_text = ""
+        loc_text = ""
+        post_date = ""
+
 
                             # Derive a clean title & possible location from the text
                             raw_text = text or ""
