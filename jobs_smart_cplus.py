@@ -42,13 +42,20 @@ COMPANIES = {
     "InfluxData": ["https://www.influxdata.com/careers/#jobs"],
     "Informatica": ["https://informatica.gr8people.com/jobs", "https://www.informatica.com/us/careers.html"],
     "Matillion": ["https://jobs.lever.co/matillion"],
-    "MongoDB": ["https://www.mongodb.com/company/careers/teams/engineering",
-        "https://www.mongodb.com/company/careers/teams/product-management-and-design"],
+    "MongoDB": [
+        "https://www.mongodb.com/company/careers/teams/engineering",
+        "https://www.mongodb.com/company/careers/teams/product-management-and-design"
+    ],
     "Monte Carlo": ["https://jobs.ashbyhq.com/montecarlodata"],
     "Oracle": ["https://careers.oracle.com/en/sites/jobsearch/jobs"],
-    "Precisely": ["https://www.precisely.com/careers-and-culture/us-jobs",
-        "https://www.precisely.com/careers-and-culture/international-jobs"],
-    "Pentaho": ["https://www.hitachivantara.com/en-us/company/careers/job-search","https://www.hitachivantara.com/en-us/careers.html"],
+    "Precisely": [
+        "https://www.precisely.com/careers-and-culture/us-jobs",
+        "https://www.precisely.com/careers-and-culture/international-jobs"
+    ],
+    "Pentaho": [
+        "https://www.hitachivantara.com/en-us/company/careers/job-search",
+        "https://www.hitachivantara.com/en-us/careers.html"
+    ],
     "Qlik": ["http://careerhub.qlik.com/careers"],
     "Sifflet": ["https://www.welcometothejungle.com/en/companies/sifflet/jobs"],
     "Snowflake": ["https://careers.snowflake.com/global/en/search-results"],
@@ -178,7 +185,8 @@ def try_extract_location_from_card(el):
         if v and isinstance(v, str):
             return v
     return ""
-    
+
+
 def detect_seniority(title):
     if not title:
         return "Unknown"
@@ -282,7 +290,7 @@ def extract_date_from_html(html_text):
         except Exception:
             pass
 
-    m2 = re.search(r'<time[^>]+datetime=["\']([^"\']+)["\']', html_text, re.I)
+    m2 = re.search(r'<time[^>]+datetime=["\']([^"\\']+)["\']', html_text, re.I)
     if m2:
         raw = m2.group(1)
         try:
@@ -335,37 +343,37 @@ def scrape():
                         print(f"[DEBUG] SPECIAL RETURNED FOR {company}: {len(special)} items")
 
                         for item in special:
-    if not item:
-        continue
+                            if not item:
+                                continue
 
-    # Databricks full extractor: (link, title, desc_text, loc_text, post_date)
-    if len(item) == 5:
-        link, text, desc_text, loc_text, post_date = item
-        el = None
+                            # --- Databricks 5-tuple support ---
+                            if len(item) == 5:
+                                link, text, desc_text, loc_text, post_date = item
+                                el = None
 
-    # Normal special extractors (old format)
-    elif len(item) == 3:
-        link, text, el = item
-        desc_text = ""
-        loc_text = ""
-        post_date = ""
+                            # --- Standard 3-tuple special extractors ---
+                            elif len(item) == 3:
+                                link, text, el = item
+                                desc_text = ""
+                                loc_text = ""
+                                post_date = ""
 
-    elif len(item) == 2:
-        link, text = item
-        el = None
-        desc_text = ""
-        loc_text = ""
-        post_date = ""
+                            # --- Legacy 2-tuple extractors ---
+                            elif len(item) == 2:
+                                link, text = item
+                                el = None
+                                desc_text = ""
+                                loc_text = ""
+                                post_date = ""
 
-    else:
-        # Fallback for weird tuples
-        link = item[0]
-        text = item[1] if len(item) > 1 else ""
-        el = None
-        desc_text = ""
-        loc_text = ""
-        post_date = ""
-
+                            else:
+                                # --- Weird formats fallback ---
+                                link = item[0]
+                                text = item[1] if len(item) > 1 else ""
+                                el = None
+                                desc_text = ""
+                                loc_text = ""
+                                post_date = ""
 
                             # Derive a clean title & possible location from the text
                             raw_text = text or ""
@@ -377,8 +385,8 @@ def scrape():
                                 print(f"[DROP-SPECIAL] Filtered non-job from {company} | {title_final} | {link}")
                                 continue
 
-                            posting_date = ""
-                            location_final = (loc_candidate or "").strip()
+                            posting_date = post_date or ""
+                            location_final = (loc_text or loc_candidate or "").strip()
 
                             # Optional detail fetch to enrich ONLY location/date
                             if detail_count < MAX_DETAIL_PAGES:
@@ -534,7 +542,7 @@ def scrape():
                 # parse filtered candidates (unchanged generic logic)
                 for link, anchor_text, el in filtered:
                     time.sleep(SLEEP_BETWEEN_REQUESTS)
-                    
+
                     # --- Workday real title override (CRITICAL FIX FOR ALATION) ---
                     job_title_div = None
                     try:
@@ -572,7 +580,7 @@ def scrape():
                         r'product\s+commercial',
                         r'marketing\s+product'
                     ]
-                    
+
                     # Initialize must_reasons for the block below
                     must_reasons = []
 
@@ -600,12 +608,10 @@ def scrape():
                     if card_loc and not location_candidate:
                         location_candidate = card_loc
                     light_score = score_title_desc(title_candidate, "", company)
-                    
+
                     posting_date = ""
 
                     # === PATCH 1: PRODUCT FILTER (EARLY FORCE DETAIL) ===
-                    # This section appears to be a duplicate/repetition from above, 
-                    # but I'll maintain the logic flow and correct indentation.
                     if "product" in (title_clean or "").lower() and "product_role_force_detail" not in must_reasons:
                         must_detail = True
                         must_reasons.append("product_role_force_detail")
@@ -704,7 +710,7 @@ def scrape():
 
                                 except Exception as e:
                                     print(f"[WARN] detail parse fail {link} -> {e}")
-                        
+
                         # === PATCH 2: PRODUCT FILTER (DESCRIPTION-BASED STRICT CHECK) ===
                         PRODUCT_TECH_KEYWORDS = [
                             "etl", "pipeline", "connector", "integration", "api", "sdk",
