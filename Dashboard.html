@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hiring Intelligence Dashboard · Competitive CI</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--bg2:#13161e;--bg3:#1a1e28;--border:#ffffff12;--border2:#ffffff22;
+  --accent:#4f9eff;--accent2:#38e5b4;--accent3:#ff6b6b;--accent4:#ffb74d;
+  --text:#e8eaf0;--muted:#7a8099;--muted2:#4a5068;
+  --font-head:'Syne',sans-serif;--font-mono:'DM Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-mono);font-size:13px;min-height:100vh;padding:24px 28px}
+.header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.header-left h1{font-family:var(--font-head);font-size:24px;font-weight:700;letter-spacing:-0.5px}
+.header-left p{color:var(--muted);font-size:11px;margin-top:5px;letter-spacing:0.4px}
+.header-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.badge{display:inline-flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:4px 10px;font-size:11px;color:var(--accent2)}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent2);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.pill{font-size:10px;color:var(--muted);padding:4px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:4px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi.k1::after{background:var(--accent)}
+.kpi.k2::after{background:var(--accent2)}
+.kpi.k3::after{background:var(--accent4)}
+.kpi.k4::after{background:var(--accent3)}
+.kpi-label{font-size:10px;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:8px}
+.kpi-val{font-family:var(--font-head);font-size:30px;font-weight:700}
+.kpi.k1 .kpi-val{color:var(--accent)}
+.kpi.k2 .kpi-val{color:var(--accent2)}
+.kpi.k3 .kpi-val{color:var(--accent4)}
+.kpi.k4 .kpi-val{color:var(--accent3)}
+.kpi-sub{font-size:10px;color:var(--muted);margin-top:5px}
+.grid3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px}
+.card-title{font-size:10px;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.card-title span{color:var(--muted2);font-size:10px;text-transform:none;letter-spacing:0}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.bar-label{font-size:10px;color:var(--muted);width:88px;text-align:right;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-label.real{color:var(--text)}
+.bar-track{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px}
+.bar-fill.blurred{filter:blur(3px);opacity:0.55}
+.bar-val{font-size:11px;color:var(--muted);width:36px;text-align:right;flex-shrink:0}
+.bar-val.redacted{background:var(--muted2);color:var(--muted2);border-radius:2px;user-select:none;font-size:9px}
+.donut-wrap{display:flex;gap:16px;align-items:center}
+.donut-legend{flex:1}
+.legend-row{display:flex;align-items:center;gap:6px;margin-bottom:7px;font-size:11px;color:var(--muted)}
+.legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.legend-pct{color:var(--text);font-weight:500;margin-left:auto}
+.hm-header{display:flex;gap:3px;margin-left:80px;margin-bottom:4px}
+.hm-h{width:32px;font-size:9px;color:var(--muted);text-align:center}
+.hm-row{display:flex;gap:3px;align-items:center;margin-bottom:3px}
+.hm-label{font-size:10px;color:var(--muted);width:76px;text-align:right;flex-shrink:0}
+.hm-label.real{color:var(--text)}
+.hm-cell{width:32px;height:24px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--font-mono)}
+.hm-cell.blurred{filter:blur(4px)}
+.loc-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 28px}
+.footer{margin-top:16px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:10px;color:var(--muted2)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Hiring Intelligence Dashboard</h1>
+    <p>Automated competitive talent signal monitoring &middot; Data infrastructure sector &middot; Partial data redacted</p>
+  </div>
+  <div class="header-right">
+    <div class="badge">Pipeline Active</div>
+    <div class="pill">1,099 roles tracked</div>
+    <div class="pill">15 competitors</div>
+    <div class="pill">March 2026</div>
+  </div>
+</div>
+
+<div class="kpis">
+  <div class="kpi k1">
+    <div class="kpi-label">Total Openings</div>
+    <div class="kpi-val">1,099</div>
+    <div class="kpi-sub">Scraped &amp; enriched via pipeline</div>
+  </div>
+  <div class="kpi k2">
+    <div class="kpi-label">Director+ Roles</div>
+    <div class="kpi-val">88</div>
+    <div class="kpi-sub">Senior leadership hiring signals</div>
+  </div>
+  <div class="kpi k3">
+    <div class="kpi-label">High Relevancy</div>
+    <div class="kpi-val">112</div>
+    <div class="kpi-sub">Relevancy score &ge; 8.5</div>
+  </div>
+  <div class="kpi k4">
+    <div class="kpi-label">Posted &lt; 7 Days</div>
+    <div class="kpi-val">208</div>
+    <div class="kpi-sub">Fresh signals this week</div>
+  </div>
+</div>
+
+<div class="grid3">
+  <div class="card">
+    <div class="card-title">Openings by competitor <span>top 10 &middot; partial redaction applied</span></div>
+    <div id="company-bars"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Seniority mix</div>
+    <div class="donut-wrap">
+      <canvas id="donut" width="110" height="110"></canvas>
+      <div class="donut-legend" id="donut-legend"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Function split</div>
+    <div id="func-bars"></div>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="card">
+    <div class="card-title">Seniority &times; company heatmap <span>top 6 &middot; partial redaction</span></div>
+    <div id="heatmap"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Posting velocity <span>days since posted</span></div>
+    <div id="velocity"></div>
+    <div style="margin-top:18px">
+      <div class="card-title" style="margin-bottom:10px">Relevancy score distribution</div>
+      <div id="relevancy"></div>
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:12px">
+  <div class="card-title">Geographic distribution <span>top 10 locations</span></div>
+  <div class="loc-grid" id="location-bars"></div>
+</div>
+
+<div class="footer">
+  <span>Playwright scraper &rarr; validation &amp; enrichment pipeline &rarr; automated daily delivery &middot; Full dataset restricted</span>
+  <span>Data infrastructure sector &middot; 1,099 job postings &middot; March 2026</span>
+</div>
+
+<script>
+const companies = [
+  {name:"Databricks",   val:620, real:true},
+  {name:"Fivetran",     val:135, real:true},
+  {name:"MongoDB",      val:107, real:true},
+  {name:"Competitor D", val:43,  real:false},
+  {name:"Competitor E", val:37,  real:false},
+  {name:"Competitor F", val:31,  real:false},
+  {name:"Competitor G", val:16,  real:false},
+  {name:"Competitor H", val:13,  real:false},
+  {name:"Competitor I", val:12,  real:false},
+  {name:"Competitor J", val:12,  real:false},
+];
+const seniority = {Senior:450,Unknown:346,Manager:151,"Director+":88,"Principal/Staff":38,Mid:13,Intern:11,Entry:2};
+const funcs = {Engineering:585,Other:384,Product:62,"Data/Analytics":27,Sales:22,Marketing:13};
+const heatData = {
+  "Databricks":   {Senior:247,Manager:82,"Director+":60,"Principal/Staff":12,Unknown:210,real:true},
+  "Fivetran":     {Senior:59, Manager:30,"Director+":14,"Principal/Staff":3, Unknown:20, real:true},
+  "MongoDB":      {Senior:63, Manager:1, "Director+":3, "Principal/Staff":1, Unknown:36, real:true},
+  "Competitor D": {Senior:12, Manager:11,"Director+":0, "Principal/Staff":4, Unknown:16, real:false},
+  "Competitor E": {Senior:17, Manager:7, "Director+":1, "Principal/Staff":0, Unknown:11, real:false},
+  "Competitor F": {Senior:16, Manager:2, "Director+":3, "Principal/Staff":6, Unknown:4,  real:false},
+};
+const locations = [
+  ["United States",145],["Bengaluru, India",75],["San Francisco, CA",68],
+  ["Mountain View, CA",38],["India",34],["London, UK",31],
+  ["Seattle, WA",28],["Amsterdam, NL",26],["MV + SF, CA",23],["Bellevue, WA",16]
+];
+const veloc = {"0-7d":208,"8-14d":93,"15-30d":453,"30d+":32};
+const rel   = {"< 5":638,"5 - 7":99,"7 - 8.5":250,"8.5+":112};
+
+// Company bars
+const coColors = ["#4f9eff","#38e5b4","#a78bfa","#ffb74d","#ff6b6b","#4f9eff","#38e5b4","#ffb74d","#ff6b6b","#a78bfa"];
+const maxCo = companies[0].val;
+const coBars = document.getElementById('company-bars');
+companies.forEach(({name,val,real},i) => {
+  coBars.innerHTML += `<div class="bar-row">
+    <div class="bar-label ${real?'real':''}">${name}</div>
+    <div class="bar-track"><div class="bar-fill ${real?'':'blurred'}" style="width:${Math.round(val/maxCo*100)}%;background:${coColors[i]}"></div></div>
+    <div class="bar-val ${real?'':'redacted'}">${val}</div>
+  </div>`;
+});
+
+// Donut
+const dCtx = document.getElementById('donut').getContext('2d');
+const senColors = {Senior:'#4f9eff',Unknown:'#4a5068',Manager:'#ffb74d',"Director+":'#ff6b6b',"Principal/Staff":'#a78bfa',Mid:'#38e5b4',Intern:'#f06292',Entry:'#80cbc4'};
+const senTotal = Object.values(seniority).reduce((a,b)=>a+b,0);
+let sa = -Math.PI/2;
+Object.entries(seniority).forEach(([key,val]) => {
+  const slice = (val/senTotal)*Math.PI*2;
+  dCtx.beginPath(); dCtx.moveTo(55,55); dCtx.arc(55,55,48,sa,sa+slice); dCtx.closePath();
+  dCtx.fillStyle = senColors[key]||'#666'; dCtx.fill(); sa += slice;
+});
+dCtx.beginPath(); dCtx.arc(55,55,30,0,Math.PI*2); dCtx.fillStyle='#13161e'; dCtx.fill();
+dCtx.fillStyle='#e8eaf0'; dCtx.font='bold 13px Syne,sans-serif'; dCtx.textAlign='center'; dCtx.textBaseline='middle'; dCtx.fillText('1,099',55,48);
+dCtx.fillStyle='#7a8099'; dCtx.font='9px DM Mono,monospace'; dCtx.fillText('total',55,62);
+const legend = document.getElementById('donut-legend');
+Object.entries(seniority).forEach(([k,v]) => {
+  if(v<5) return;
+  legend.innerHTML += `<div class="legend-row"><div class="legend-dot" style="background:${senColors[k]}"></div><span>${k}</span><span class="legend-pct">${Math.round(v/senTotal*100)}%</span></div>`;
+});
+
+// Function bars
+const maxF = funcs.Engineering;
+const fcColors = ["#4f9eff","#4a5068","#38e5b4","#ffb74d","#ff6b6b","#a78bfa"];
+const funcBars = document.getElementById('func-bars');
+Object.entries(funcs).forEach(([name,val],i) => {
+  funcBars.innerHTML += `<div class="bar-row"><div class="bar-label real" style="width:94px">${name}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(val/maxF*100)}%;background:${fcColors[i]}"></div></div><div class="bar-val">${val}</div></div>`;
+});
+
+// Heatmap
+const hmSens = ["Senior","Manager","Director+","Principal/Staff","Unknown"];
+const maxHM = 247;
+const getColor = v => {
+  if(!v) return '#1a1e28';
+  const t = Math.min(v/maxHM,1);
+  return `rgb(${Math.round(25+t*54)},${Math.round(30+t*128)},${Math.round(50+t*155)})`;
+};
+const hmDiv = document.getElementById('heatmap');
+let hmHtml = '<div class="hm-header">';
+hmSens.forEach(s => hmHtml += `<div class="hm-h">${s.substring(0,4)}</div>`);
+hmHtml += '</div>';
+Object.entries(heatData).forEach(([co,d]) => {
+  hmHtml += `<div class="hm-row"><div class="hm-label ${d.real?'real':''}">${co}</div>`;
+  hmSens.forEach(s => {
+    const v = d[s]||0;
+    hmHtml += `<div class="hm-cell ${d.real?'':'blurred'}" style="background:${getColor(v)};color:${v>50?'#e8eaf0':'#4a5068'}">${v||''}</div>`;
+  });
+  hmHtml += '</div>';
+});
+hmDiv.innerHTML = hmHtml;
+
+// Velocity
+const velDiv = document.getElementById('velocity');
+const maxV = Math.max(...Object.values(veloc));
+const vColors = ['#38e5b4','#4f9eff','#ffb74d','#ff6b6b'];
+Object.entries(veloc).forEach(([label,val],i) => {
+  velDiv.innerHTML += `<div class="bar-row"><div class="bar-label real" style="width:52px">${label}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(val/maxV*100)}%;background:${vColors[i]}"></div></div><div class="bar-val">${val}</div></div>`;
+});
+
+// Relevancy
+const relDiv = document.getElementById('relevancy');
+const maxR = Math.max(...Object.values(rel));
+const rColors = ['#4a5068','#ffb74d','#4f9eff','#38e5b4'];
+Object.entries(rel).forEach(([label,val],i) => {
+  relDiv.innerHTML += `<div class="bar-row"><div class="bar-label real" style="width:52px">${label}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(val/maxR*100)}%;background:${rColors[i]}"></div></div><div class="bar-val">${val}</div></div>`;
+});
+
+// Locations
+const locDiv = document.getElementById('location-bars');
+const maxL = locations[0][1];
+const lcColors = ["#4f9eff","#38e5b4","#4f9eff","#38e5b4","#ffb74d","#4f9eff","#38e5b4","#ffb74d","#ff6b6b","#4f9eff"];
+locations.forEach(([name,val],i) => {
+  locDiv.innerHTML += `<div class="bar-row"><div class="bar-label real" style="width:130px">${name}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(val/maxL*100)}%;background:${lcColors[i]}"></div></div><div class="bar-val">${val}</div></div>`;
+});
+</script>
+</body>
+</html>
