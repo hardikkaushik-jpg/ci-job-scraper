@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Competitive Hiring Intelligence · Actian CI Pipeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f3ee;--bg2:#fff;--bg3:#eeede6;--bg4:#e8e7df;
+  --border:#dddcd3;--border2:#c8c7be;
+  --teal:#146b5c;--teal-l:#e4f2ef;--teal-m:#1d8a77;
+  --blue:#1452a0;--blue-l:#e4edf8;
+  --amber:#a85f0a;--amber-l:#fdf0e0;
+  --red:#a82a2a;--red-l:#fce8e8;
+  --purple:#5228a0;--purple-l:#ede8fa;
+  --green:#186b30;--green-l:#e4f5ea;
+  --text:#16150f;--muted:#636058;--muted2:#9c9b92;
+  --font:'Inter',sans-serif;--font-h:'Syne',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;padding:22px 26px;line-height:1.5;min-width:900px}
+
+/* HEADER */
+.hdr{background:var(--teal);color:#fff;border-radius:10px;padding:18px 24px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.hdr h1{font-family:var(--font-h);font-size:20px;font-weight:800;letter-spacing:-0.4px}
+.hdr p{font-size:10px;opacity:0.68;margin-top:3px;letter-spacing:0.2px}
+.hdr-right{display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.hdr-tag{background:rgba(255,255,255,0.15);border-radius:4px;padding:3px 9px;font-size:10px;font-weight:500;white-space:nowrap}
+.live{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:500}
+.live::before{content:'';width:7px;height:7px;border-radius:50%;background:#5ef0ca;animation:lp 2s infinite;flex-shrink:0}
+@keyframes lp{0%,100%{opacity:1}50%{opacity:0.25}}
+
+/* ZONE DIVIDERS */
+.zone{font-size:9px;font-weight:700;color:var(--muted2);letter-spacing:1.4px;text-transform:uppercase;margin:16px 0 9px 1px;display:flex;align-items:center;gap:8px}
+.zone::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* KPI STRIP */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:14px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:13px 14px;position:relative;overflow:hidden}
+.kpi-bar{position:absolute;top:0;left:0;width:3px;height:100%;border-radius:8px 0 0 8px}
+.kpi-lbl{font-size:9px;color:var(--muted);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:5px}
+.kpi-val{font-family:var(--font-h);font-size:27px;font-weight:800;line-height:1}
+.kpi-note{font-size:10px;color:var(--muted);margin-top:4px}
+.kpi-delta{font-size:10px;font-weight:600;margin-top:3px}
+.up{color:var(--teal)}.warn{color:var(--amber)}.neutral{color:var(--muted2)}
+
+/* LAYOUT */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.g3l{display:grid;grid-template-columns:3fr 2fr;gap:10px;margin-bottom:10px}
+.g3r{display:grid;grid-template-columns:2fr 3fr;gap:10px;margin-bottom:10px}
+.g32{display:grid;grid-template-columns:2fr 1.3fr;gap:10px;margin-bottom:10px}
+.vstack{display:flex;flex-direction:column;gap:10px}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:13px 15px}
+.ct{font-size:11px;font-weight:600;color:var(--text);margin-bottom:2px;line-height:1.4}
+.cs{font-size:10px;color:var(--muted);margin-bottom:10px;line-height:1.4}
+
+/* INSIGHT CALLOUTS */
+.ins{background:var(--teal-l);border-left:3px solid var(--teal);border-radius:0 5px 5px 0;padding:7px 10px;margin-bottom:9px;font-size:11px;color:#0c4a3e;line-height:1.5}
+.ins strong{font-weight:600}
+.warn-ins{background:var(--amber-l);border-left:3px solid var(--amber);border-radius:0 5px 5px 0;padding:7px 10px;margin-bottom:9px;font-size:11px;color:#6e3e08;line-height:1.5}
+.warn-ins strong{font-weight:600}
+
+/* SIGNAL FLAGS */
+.sflag{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:0.3px;margin-bottom:9px}
+.sflag::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.sflag-red{background:var(--red-l);color:var(--red)}.sflag-red::before{background:var(--red)}
+.sflag-amb{background:var(--amber-l);color:var(--amber)}.sflag-amb::before{background:var(--amber)}
+.sflag-teal{background:var(--teal-l);color:var(--teal)}.sflag-teal::before{background:var(--teal)}
+
+/* BARS */
+.br{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.bl{font-size:10px;color:var(--muted);text-align:right;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bl.hi{color:var(--text);font-weight:500}
+.bt{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.bf{height:100%;border-radius:3px}
+.bv{font-size:10px;color:var(--muted);width:30px;text-align:right;flex-shrink:0}
+.bv.blur{filter:blur(4px);user-select:none}
+
+/* HEATMAP */
+.hm-hdr{display:flex;gap:2px;margin-left:90px;margin-bottom:3px}
+.hm-h{width:36px;font-size:9px;color:var(--muted);text-align:center;font-weight:500}
+.hm-row{display:flex;gap:2px;align-items:center;margin-bottom:2px}
+.hm-lb{font-size:10px;width:86px;text-align:right;padding-right:4px;color:var(--muted);flex-shrink:0}
+.hm-lb.hi{color:var(--text);font-weight:500}
+.hm-cell{width:36px;height:25px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;cursor:default;transition:opacity 0.15s}
+.hm-cell:hover{opacity:0.75}
+.hm-cell.blur{filter:blur(4px)}
+
+/* SKILL ROWS */
+.sk{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--bg3)}
+.sk:last-child{border-bottom:none}
+.sk-n{font-size:11px;font-weight:600;width:110px;flex-shrink:0}
+.sk-b{flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.sk-f{height:100%;border-radius:3px}
+.sk-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;flex-shrink:0;width:40px;text-align:center}
+.sk-hi{background:var(--teal-l);color:var(--teal)}
+.sk-med{background:var(--purple-l);color:var(--purple)}
+.sk-lo{background:var(--bg3);color:var(--muted)}
+.sk-trend{font-size:9px;font-weight:600;width:42px;text-align:right;color:var(--teal);flex-shrink:0}
+.sk-trend.stable{color:var(--muted2)}
+.sk-cnt{font-size:10px;color:var(--muted);width:50px;text-align:right;flex-shrink:0}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{font-size:9px;font-weight:700;color:var(--muted);padding:5px 7px;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap;text-transform:uppercase;letter-spacing:0.4px}
+td{padding:5px 7px;border-bottom:1px solid var(--bg3);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3)}
+.tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:700}
+.rb{display:inline-block;padding:2px 7px;border-radius:3px;font-weight:700;font-size:10px}
+.rb-hi{background:var(--red-l);color:var(--red)}
+.rb-med{background:var(--amber-l);color:var(--amber)}
+.rb-lo{background:var(--bg3);color:var(--muted)}
+.skill-tag{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;background:var(--teal-l);color:var(--teal)}
+
+/* GTM SECTION */
+.gtm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:10px}
+.gtm-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:13px 15px;display:flex;flex-direction:column;gap:0}
+.gtm-type{font-size:9px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;justify-content:space-between}
+.gtm-urgency{font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px}
+.urg-high{background:var(--red-l);color:var(--red)}
+.urg-med{background:var(--amber-l);color:var(--amber)}
+.urg-watch{background:var(--blue-l);color:var(--blue)}
+.gtm-signal{font-size:11px;font-weight:600;color:var(--text);margin-bottom:4px;line-height:1.4}
+.gtm-evidence{font-size:10px;color:var(--muted);margin-bottom:8px;line-height:1.5;padding-bottom:8px;border-bottom:1px solid var(--bg3)}
+.gtm-action-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:3px}
+.gtm-action{font-size:10px;line-height:1.5;padding:7px 9px;border-radius:5px;font-weight:500}
+.gtm-threat .gtm-type{color:var(--red)}
+.gtm-threat .gtm-action{background:var(--red-l);color:#7a1a1a}
+.gtm-threat .gtm-action-lbl{color:var(--red)}
+.gtm-opportunity .gtm-type{color:var(--green)}
+.gtm-opportunity .gtm-action{background:var(--green-l);color:#0f4a1e}
+.gtm-opportunity .gtm-action-lbl{color:var(--green)}
+.gtm-monitor .gtm-type{color:var(--blue)}
+.gtm-monitor .gtm-action{background:var(--blue-l);color:#0a3878}
+.gtm-monitor .gtm-action-lbl{color:var(--blue)}
+.gtm-co{font-size:10px;color:var(--muted);font-weight:500;margin-bottom:6px}
+
+/* GROUP SUMMARY */
+.grp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:10px}
+.grp-card{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:10px 11px}
+.grp-name{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grp-val{font-family:var(--font-h);font-size:20px;font-weight:800}
+.grp-sub{font-size:9px;color:var(--muted);margin-top:2px}
+.grp-cos{font-size:9px;color:var(--muted2);margin-top:3px}
+
+.footer{margin-top:14px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:10px;color:var(--muted2)}
+
+/* COMPANY TABLE TAGS */
+.t-wh{background:#e4f2ef;color:#146b5c}
+.t-et{background:#e4edf8;color:#1452a0}
+.t-di{background:#ede8fa;color:#5228a0}
+.t-ob{background:#e4f5ea;color:#186b30}
+.t-mo{background:#fdf0e0;color:#a85f0a}
+.t-ot{background:#eeede6;color:#636058}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div>
+    <h1>Competitive Hiring Intelligence Dashboard</h1>
+    <p>Automated pipeline: scrape → validate → enrich → relevancy score → daily delivery &nbsp;·&nbsp; Data infrastructure &amp; analytics sector &nbsp;·&nbsp; Some data redacted</p>
+  </div>
+  <div class="hdr-right">
+    <div class="live">Pipeline Active</div>
+    <div class="hdr-tag">4,367 roles tracked</div>
+    <div class="hdr-tag">62 competitors</div>
+    <div class="hdr-tag">6 market segments</div>
+    <div class="hdr-tag">March 2026</div>
+  </div>
+</div>
+
+<!-- ZONE 1: SNAPSHOT -->
+<div class="zone">Executive snapshot</div>
+<div class="kpis">
+  <div class="kpi">
+    <div class="kpi-bar" style="background:var(--teal)"></div>
+    <div class="kpi-lbl">Total roles tracked</div>
+    <div class="kpi-val" style="color:var(--teal)">4,367</div>
+    <div class="kpi-note">62 competitors · 6 segments</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-bar" style="background:var(--red)"></div>
+    <div class="kpi-lbl">Direct threat roles</div>
+    <div class="kpi-val" style="color:var(--red)">412</div>
+    <div class="kpi-note">Relevancy ≥ 8.5 to Actian</div>
+    <div class="kpi-delta warn">↑ +18% vs prior 30d</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-bar" style="background:var(--amber)"></div>
+    <div class="kpi-lbl">Leadership signals</div>
+    <div class="kpi-val" style="color:var(--amber)">558</div>
+    <div class="kpi-note">Director+ openings active</div>
+    <div class="kpi-delta warn">↑ 13% of all postings</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-bar" style="background:var(--blue)"></div>
+    <div class="kpi-lbl">Active this week</div>
+    <div class="kpi-val" style="color:var(--blue)">786</div>
+    <div class="kpi-note">Posted in last 7 days</div>
+    <div class="kpi-delta up">Feb–Mar hiring season peak</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-bar" style="background:var(--purple)"></div>
+    <div class="kpi-lbl">High-signal skills</div>
+    <div class="kpi-val" style="color:var(--purple)">2</div>
+    <div class="kpi-note">Gov. (33.9) · Obs. (30.8)</div>
+    <div class="kpi-delta up">↑ rising frequency</div>
+  </div>
+</div>
+
+<!-- MARKET SEGMENT SUMMARY -->
+<div class="zone">Market segment overview — 6 groups · 62 competitors</div>
+<div class="grp-grid" id="grpGrid"></div>
+
+<!-- ZONE 2: MOMENTUM -->
+<div class="zone">Hiring momentum &amp; velocity</div>
+<div class="g3l">
+  <div class="card">
+    <div class="ct">Sector-wide hiring velocity — weekly postings by segment</div>
+    <div class="cs">16-week view · Feb–Mar surge is a sector-wide Q1 headcount release, not a single-company event</div>
+    <div class="ins"><strong>Hiring season peaked Feb 17 across all segments simultaneously</strong> — consistent with annual planning cycle. Warehouse/Processing and Monitoring groups show the largest absolute volumes. ETL/Connectors peaked one week later, suggesting a secondary wave of pipeline tooling investment.</div>
+    <div style="position:relative;height:165px"><canvas id="trendChart"></canvas></div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:10px;color:var(--muted)" id="trendLeg"></div>
+  </div>
+  <div class="card">
+    <div class="ct">Top 12 competitors by total openings</div>
+    <div class="cs">Public companies · counts partially redacted for smaller players</div>
+    <div class="ins"><strong>No single company dominates</strong> — top 10 range from 138–174 roles. Balanced distribution across public-stage players indicates a competitive, expanding market.</div>
+    <div id="momBars"></div>
+  </div>
+</div>
+
+<!-- ZONE 3: SIGNAL DEPTH -->
+<div class="zone">Signal depth — seniority, skills &amp; function</div>
+<div class="g2">
+  <div class="card">
+    <div class="ct">Leadership vs execution — seniority heatmap by top competitor</div>
+    <div class="cs">Shading = intensity relative to company total · redacted for non-disclosed companies</div>
+    <div class="ins"><strong>Collibra and Informatica IDMC show disproportionate Director+ hiring</strong> (12–14% of postings) — signals strategic repositioning, not backfill. Acceldata is almost entirely Senior/Principal engineering — classic early-scale pattern.</div>
+    <div id="heatmap"></div>
+  </div>
+  <div class="vstack">
+    <div class="card">
+      <div class="ct">Skill signals — what competitors are advertising as priority</div>
+      <div class="cs">Ranked by avg relevancy to Actian · trend direction shown</div>
+      <div class="ins"><strong>GOVERNANCE (33.9) and OBSERVABILITY (30.8) are direct Actian territory.</strong> Low frequency but highest relevancy — every role with these terms is a potential competitive displacement event. DATA MESH is the emerging white space signal.</div>
+      <div id="skillRows"></div>
+    </div>
+    <div class="card">
+      <div class="ct">Function mix by market segment</div>
+      <div class="cs">Engineering dominates across all groups · Data Intelligence shows highest Product ratio</div>
+      <div id="funcBars"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ZONE 4: GTM INTELLIGENCE -->
+<div class="zone">GTM &amp; sales intelligence — product launch signals &amp; actionable recommendations</div>
+<div class="gtm-grid" id="gtmGrid"></div>
+
+<!-- ZONE 5: DEEP SIGNAL -->
+<div class="zone">Deep signal — top roles &amp; geographic intelligence</div>
+<div class="g32">
+  <div class="card">
+    <div class="ct">Top 12 roles to watch — ranked by competitive relevance to Actian</div>
+    <div class="cs">Roles scoring ≥ 24 relevancy · Governance &amp; Observability roles flagged · redacted = full dataset access required</div>
+    <div class="ins"><strong>Collibra's VP Product (Governance Automation) at 38.2 is the highest-relevancy role in the dataset.</strong> Combined with Snowflake's Director of Data Integration Engineering, these signal two separate competitive entry points into Actian's core market within the same 30-day window.</div>
+    <div style="overflow-x:auto"><table id="rolesTable"></table></div>
+  </div>
+  <div class="vstack">
+    <div class="card">
+      <div class="ct">Geographic concentration — where talent is being pulled</div>
+      <div class="cs">Top 10 locations across all 62 competitors</div>
+      <div class="warn-ins"><strong>San Francisco + Seattle + Remote (US)</strong> account for 37% of all postings. Bengaluru at 11% signals continued offshore engineering scale. London and Amsterdam represent EMEA competitive clusters to monitor.</div>
+      <div id="geoBars"></div>
+    </div>
+    <div class="card">
+      <div class="ct">Overall seniority distribution</div>
+      <div class="cs">Senior-heavy build across sector confirms expansion, not backfill</div>
+      <div style="position:relative;height:130px"><canvas id="senChart"></canvas></div>
+      <div id="senLeg" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:10px;color:var(--muted)"></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <span>Playwright scraper → field validation &amp; enrichment → relevancy scoring → daily automated delivery &nbsp;·&nbsp; Full dataset access restricted &nbsp;·&nbsp; Synthetic data for portfolio demonstration</span>
+  <span>Data infrastructure &amp; analytics sector &nbsp;·&nbsp; 4,367 job postings &nbsp;·&nbsp; 62 competitors &nbsp;·&nbsp; March 2026</span>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+
+const groups = [
+  {name:"Warehouse/Processing", short:"Warehouse",  cos:14, jobs:1124, dir:143, eng:583, color:"#146b5c"},
+  {name:"ETL / Connectors",     short:"ETL",        cos:12, jobs:807,  dir:108, eng:443, color:"#1452a0"},
+  {name:"Data Intelligence",    short:"Data Intel", cos:12, jobs:627,  dir:76,  eng:262, color:"#5228a0"},
+  {name:"Data Observability",   short:"Observ.",    cos:10, jobs:227,  dir:21,  eng:136, color:"#186b30"},
+  {name:"Monitoring/Platforms", short:"Monitoring", cos:8,  jobs:939,  dir:128, eng:545, color:"#a85f0a"},
+  {name:"Other / Adjacent",     short:"Other",      cos:6,  jobs:643,  dir:82,  eng:308, color:"#636058"},
+];
+
+const trendWeeks = ["Nov 4","Nov 18","Dec 2","Dec 16","Dec 30","Jan 13","Jan 27","Feb 3","Feb 10","Feb 17","Feb 24","Mar 3","Mar 10","Mar 17","Mar 24","Mar 31"];
+const groupTrend = {
+  "Warehouse":  [46,40,24,18,29,62,57,104,145,120,140,103,74,56,58,49],
+  "ETL":        [27,29,13,17,26,33,57,62,92,124,115,68,70,57,44,26],
+  "Data Intel": [23,20,15,12,18,31,33,62,63,85,77,72,45,32,34,29],
+  "Observ.":    [10,8,5,4,8,9,16,16,31,27,29,27,18,14,12,10],
+  "Monitoring": [45,38,18,18,26,43,67,83,96,134,110,109,75,55,52,35],
+  "Other":      [30,22,11,15,19,28,44,57,66,99,75,53,43,44,34,30],
+};
+
+const top12 = [
+  {name:"Amazon Redshift",   jobs:174, group:"wh", real:true},
+  {name:"Splunk",            jobs:173, group:"mo", real:true},
+  {name:"Snowflake",         jobs:161, group:"wh", real:true},
+  {name:"Salesforce DC",     jobs:160, group:"ot", real:true},
+  {name:"Collibra",          jobs:159, group:"di", real:true},
+  {name:"Talend",            jobs:157, group:"et", real:true},
+  {name:"Informatica IDMC",  jobs:155, group:"di", real:true},
+  {name:"Sumo Logic",        jobs:148, group:"mo", real:false},
+  {name:"Informatica",       jobs:144, group:"et", real:false},
+  {name:"Elastic",           jobs:138, group:"mo", real:false},
+  {name:"Datadog",           jobs:124, group:"mo", real:false},
+  {name:"MongoDB",           jobs:128, group:"ot", real:false},
+];
+
+const hmCos = [
+  {name:"Collibra",        real:true,  d:{Senior:60,Manager:29,"Director+":19,"P/Staff":19,Mid:16}},
+  {name:"Informatica IDMC",real:true,  d:{Senior:54,Manager:31,"Director+":22,"P/Staff":16,Mid:19}},
+  {name:"Snowflake",       real:true,  d:{Senior:56,Manager:32,"Director+":23,"P/Staff":16,Mid:19}},
+  {name:"Talend",          real:true,  d:{Senior:55,Manager:31,"Director+":22,"P/Staff":16,Mid:19}},
+  {name:"Amazon Redshift", real:true,  d:{Senior:61,Manager:35,"Director+":24,"P/Staff":17,Mid:21}},
+  {name:"Fivetran",        real:true,  d:{Senior:36,Manager:17,"Director+":11,"P/Staff":11,Mid:9}},
+  {name:"Competitor G",    real:false, d:{Senior:43,Manager:25,"Director+":17,"P/Staff":12,Mid:15}},
+  {name:"Competitor H",    real:false, d:{Senior:48,Manager:28,"Director+":19,"P/Staff":14,Mid:17}},
+];
+const hmSens = ["Senior","Manager","Director+","P/Staff","Mid"];
+
+const skills = [
+  {name:"GOVERNANCE",    count:47,  avg:33.9, trend:"rising"},
+  {name:"OBSERVABILITY", count:52,  avg:30.8, trend:"rising"},
+  {name:"DATA MESH",     count:28,  avg:22.4, trend:"rising"},
+  {name:"LAKEHOUSE",     count:89,  avg:18.6, trend:"stable"},
+  {name:"STREAMING",     count:64,  avg:16.1, trend:"stable"},
+  {name:"AI/ML",         count:312, avg:14.2, trend:"rising"},
+  {name:"INTEGRATION",   count:143, avg:12.8, trend:"stable"},
+  {name:"dbt",           count:38,  avg:9.4,  trend:"stable"},
+];
+
+const funcData = [
+  {name:"Warehouse/Processing",eng:583,prod:142,sales:124,other:275,color:"#146b5c"},
+  {name:"Monitoring/Platforms", eng:545,prod:106,sales:102,other:186,color:"#a85f0a"},
+  {name:"ETL / Connectors",     eng:443,prod:109,sales:83, other:172,color:"#1452a0"},
+  {name:"Data Intelligence",    eng:262,prod:100,sales:74, other:191,color:"#5228a0"},
+  {name:"Other / Adjacent",     eng:308,prod:77, sales:55, other:203,color:"#636058"},
+  {name:"Data Observability",   eng:136,prod:42, sales:27, other:22, color:"#186b30"},
+];
+
+const gtmSignals = [
+  {type:"threat",   category:"Product Expansion", urgency:"HIGH",
+   company:"Collibra + Atlan",
+   signal:"Coordinated Governance Automation product push — 14 PM roles with 'lineage automation' in JDs",
+   evidence:"47 governance-tagged roles across 8 companies in 6 weeks · avg relevancy 33.9",
+   action:"Actian's automated lineage capabilities are directly in the crosshairs. Brief sales on differentiation before Q2 pipeline reviews. Accelerate documentation of lineage features in competitive battlecards."},
+  {type:"threat",   category:"Market Entry Signal", urgency:"HIGH",
+   company:"Snowflake",
+   signal:"Snowflake hiring 'Data Integration Platform Engineers' — direct ETL market entry",
+   evidence:"18 integration-specific roles posted Feb–Mar · zero in prior quarter · Director-level hire in SF",
+   action:"Flag to sales immediately: expect Snowflake bundling native ETL in enterprise deals by Q3 2026. Update competitive positioning for any Snowflake-adjacent deals. Consider co-sell pivot before they close that gap."},
+  {type:"opportunity", category:"Partnership Gap", urgency:"MEDIUM",
+   company:"Monte Carlo + Anomalo",
+   signal:"Observability vendors scaling SEs with no SI or partner ecosystem roles",
+   evidence:"83 SE roles, 2 partner-facing roles across Data Observability group · no channel investment",
+   action:"These vendors need implementation partners for enterprise deployments. Actian can position as the integration backbone for observability pipelines. Reach out to their SE leadership with a co-sell conversation before a larger SI captures this."},
+  {type:"opportunity", category:"Emerging White Space", urgency:"MEDIUM",
+   company:"Sector-wide (11 companies)",
+   signal:"'Data Mesh' appearing in 28 JDs across 11 competitors — no dedicated product launched yet",
+   evidence:"Avg relevancy 22.4 · highest emerging-term score · Databricks + Collibra + Atlan all hiring for it",
+   action:"First-mover opportunity. No competitor has shipped a dedicated data mesh product. Actian's distributed architecture maps directly to mesh principles. Thought leadership content + analyst briefing now could own the narrative before a funded launch."},
+  {type:"monitor",  category:"EMEA Leadership Build", urgency:"WATCH",
+   company:"Databricks + Fivetran + Informatica",
+   signal:"Simultaneous Director+ GTM hiring in London, Amsterdam, and Frankfurt",
+   evidence:"19 EMEA Director+ roles in 30 days · 3× prior period rate · primarily enterprise sales profiles",
+   action:"Three-way EMEA push signals competitive intensity in enterprise accounts. Brief UK and DACH regional sales before Q2. Identify any shared accounts where these hires could influence deal timing."},
+  {type:"monitor",  category:"Platform Re-Architecture", urgency:"WATCH",
+   company:"dbt Labs + Airbyte",
+   signal:"Rust and WebAssembly engineer hiring at companies historically on Python stacks",
+   evidence:"12 Rust-specific roles in 8 weeks · both companies known for Python/Go codebases",
+   action:"Platform rewrites take 12–18 months but the performance positioning follows. This is an early signal of next-gen throughput benchmarking. Track for product roadmap and benchmark response implications in late 2026."},
+];
+
+const roles = [
+  {co:"Collibra",    coTag:"di", title:"VP Product — Data Governance Automation",    loc:"New York, NY",      rel:38.2, sen:"Director+",   skill:"GOVERNANCE"},
+  {co:"Snowflake",   coTag:"wh", title:"Director, Data Integration Engineering",      loc:"San Francisco, CA", rel:36.8, sen:"Director+",   skill:"INTEGRATION"},
+  {co:"Monte Carlo", coTag:"ob", title:"Staff Engineer — Pipeline Observability",     loc:"Remote (US)",       rel:35.1, sen:"P/Staff",     skill:"OBSERVABILITY"},
+  {co:"Atlan",       coTag:"di", title:"Senior PM — Automated Data Lineage",          loc:"New York, NY",      rel:34.6, sen:"Manager",     skill:"GOVERNANCE"},
+  {co:"Databricks",  coTag:"wh", title:"Director Eng — Data Governance Platform",     loc:"Mountain View, CA", rel:33.0, sen:"Director+",   skill:"GOVERNANCE"},
+  {co:"Anomalo",     coTag:"ob", title:"Senior SWE — Data Quality & Observability",   loc:"Remote (US)",       rel:32.4, sen:"Senior",      skill:"OBSERVABILITY"},
+  {co:"Informatica", coTag:"et", title:"Principal Architect — Cloud Data Integration","loc":"Austin, TX",       rel:31.8, sen:"P/Staff",     skill:"INTEGRATION"},
+  {co:"Fivetran",    coTag:"et", title:"Director, Enterprise Sales — EMEA",           loc:"London, UK",        rel:29.2, sen:"Director+",   skill:""},
+  {co:"dbt Labs",    coTag:"et", title:"Staff Engineer — Streaming Transformations",  loc:"Remote (US)",       rel:27.8, sen:"P/Staff",     skill:"STREAMING"},
+  {co:"Collibra",    coTag:"di", title:"Senior SE — Governance & Compliance",         loc:"Amsterdam, NL",     rel:26.4, sen:"Senior",      skill:"GOVERNANCE"},
+  {co:"Sifflet",     coTag:"ob", title:"Senior Backend Eng — Data Integration",       loc:"Paris, France",     rel:25.1, sen:"Senior",      skill:"INTEGRATION"},
+  {co:"Snowflake",   coTag:"wh", title:"PM — Native Data Pipeline Builder",           loc:"Seattle, WA",       rel:24.8, sen:"Manager",     skill:"INTEGRATION"},
+];
+
+const geo = [
+  ["San Francisco, CA",611],["Remote (US)",524],["Bengaluru, India",480],
+  ["Seattle, WA",393],["Other International",393],["New York, NY",349],
+  ["Other US",349],["London, UK",306],["Amsterdam, NL",218],["Austin, TX",175],
+];
+
+const seniority = {Senior:1526,Manager:800,"Director+":558,"Principal/Staff":494,Mid:549,Entry:283,Intern:157};
+const senColors  = {Senior:"#146b5c",Manager:"#a85f0a","Director+":"#a82a2a","Principal/Staff":"#5228a0",Mid:"#1452a0",Entry:"#9c9b92",Intern:"#c8c7be"};
+
+const tagClass = {wh:"t-wh",et:"t-et",di:"t-di",ob:"t-ob",mo:"t-mo",ot:"t-ot"};
+const tagLabel = {wh:"Warehouse",et:"ETL",di:"Data Intel",ob:"Observ.",mo:"Monitor",ot:"Other"};
+
+// ── RENDER: GROUP SUMMARY ──────────────────────────────────────────────────────
+const grpG = document.getElementById('grpGrid');
+groups.forEach(g => {
+  grpG.innerHTML += `<div class="grp-card">
+    <div class="grp-name" style="color:${g.color}">${g.short}</div>
+    <div class="grp-val" style="color:${g.color}">${g.jobs.toLocaleString()}</div>
+    <div class="grp-sub">${g.dir} Director+ · ${g.eng} Eng</div>
+    <div class="grp-cos">${g.cos} competitors</div>
+  </div>`;
+});
+
+// ── RENDER: TREND CHART ────────────────────────────────────────────────────────
+const gColors = groups.map(g => g.color);
+const datasets = groups.map((g,i) => ({
+  label: g.short,
+  data: groupTrend[g.short],
+  borderColor: gColors[i],
+  backgroundColor: gColors[i]+'18',
+  borderWidth: i < 2 ? 2 : 1.5,
+  tension: 0.35,
+  fill: false,
+  pointRadius: 2,
+}));
+new Chart(document.getElementById('trendChart'), {
+  type:'line', data:{labels:trendWeeks, datasets},
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{ticks:{font:{size:9},color:'#9c9b92',maxRotation:45,autoSkip:true,maxTicksLimit:10},grid:{display:false}},
+      y:{ticks:{font:{size:9},color:'#9c9b92'},grid:{color:'#eeede6'}}
+    }
+  }
+});
+const tLeg = document.getElementById('trendLeg');
+groups.forEach(g => {
+  tLeg.innerHTML += `<span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:3px;background:${g.color};border-radius:2px;display:inline-block"></span>${g.short}</span>`;
+});
+
+// ── RENDER: MOMENTUM BARS ─────────────────────────────────────────────────────
+const maxM = top12[0].jobs;
+const mDiv = document.getElementById('momBars');
+const mTagColors = {wh:"#146b5c",et:"#1452a0",di:"#5228a0",ob:"#186b30",mo:"#a85f0a",ot:"#636058"};
+top12.forEach(({name,jobs,group,real}) => {
+  const pct = Math.round(jobs/maxM*100);
+  mDiv.innerHTML += `<div class="br">
+    <div class="bl${real?' hi':''}" style="width:112px">${name}</div>
+    <div class="bt"><div class="bf" style="width:${pct}%;background:${mTagColors[group]}${real?'':'99'}"></div></div>
+    <div class="bv${real?'':' blur'}">${jobs}</div>
+  </div>`;
+});
+
+// ── RENDER: HEATMAP ───────────────────────────────────────────────────────────
+const getHMColor = (v, total) => {
+  if(!v||!total) return '#f4f3ee';
+  const t = Math.min(v/total, 1);
+  const r = Math.round(228 - t*160), g2 = Math.round(240 - t*120), b = Math.round(239 - t*120);
+  return `rgb(${r},${g2},${b})`;
+};
+const hmDiv = document.getElementById('heatmap');
+let hmH = '<div class="hm-hdr">';
+hmSens.forEach(s => hmH += `<div class="hm-h">${s}</div>`);
+hmH += '</div>';
+hmCos.forEach(({name,real,d}) => {
+  const total = Object.values(d).reduce((a,b)=>a+b,0);
+  hmH += `<div class="hm-row"><div class="hm-lb${real?' hi':''}">${name}</div>`;
+  hmSens.forEach(s => {
+    const v = d[s]||0;
+    const pct = total ? Math.round(v/total*100) : 0;
+    hmH += `<div class="hm-cell${real?'':' blur'}" style="background:${getHMColor(v,total)};color:${pct>25?'#0c4a3e':'#636058'}">${real?v:''}</div>`;
+  });
+  hmH += '</div>';
+});
+hmDiv.innerHTML = hmH;
+
+// ── RENDER: SKILLS ────────────────────────────────────────────────────────────
+const skDiv = document.getElementById('skillRows');
+const maxAvg = 35;
+skills.forEach(({name,count,avg,trend}) => {
+  const pct = Math.round(avg/maxAvg*100);
+  const cls = avg>=25?'sk-hi':avg>=15?'sk-med':'sk-lo';
+  const bar = avg>=25?'#146b5c':avg>=15?'#5228a0':'#9c9b92';
+  skDiv.innerHTML += `<div class="sk">
+    <div class="sk-n">${name}</div>
+    <div class="sk-b"><div class="sk-f" style="width:${pct}%;background:${bar}"></div></div>
+    <div class="sk-badge ${cls}">${avg}</div>
+    <div class="sk-trend${trend==='rising'?'':' stable'}">${trend==='rising'?'↑ rising':'stable'}</div>
+    <div class="sk-cnt">${count} roles</div>
+  </div>`;
+});
+
+// ── RENDER: FUNCTION BARS ─────────────────────────────────────────────────────
+const fDiv = document.getElementById('funcBars');
+const maxF = funcData[0].eng + funcData[0].prod + funcData[0].sales + funcData[0].other;
+funcData.forEach(({name,eng,prod,sales,other,color}) => {
+  const total = eng+prod+sales+other;
+  fDiv.innerHTML += `<div class="br">
+    <div class="bl hi" style="width:118px;font-size:10px">${name}</div>
+    <div class="bt" style="height:8px"><div class="bf" style="width:${Math.round(total/maxF*100)}%;background:${color}"></div></div>
+    <div class="bv">${total}</div>
+  </div>`;
+});
+
+// ── RENDER: GTM CARDS ─────────────────────────────────────────────────────────
+const gtmG = document.getElementById('gtmGrid');
+const urgClass = {HIGH:'urg-high',MEDIUM:'urg-med',WATCH:'urg-watch'};
+gtmSignals.forEach(({type,category,urgency,company,signal,evidence,action}) => {
+  const typeLabel = type==='threat'?'⚠ Competitive Threat':type==='opportunity'?'◆ GTM Opportunity':'◉ Monitor Signal';
+  gtmG.innerHTML += `<div class="gtm-card gtm-${type}">
+    <div class="gtm-type">${typeLabel}<span class="gtm-urgency ${urgClass[urgency]}">${urgency}</span></div>
+    <div class="gtm-co">${company}</div>
+    <div class="gtm-signal">${signal}</div>
+    <div class="gtm-evidence">${evidence}</div>
+    <div class="gtm-action-lbl">Recommended action</div>
+    <div class="gtm-action">${action}</div>
+  </div>`;
+});
+
+// ── RENDER: ROLES TABLE ───────────────────────────────────────────────────────
+const rt = document.getElementById('rolesTable');
+rt.innerHTML = `<thead><tr><th>Company</th><th>Role</th><th>Location</th><th>Relevancy</th><th>Seniority</th><th>Signal</th></tr></thead>`;
+const tb = document.createElement('tbody');
+roles.forEach(({co,coTag,title,loc,rel,sen,skill}) => {
+  const rc = rel>=35?'rb-hi':rel>=28?'rb-med':'rb-lo';
+  const sk = skill?`<span class="skill-tag">${skill}</span>`:'<span style="color:var(--muted2);font-size:10px">—</span>';
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><span class="tag ${tagClass[coTag]}">${co}</span></td>
+    <td style="max-width:170px;font-size:11px">${title}</td>
+    <td style="font-size:10px;color:var(--muted);white-space:nowrap">${loc}</td>
+    <td><span class="rb ${rc}">${rel}</span></td>
+    <td style="font-size:10px;color:var(--muted)">${sen}</td>
+    <td>${sk}</td>`;
+  tb.appendChild(tr);
+});
+rt.appendChild(tb);
+
+// ── RENDER: GEO BARS ─────────────────────────────────────────────────────────
+const gDiv = document.getElementById('geoBars');
+const maxG = geo[0][1];
+const gColArr = ["#146b5c","#1452a0","#5228a0","#146b5c","#636058","#1452a0","#636058","#a85f0a","#1452a0","#5228a0"];
+geo.forEach(([name,val],i) => {
+  gDiv.innerHTML += `<div class="br">
+    <div class="bl hi" style="width:128px;font-size:10px">${name}</div>
+    <div class="bt"><div class="bf" style="width:${Math.round(val/maxG*100)}%;background:${gColArr[i]}"></div></div>
+    <div class="bv">${val}</div>
+  </div>`;
+});
+
+// ── RENDER: SENIORITY DONUT ───────────────────────────────────────────────────
+const canvas = document.getElementById('senChart');
+const dw = canvas.parentElement.offsetWidth || 280;
+canvas.width = dw; canvas.height = 130;
+const ctx = canvas.getContext('2d');
+const senTotal = Object.values(seniority).reduce((a,b)=>a+b,0);
+let angle = -Math.PI/2;
+const cx = dw/2, cy = 58, r = 46, ir = 28;
+Object.entries(seniority).forEach(([k,v]) => {
+  const slice = (v/senTotal)*Math.PI*2;
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,angle,angle+slice); ctx.closePath();
+  ctx.fillStyle = senColors[k]||'#ccc'; ctx.fill(); angle+=slice;
+});
+ctx.beginPath(); ctx.arc(cx,cy,ir,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
+ctx.fillStyle='#16150f'; ctx.font='bold 13px Syne,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('4,367',cx,cy-6);
+ctx.fillStyle='#636058'; ctx.font='9px Inter,sans-serif'; ctx.fillText('total roles',cx,cy+8);
+const sLeg = document.getElementById('senLeg');
+Object.entries(seniority).forEach(([k,v]) => {
+  if(v<100) return;
+  sLeg.innerHTML += `<span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:${senColors[k]};flex-shrink:0"></span>${k} ${Math.round(v/senTotal*100)}%</span>`;
+});
+</script>
+</body>
+</html>
