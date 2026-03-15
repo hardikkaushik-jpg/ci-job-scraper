@@ -84,6 +84,13 @@ TODAY = date.today().isoformat()
 # Companies with JS-heavy portals — given longer timeout
 SLOW_COMPANIES = {"SAP", "IBM", "Salesforce", "Amazon", "Oracle"}
 
+# These use APIs returning complete 5-tuples — skip detail page fetch entirely
+API_COMPLETE_COMPANIES = {
+    "Databricks", "Collibra", "Fivetran", "MongoDB", "Boomi",
+    "Matillion", "Anomalo", "Atlan", "Pinecone", "Zilliz",
+    "Monte Carlo", "Datadog",
+}
+
 # ─────────────────────────────────────────────────────────────────────────────
 # PATTERNS
 # ─────────────────────────────────────────────────────────────────────────────
@@ -476,8 +483,10 @@ def scrape():
 
                         location_final = (loc_text or loc_candidate or "").strip()
 
-                        # Fetch detail to fill gaps
-                        if link:
+                        # Skip detail fetch for API companies — they already have full data
+                        if company not in API_COMPLETE_COMPANIES and link and (
+                            not location_final or not post_date or not desc_text
+                        ):
                             location_final, post_date, desc_enriched, detail_count = enrich_detail(
                                 page, link, detail_count, location_final, post_date
                             )
