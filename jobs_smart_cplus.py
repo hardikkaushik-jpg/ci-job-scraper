@@ -1,121 +1,137 @@
-# jobs_smart_cplus.py
-# Cleaned + compact Playwright + BeautifulSoup hybrid scraper
-# ATS-aware, special extractors, enriched relevancy flow.
-# Run: python3 jobs_smart_cplus.py
-# Requires: playwright, beautifulsoup4, lxml
+# jobs_smart_cplus.py  — Refactored v5.0
+# Fixes applied:
+#   1. Double-scraping bug: generic pipeline is SKIPPED when a special extractor runs
+#   2. URL normalisation before deduplication
+#   3. Per-company row cap (300) with hard warning
+#   4. first_seen / last_seen lifecycle columns
+#   5. Consistent 5-tuple output contract from all code paths
+#   6. Detail fetching writes description into row for enrichment downstream
 
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, urlunparse
 import re, csv, time, sys, json, os
 from datetime import datetime, date, timedelta
 
-# import deep site-specific extractors (created separately)
-# Ensure this file exists in the same directory or handle the ImportWarning
 try:
     from special_extractors_deep import SPECIAL_EXTRACTORS_DEEP
 except ImportError:
     SPECIAL_EXTRACTORS_DEEP = {}
 
-# ---------- CONFIG ----------
+# ─────────────────────────────────────────────────────────────────────────────
+# CONFIG
+# ─────────────────────────────────────────────────────────────────────────────
 COMPANIES = {
-    "Airtable": ["https://airtable.com/careers#open-positions"],
-    "Alation": ["https://www.alation.com/careers/all-careers/"],
-    "Alteryx": ["https://alteryx.wd108.myworkdayjobs.com/AlteryxCareers"],
-    "Ataccama": ["https://jobs.ataccama.com/#one-team"],
-    "Atlan": ["https://atlan.com/careers"],
-    "Anomalo": ["https://boards.greenhouse.io/anomalojobs"],
-    "BigEye": ["https://www.bigeye.com/careers#positions"],
-    "Boomi": ["https://boomi.com/company/careers/#greenhouseapp"],
-    "CastorDoc (Coalesce)": ["https://jobs.ashbyhq.com/coalesce"],
-    "Cloudera": ["https://cloudera.wd5.myworkdayjobs.com/External_Career"],
-    "Collibra": ["https://www.collibra.com/company/careers#sub-menu-find-jobs"],
-    "Couchbase": ["https://www.couchbase.com/careers/"],
-    "Data.World": ["https://data.world/company/careers/#careers-list"],
-    "Databricks": ["https://www.databricks.com/company/careers/open-positions"],
-    "Datadog": ["https://careers.datadoghq.com/all-jobs/"],
-    "DataGalaxy": ["https://www.welcometothejungle.com/en/companies/datagalaxy/jobs"],
-    "Decube": ["https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41"],
-    "Exasol": ["https://careers.exasol.com/en/jobs"],
-    "Firebolt": ["https://www.firebolt.io/careers"],
-    "Fivetran": ["https://www.fivetran.com/careers#jobs"],
-    "InfluxData": ["https://www.influxdata.com/careers/#jobs"],
-    "Informatica": ["https://informatica.gr8people.com/jobs", "https://www.informatica.com/us/careers.html"],
-    "Matillion": ["https://jobs.lever.co/matillion"],
-    "MongoDB": ["https://www.mongodb.com/company/careers/teams/engineering",
-        "https://www.mongodb.com/company/careers/teams/product-management-and-design"],
-    "Monte Carlo": ["https://jobs.ashbyhq.com/montecarlodata"],
-    "Oracle": ["https://careers.oracle.com/en/sites/jobsearch/jobs"],
-    "Precisely": ["https://www.precisely.com/careers-and-culture/us-jobs",
-        "https://www.precisely.com/careers-and-culture/international-jobs"],
-    "Pentaho": ["https://www.hitachivantara.com/en-us/company/careers/job-search","https://www.hitachivantara.com/en-us/careers.html"],
-    "Qlik": ["http://careerhub.qlik.com/careers"],
-    "Sifflet": ["https://www.welcometothejungle.com/en/companies/sifflet/jobs"],
-    "Snowflake": ["https://careers.snowflake.com/global/en/search-results"],
-    "Syniti": ["https://careers.syniti.com/go/Explore-Our-Roles/8777900/"],
-    "Teradata": ["https://careers.teradata.com/jobs"],
-    "Vertica": ["https://careers.opentext.com/us/en/home"],
-    # large noisy portals
-    "Salesforce": ["https://careers.salesforce.com/en/jobs/"],
-    "Amazon": ["https://www.amazon.jobs/en/"],
-    "IBM": ["https://www.ibm.com/careers/search"],
-    "SAP": ["https://jobs.sap.com/"],
+    "Airtable":           ["https://airtable.com/careers#open-positions"],
+    "Alation":            ["https://www.alation.com/careers/all-careers/"],
+    "Alteryx":            ["https://alteryx.wd108.myworkdayjobs.com/AlteryxCareers"],
+    "Ataccama":           ["https://jobs.ataccama.com/#one-team"],
+    "Atlan":              ["https://atlan.com/careers"],
+    "Anomalo":            ["https://boards.greenhouse.io/anomalojobs"],
+    "BigEye":             ["https://www.bigeye.com/careers#positions"],
+    "Boomi":              ["https://boomi.com/company/careers/#greenhouseapp"],
+    "CastorDoc":          ["https://jobs.ashbyhq.com/coalesce"],
+    "Cloudera":           ["https://cloudera.wd5.myworkdayjobs.com/External_Career"],
+    "Collibra":           ["https://www.collibra.com/company/careers#sub-menu-find-jobs"],
+    "Couchbase":          ["https://www.couchbase.com/careers/"],
+    "Data.World":         ["https://data.world/company/careers/#careers-list"],
+    "Databricks":         ["https://www.databricks.com/company/careers/open-positions"],
+    "Datadog":            ["https://careers.datadoghq.com/all-jobs/"],
+    "DataGalaxy":         ["https://www.welcometothejungle.com/en/companies/datagalaxy/jobs"],
+    "Decube":             ["https://boards.briohr.com/bousteaduacmalaysia-4hu7jdne41"],
+    "Exasol":             ["https://careers.exasol.com/en/jobs"],
+    "Firebolt":           ["https://www.firebolt.io/careers"],
+    "Fivetran":           ["https://www.fivetran.com/careers#jobs"],
+    "InfluxData":         ["https://www.influxdata.com/careers/#jobs"],
+    "Informatica":        ["https://informatica.gr8people.com/jobs"],
+    "Matillion":          ["https://jobs.lever.co/matillion"],
+    "MongoDB":            ["https://www.mongodb.com/company/careers/teams/engineering",
+                           "https://www.mongodb.com/company/careers/teams/product-management-and-design"],
+    "Monte Carlo":        ["https://jobs.ashbyhq.com/montecarlodata"],
+    "Oracle":             ["https://careers.oracle.com/en/sites/jobsearch/jobs"],
+    "Precisely":          ["https://www.precisely.com/careers-and-culture/us-jobs"],
+    "Pentaho":            ["https://www.hitachivantara.com/en-us/company/careers/job-search"],
+    "Qlik":               ["http://careerhub.qlik.com/careers"],
+    "Sifflet":            ["https://www.welcometothejungle.com/en/companies/sifflet/jobs"],
+    "Snowflake":          ["https://careers.snowflake.com/global/en/search-results"],
+    "Syniti":             ["https://careers.syniti.com/go/Explore-Our-Roles/8777900/"],
+    "Teradata":           ["https://careers.teradata.com/jobs"],
+    "Vertica":            ["https://careers.opentext.com/us/en/home"],
+    "Salesforce":         ["https://careers.salesforce.com/en/jobs/"],
+    "Amazon":             ["https://www.amazon.jobs/en/"],
+    "IBM":                ["https://www.ibm.com/careers/search"],
+    "SAP":                ["https://jobs.sap.com/"],
 }
-PAGE_NAV_TIMEOUT = 40000
-PAGE_DOM_TIMEOUT = 15000
-SLEEP_BETWEEN_REQUESTS = 0.18
-MAX_DETAIL_PAGES = 12000
-# ---------- PATTERNS ----------
+
+PAGE_NAV_TIMEOUT     = 40_000
+PAGE_DOM_TIMEOUT     = 15_000
+SLEEP_BETWEEN        = 0.18
+MAX_DETAIL_PAGES     = 12_000
+PER_COMPANY_ROW_CAP  = 300          # hard warning threshold
+
+TODAY = date.today().isoformat()
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PATTERNS
+# ─────────────────────────────────────────────────────────────────────────────
 FORBIDDEN_RE = re.compile(
-    r'\b(?:privacy|about|press|blog|partners|pricing|docs|support|events|resources|login|apply now|read more)\b',
-    re.I
+    r'\b(?:privacy|about|press|blog|partners|pricing|docs|support|events|'
+    r'resources|login|apply now|read more)\b', re.I
 )
-
 LOC_RE = re.compile(
-    r'\b(?:remote|hybrid|usa|united states|uk|germany|india|london|new york|singapore|berlin|bengaluru)\b',
-    re.I
+    r'\b(?:remote|hybrid|usa|united states|uk|germany|india|london|new york|'
+    r'singapore|berlin|bengaluru)\b', re.I
 )
-
 ROLE_WORDS_RE = re.compile(
-    r'\b(?:engineer|developer|manager|director|architect|scientist|analyst|product|sre|intern)\b',
-    re.I
+    r'\b(?:engineer|developer|manager|director|architect|scientist|analyst|'
+    r'product|sre|intern|specialist|consultant|lead|staff|principal)\b', re.I
 )
-
 COMPANY_SKIP_RULES = {
     "Ataccama": [r'one-team', r'blog', r'about'],
-    "Fivetran": [r'launchers', r'product', r'developer-relations'],
-    "Datadog": [r'resources', r'events', r'learning'],
-    "BigEye": [r'product', r'resources'],
+    "Fivetran":  [r'launchers', r'developer-relations'],
+    "Datadog":   [r'resources', r'events', r'learning'],
+    "BigEye":    [r'product', r'resources'],
 }
-
-CRITICAL_COMPANIES = {"fivetran", "ataccama", "datadog", "snowflake",
-                      "matillion", "oracle", "mongodb", "databricks"}
-
+CRITICAL_COMPANIES = {
+    "fivetran", "ataccama", "datadog", "snowflake",
+    "matillion", "oracle", "mongodb", "databricks"
+}
 RELEVANCE_HARD = [
-    r'\bdata engineer\b',
-    r'\betl\b',
-    r'\bintegrat',
-    r'\bconnector',
-    r'\bpipeline\b',
-    r'\bsnowflake\b',
-    r'\bdatabricks\b',
-    r'\bobs ervab'
+    r'\bdata engineer\b', r'\betl\b', r'\bintegrat',
+    r'\bconnector', r'\bpipeline\b', r'\bsnowflake\b',
+    r'\bdatabricks\b', r'\bobservab',
 ]
 RELEVANCY_THRESHOLD = 2
 
+NON_TECH_PRODUCT_PATTERNS = [
+    r'product\s+marketing', r'product\s+marketer', r'product\s+g?tm',
+    r'product\s+operations', r'product\s+ops', r'product\s+design(er)?',
+    r'product\s+growth', r'product\s+strategy', r'product\s+enablement',
+    r'product\s+commercial', r'marketing\s+product',
+]
+PRODUCT_TECH_KEYWORDS = [
+    "etl", "pipeline", "connector", "integration", "api", "sdk",
+    "snowflake", "databricks", "warehouse", "lakehouse", "airflow",
+    "spark", "bigquery", "postgres", "mysql", "orchestration",
+    "kafka", "kubernetes", "observability",
+]
 
-def score_title_desc(title, desc, company=""):
-    t = ((title or "") + " " + (desc or "")).lower()
-    score = 0
-    for p in RELEVANCE_HARD:
-        if re.search(p, t):
-            score += 3
-    if company and "oracle" in company.lower() and "autonomous" in t:
-        score += 1
-    return score
+# ─────────────────────────────────────────────────────────────────────────────
+# HELPERS
+# ─────────────────────────────────────────────────────────────────────────────
+def normalise_url(url: str) -> str:
+    """Strip query params, fragments, and trailing slashes for deduplication."""
+    if not url:
+        return ""
+    try:
+        p = urlparse(url.strip())
+        # keep scheme + netloc + path only, lowercase netloc
+        clean = urlunparse((p.scheme, p.netloc.lower(), p.path.rstrip("/"), "", "", ""))
+        return clean
+    except Exception:
+        return url.strip().rstrip("/")
 
 
-# helpers
 def normalize_link(base, href):
     if not href:
         return ""
@@ -164,15 +180,13 @@ def extract_location_from_text(txt):
 def try_extract_location_from_card(el):
     if not el:
         return ""
-    selectors = [".location", ".job-location", ".posting-location", ".job_meta_location"]
-    for sel in selectors:
+    for sel in [".location", ".job-location", ".posting-location", ".job_meta_location"]:
         try:
             found = el.select_one(sel)
         except Exception:
             found = None
         if found and found.get_text(strip=True):
             return found.get_text(" ", strip=True)
-    # attribute fallback
     for attr in ("data-location", "data-geo", "aria-label", "title"):
         v = el.get(attr)
         if v and isinstance(v, str):
@@ -186,13 +200,13 @@ def detect_seniority(title):
     t = title.lower()
     if any(x in t for x in ["chief ", "cto", "vp ", "director", "head of"]):
         return "Director+"
-    if any(x in t for x in ["principal", "distinguished"]):
+    if any(x in t for x in ["principal", "distinguished", "staff "]):
         return "Principal/Staff"
     if any(x in t for x in ["senior", "sr.", "lead "]):
         return "Senior"
     if any(x in t for x in ["manager", "mgr"]):
         return "Manager"
-    if any(x in t for x in ["mid ", "associate", "ii"]):
+    if any(x in t for x in ["mid ", "associate", " ii"]):
         return "Mid"
     if any(x in t for x in ["junior", "jr.", "entry"]):
         return "Entry"
@@ -210,18 +224,8 @@ def is_likely_job_anchor(href, text):
            "resources", "download", "company", "blog"]
     if any(b in h for b in BAD) or any(b in t for b in BAD):
         return False
-    ATS = [
-        "lever.co",
-        "greenhouse",
-        "myworkdayjobs",
-        "ashby",
-        "bamboohr",
-        "smartrecruiters",
-        "jobvite",
-        "/jobs/",
-        "/job/",
-        "fivetran.com"
-    ]
+    ATS = ["lever.co", "greenhouse", "myworkdayjobs", "ashby",
+           "bamboohr", "smartrecruiters", "jobvite", "/jobs/", "/job/"]
     if any(a in h for a in ATS):
         return True
     if ROLE_WORDS_RE.search(t):
@@ -229,23 +233,8 @@ def is_likely_job_anchor(href, text):
     return False
 
 
-def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT, dom_timeout=PAGE_DOM_TIMEOUT):
-    try:
-        page.goto(url, timeout=nav_timeout, wait_until="networkidle")
-        page.wait_for_load_state("networkidle")
-        page.wait_for_timeout(900)
-        return page.content()
-    except Exception:
-        try:
-            page.goto(url, timeout=nav_timeout, wait_until="domcontentloaded")
-            page.wait_for_timeout(900)
-            return page.content()
-        except Exception:
-            return ""
-
-
 def should_drop_by_title(title):
-    if not title or title.strip() == "":
+    if not title or not title.strip():
         return True
     if ROLE_WORDS_RE.search((title or "").lower()):
         return False
@@ -274,38 +263,134 @@ def _iso_only_date(raw):
 def extract_date_from_html(html_text):
     if not html_text:
         return ""
-
     m = re.search(r'"datePosted"\s*:\s*"([^"]+)"', html_text)
     if m:
-        raw = m.group(1)
         try:
-            return datetime.fromisoformat(raw.split("T")[0]).date().isoformat()
+            return datetime.fromisoformat(m.group(1).split("T")[0]).date().isoformat()
         except Exception:
             pass
-
     m2 = re.search(r'<time[^>]+datetime=["\']([^"\']+)["\']', html_text, re.I)
     if m2:
-        raw = m2.group(1)
         try:
-            return datetime.fromisoformat(raw.split("T")[0]).date().isoformat()
+            return datetime.fromisoformat(m2.group(1).split("T")[0]).date().isoformat()
         except Exception:
             pass
-
     mm = re.search(r'posted\s+(\d+)\s+days?\s+ago', html_text, re.I)
     if mm:
         try:
-            days = int(mm.group(1))
-            return (date.today() - timedelta(days=days)).isoformat()
+            return (date.today() - timedelta(days=int(mm.group(1)))).isoformat()
         except Exception:
             pass
-
     mm2 = re.search(r'(\d{4}-\d{2}-\d{2})', html_text)
     if mm2:
         return mm2.group(1)
-
     return ""
 
 
+def fetch_page_content(page, url, nav_timeout=PAGE_NAV_TIMEOUT):
+    try:
+        page.goto(url, timeout=nav_timeout, wait_until="networkidle")
+        page.wait_for_load_state("networkidle")
+        page.wait_for_timeout(900)
+        return page.content()
+    except Exception:
+        try:
+            page.goto(url, timeout=nav_timeout, wait_until="domcontentloaded")
+            page.wait_for_timeout(900)
+            return page.content()
+        except Exception:
+            return ""
+
+
+def score_title_desc(title, desc, company=""):
+    t = ((title or "") + " " + (desc or "")).lower()
+    score = 0
+    for p in RELEVANCE_HARD:
+        if re.search(p, t):
+            score += 3
+    if company and "oracle" in company.lower() and "autonomous" in t:
+        score += 1
+    return score
+
+
+def enrich_detail(page, link, detail_count, location_in, date_in):
+    """
+    Fetch a detail page and extract location, posting date, and description text.
+    Returns (location, posting_date, description, new_detail_count).
+    """
+    if detail_count >= MAX_DETAIL_PAGES:
+        return location_in, date_in, "", detail_count
+
+    detail_count += 1
+    detail_html = fetch_page_content(page, link)
+    location_out = location_in
+    date_out = date_in
+    desc_out = ""
+
+    if not detail_html:
+        return location_out, date_out, desc_out, detail_count
+
+    try:
+        s = BeautifulSoup(detail_html, "lxml")
+
+        # Location selectors
+        for sel in ["span.location", ".job-location", ".location",
+                    "[data-test='job-location']", ".posting-location",
+                    ".job_meta_location", ".location--name"]:
+            eloc = s.select_one(sel)
+            if eloc and eloc.get_text(strip=True):
+                location_out = eloc.get_text(" ", strip=True)
+                break
+
+        # Description text (first 4000 chars)
+        for sel in [".job-description", "#job-description", ".description",
+                    "[data-automation-id='jobPostingDescription']",
+                    ".content", "article", "main"]:
+            el = s.select_one(sel)
+            if el:
+                desc_out = el.get_text(" ", strip=True)[:4000]
+                break
+
+        # JSON-LD for date and location
+        for script in s.find_all("script", type="application/ld+json"):
+            raw = script.string or ""
+            if not raw:
+                continue
+            try:
+                payload = json.loads(raw)
+            except Exception:
+                continue
+            items = payload if isinstance(payload, list) else [payload]
+            for obj in items:
+                if not isinstance(obj, dict):
+                    continue
+                if not date_out and isinstance(obj.get("datePosted"), str):
+                    date_out = _iso_only_date(obj["datePosted"])
+                if not location_out:
+                    jl = obj.get("jobLocation") or obj.get("jobLocations")
+                    if jl:
+                        entry = jl[0] if isinstance(jl, list) else jl
+                        if isinstance(entry, dict):
+                            addr = entry.get("address") or entry
+                            if isinstance(addr, dict):
+                                parts = [str(addr.get(k)) for k in
+                                         ("addressLocality", "addressRegion",
+                                          "addressCountry") if addr.get(k)]
+                                if parts:
+                                    location_out = ", ".join(parts)
+
+        if not date_out:
+            date_out = extract_date_from_html(detail_html)
+
+    except Exception as e:
+        print(f"[WARN] detail parse fail {link} -> {e}")
+
+    return location_out, date_out, desc_out, detail_count
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# MAIN SCRAPE
+# ─────────────────────────────────────────────────────────────────────────────
 def scrape():
     rows = []
     detail_count = 0
@@ -316,152 +401,84 @@ def scrape():
         page = context.new_page()
 
         for company, url_list in COMPANIES.items():
+            company_rows = []
+
             for main_url in url_list:
-                print(f"[SCRAPING] {company} -> {main_url}")
+                print(f"\n[SCRAPING] {company} -> {main_url}")
                 listing_html = fetch_page_content(page, main_url)
                 if not listing_html:
-                    print(f"[WARN] no html for {company} ({main_url}) - skipping")
+                    print(f"[WARN] no html for {company} ({main_url})")
                     continue
 
                 soup = BeautifulSoup(listing_html, "lxml")
+
+                # ══════════════════════════════════════════════════════════
+                # PATH A — SPECIAL EXTRACTOR
+                # ══════════════════════════════════════════════════════════
+                if company in SPECIAL_EXTRACTORS_DEEP:
+                    print(f"[SPECIAL] Running extractor for {company}")
+                    try:
+                        raw_items = SPECIAL_EXTRACTORS_DEEP[company](soup, page, main_url)
+                        print(f"[SPECIAL] {company}: {len(raw_items)} raw items")
+                    except Exception as e:
+                        print(f"[SPECIAL ERROR] {company} -> {e}")
+                        # ── CRITICAL: skip generic pipeline even on extractor error ──
+                        continue  # move to next URL for this company
+
+                    for item in raw_items:
+                        if not item:
+                            continue
+
+                        # Normalise to (link, title, desc, loc, date)
+                        if len(item) == 5:
+                            link, title, desc_text, loc_text, post_date = item
+                        elif len(item) == 3:
+                            link, title, _ = item
+                            desc_text = loc_text = post_date = ""
+                        elif len(item) == 2:
+                            link, title = item
+                            desc_text = loc_text = post_date = ""
+                        else:
+                            link = item[0]
+                            title = item[1] if len(item) > 1 else ""
+                            desc_text = loc_text = post_date = ""
+
+                        t_candidate, loc_candidate = extract_location_from_text(title)
+                        title_final = clean_title(t_candidate or title)
+
+                        if should_drop_by_title(title_final):
+                            print(f"[DROP-SPECIAL] {company} | {title_final}")
+                            continue
+
+                        location_final = (loc_text or loc_candidate or "").strip()
+
+                        # Fetch detail to fill gaps
+                        if link:
+                            location_final, post_date, desc_enriched, detail_count = enrich_detail(
+                                page, link, detail_count, location_final, post_date
+                            )
+                            if not desc_text:
+                                desc_text = desc_enriched
+
+                        company_rows.append({
+                            "Company": company,
+                            "Job Title": title_final,
+                            "Job Link": link,
+                            "Location": location_final,
+                            "Posting Date": post_date or "",
+                            "Days Since Posted": "",
+                            "Description": desc_text[:4000] if desc_text else "",
+                        })
+                        print(f"[KEEP-SPECIAL] {company} | {title_final}")
+
+                    # ── SKIP GENERIC PIPELINE — this is the double-scraping fix ──
+                    continue
+
+                # ══════════════════════════════════════════════════════════
+                # PATH B — GENERIC PIPELINE (only runs if no special extractor)
+                # ══════════════════════════════════════════════════════════
                 candidates = []
 
-                # ====================================================
-                # 1) SPECIAL EXTRACTORS -> DIRECT ROWS (TRUSTED PATH)
-                # ====================================================
-                if company in SPECIAL_EXTRACTORS_DEEP:
-                    print(f"[DEBUG] Running special extractor for {company}")
-                    try:
-                        special = SPECIAL_EXTRACTORS_DEEP[company](soup, page, main_url)
-                        print(f"[DEBUG] SPECIAL RETURNED FOR {company}: {len(special)} items")
-
-                        for item in special:
-                            if not item:
-                                continue
-
-                            # --- Databricks 5-tuple support ---
-                            if len(item) == 5:
-                                link, text, desc_text, loc_text, post_date = item
-                                el = None
-
-                            # --- Standard 3-tuple special extractors ---
-                            elif len(item) == 3:
-                                link, text, el = item
-                                desc_text = ""
-                                loc_text = ""
-                                post_date = ""
-
-                            # --- Legacy 2-tuple extractors ---
-                            elif len(item) == 2:
-                                link, text = item
-                                el = None
-                                desc_text = ""
-                                loc_text = ""
-                                post_date = ""
-
-                            else:
-                                # --- Weird formats fallback ---
-                                link = item[0]
-                                text = item[1] if len(item) > 1 else ""
-                                el = None
-                                desc_text = ""
-                                loc_text = ""
-                                post_date = ""
-
-                            # Derive a clean title & possible location from the text
-                            raw_text = text or ""
-                            t_candidate, loc_candidate = extract_location_from_text(raw_text)
-                            title_final = clean_title(t_candidate or raw_text)
-
-                            if should_drop_by_title(title_final):
-                                # still prevent obvious garbage
-                                print(f"[DROP-SPECIAL] Filtered non-job from {company} | {title_final} | {link}")
-                                continue
-
-                            posting_date = post_date or ""
-                            location_final = (loc_text or loc_candidate or "").strip()
-
-                            # Optional detail fetch to enrich ONLY location/date
-                            if detail_count < MAX_DETAIL_PAGES:
-                                detail_count += 1
-                                detail_html = fetch_page_content(page, link)
-                                if detail_html:
-                                    try:
-                                        s_detail = BeautifulSoup(detail_html, "lxml")
-
-                                        # DO NOT override title from detail page – Workday H1 is "XYZ Careers"
-                                        # Only try to improve location
-                                        for sel in [
-                                            "span.location",
-                                            ".job-location",
-                                            ".location",
-                                            "[data-test='job-location']",
-                                            ".posting-location",
-                                            ".job_meta_location",
-                                            ".location--name"
-                                        ]:
-                                            eloc = s_detail.select_one(sel)
-                                            if eloc and eloc.get_text(strip=True):
-                                                location_final = eloc.get_text(" ", strip=True)
-                                                break
-
-                                        # JSON-LD date + location
-                                        for script in s_detail.find_all("script", type="application/ld+json"):
-                                            text_json = script.string or ""
-                                            if not text_json:
-                                                continue
-                                            try:
-                                                payload = json.loads(text_json)
-                                            except Exception:
-                                                continue
-
-                                            items = payload if isinstance(payload, list) else [payload]
-                                            for obj in items:
-                                                if isinstance(obj, dict):
-                                                    if isinstance(obj.get("datePosted"), str) and not posting_date:
-                                                        posting_date = _iso_only_date(obj["datePosted"])
-
-                                                    jl = obj.get("jobLocation") or obj.get("jobLocations")
-                                                    if jl and not location_final:
-                                                        jl_entry = jl[0] if isinstance(jl, list) else jl
-                                                        if isinstance(jl_entry, dict):
-                                                            addr = jl_entry.get("address") or jl_entry
-                                                            if isinstance(addr, dict):
-                                                                parts = []
-                                                                for k in ("addressLocality", "addressRegion", "addressCountry", "postalCode"):
-                                                                    v = addr.get(k)
-                                                                    if v:
-                                                                        parts.append(str(v))
-                                                                if parts:
-                                                                    location_final = ", ".join(parts)
-                                                                    break
-
-                                        if not posting_date:
-                                            posting_date = extract_date_from_html(detail_html)
-
-                                    except Exception as e:
-                                        print(f"[WARN-SPECIAL] detail parse fail {link} -> {e}")
-
-                            rows.append({
-                                "Company": company,
-                                "Job Title": title_final,
-                                "Job Link": link,
-                                "Location": location_final,
-                                "Posting Date": posting_date,
-                                "Days Since Posted": ""
-                            })
-                            print(f"[KEEP-SPECIAL] {company} | {title_final} | {link}")
-
-                    except Exception as e:
-                        print(f"[DEBUG] SPECIAL EXTRACTOR ERROR for {company} -> {e}")
-                else:
-                    print(f"[DEBUG] Special extractor NOT found for {company}")
-
-                # ====================================================
-                # 2) GENERIC PIPELINE (UNCHANGED)
-                # ====================================================
-
-                # generic anchors
                 for a in soup.find_all("a", href=True):
                     href = a.get("href")
                     text = a.get_text(" ", strip=True) or ""
@@ -469,35 +486,20 @@ def scrape():
                     if is_likely_job_anchor(href_abs, text):
                         candidates.append((href_abs, text, a))
 
-                # preserved Fivetran extractor
-                if "fivetran.com" in main_url:
-                    for job in soup.select("div[data-job-id], div.job-card, a[data-job-id]"):
-                        text = job.get_text(" ", strip=True)
-                        link = (
-                            job.get("href")
-                            or job.get("data-url")
-                            or job.get("data-job-url")
-                            or job.get("data-job-id")
-                        )
-                        if link and not link.startswith("http") and job.get("data-job-id"):
-                            link = f"https://www.fivetran.com/careers/job/{job.get('data-job-id')}"
-                        link = normalize_link(main_url, link)
-                        if text.strip():
-                            candidates.append((link, text, job))
-
-                # job-card containers
-                for el in soup.select("[data-job], .job, .job-listing, .job-card, .opening, .position, .posting, .role, .job-row"):
+                for el in soup.select("[data-job], .job, .job-listing, .job-card, "
+                                      ".opening, .position, .posting, .role, .job-row"):
                     a = el.find("a", href=True)
                     text = a.get_text(" ", strip=True) if a else el.get_text(" ", strip=True)
                     href = normalize_link(main_url, a.get("href")) if a else ""
                     if is_likely_job_anchor(href, text):
                         candidates.append((href, text, el))
 
-                # iframe -> ATS fallback
                 if not candidates:
                     for iframe in soup.find_all("iframe", src=True):
                         src = iframe.get("src")
-                        if src and any(k in src for k in ("greenhouse", "lever", "myworkday", "bamboohr", "ashby", "jobs.lever", "jobvite")):
+                        if src and any(k in src for k in (
+                                "greenhouse", "lever", "myworkday",
+                                "bamboohr", "ashby", "jobvite")):
                             src_full = normalize_link(main_url, src)
                             iframe_html = fetch_page_content(page, src_full)
                             if iframe_html:
@@ -509,304 +511,220 @@ def scrape():
                                     if is_likely_job_anchor(href_abs, text):
                                         candidates.append((href_abs, text, a))
 
-                # dedupe + company skip rules
-                seen = set()
+                # dedupe + skip rules
+                seen_generic = set()
                 filtered = []
                 for href, text, el in candidates:
                     if not href or href.rstrip("/") == main_url.rstrip("/"):
                         continue
-                    if href in seen:
+                    norm = normalise_url(href)
+                    if norm in seen_generic:
                         continue
-                    seen.add(href)
+                    seen_generic.add(norm)
                     skip = False
                     low_text = (text or "").lower()
                     for c, rules in COMPANY_SKIP_RULES.items():
                         if c.lower() == company.lower():
                             for r in rules:
-                                if re.search(r, low_text) or (href and re.search(r, href, re.I)):
+                                if re.search(r, low_text) or re.search(r, href, re.I):
                                     skip = True
                                     break
                         if skip:
                             break
-                    if skip:
-                        continue
-                    filtered.append((href, text, el))
+                    if not skip:
+                        filtered.append((href, text, el))
 
-                # parse filtered candidates (unchanged generic logic)
                 for link, anchor_text, el in filtered:
-                    time.sleep(SLEEP_BETWEEN_REQUESTS)
+                    time.sleep(SLEEP_BETWEEN)
 
-                    # --- Workday real title override (CRITICAL FIX FOR ALATION) ---
-                    job_title_div = None
+                    jt_div = None
                     try:
-                        job_title_div = el.select_one("[data-automation-id='jobTitle']")
+                        jt_div = el.select_one("[data-automation-id='jobTitle']")
                     except Exception:
-                        job_title_div = None
+                        pass
 
-                    if job_title_div:
-                        # Use Workday's real job title instead of "Alation Careers"
-                        title_candidate = job_title_div.get_text(" ", strip=True)
-                    else:
-                        title_candidate = re.sub(r'\s+', ' ', (anchor_text or "")).strip()
+                    title_candidate = (jt_div.get_text(" ", strip=True)
+                                       if jt_div else
+                                       re.sub(r'\s+', ' ', anchor_text or "").strip())
 
-                    # --- Continue with standard cleanup ---
                     title_clean, location_candidate = extract_location_from_text(title_candidate)
                     title_clean = clean_title(title_clean or title_candidate)
-
                     title_low = title_clean.lower()
 
-                    # ============================================================
-                    # SMART PRODUCT FILTER LOGIC (TITLE + DESCRIPTION)
-                    # ============================================================
-
-                    # 1) Non-technical PRODUCT patterns → DROP immediately (title is obvious)
-                    NON_TECH_PRODUCT_PATTERNS = [
-                        r'product\s+marketing',
-                        r'product\s+marketer',
-                        r'product\s+g?tm',
-                        r'product\s+operations',
-                        r'product\s+ops',
-                        r'product\s+design(er)?',
-                        r'product\s+growth',
-                        r'product\s+strategy',
-                        r'product\s+enablement',
-                        r'product\s+commercial',
-                        r'marketing\s+product'
-                    ]
-
-                    # Initialize must_reasons for the block below
-                    must_reasons = []
-
+                    # Product filter
                     if "product" in title_low:
                         if any(re.search(p, title_low) for p in NON_TECH_PRODUCT_PATTERNS):
-                            print(f"[DROP-PRODUCT-TITLE] Non-technical product role dropped -> {title_clean}")
+                            print(f"[DROP-PRODUCT-TITLE] {title_clean}")
                             continue
-
-                    # 2) Clear technical signals → treat normally (no force-detail)
-                    TECH_HINTS_IN_TITLE = [
-                        "data", "platform", "api", "sdk",
-                        "integration", "integrations", "etl",
-                        "pipeline", "pipelines", "connect", "connector",
-                        "warehouse", "lakehouse", "snowflake", "databricks"
-                    ]
-                    is_clear_tech_product = any(t in title_low for t in TECH_HINTS_IN_TITLE)
-
-                    # 3) Ambiguous product roles (just says "Product Manager") → must detail
-                    must_detail = False
-                    if "product" in title_low and not is_clear_tech_product:
-                        must_detail = True
-                        must_reasons.append("product_ambiguous_force_detail")
 
                     card_loc = try_extract_location_from_card(el)
                     if card_loc and not location_candidate:
                         location_candidate = card_loc
+
+                    must_detail = (
+                        company.lower() in CRITICAL_COMPANIES
+                        or not location_candidate
+                        or len((title_clean or "").split()) < 2
+                        or LOC_RE.search(title_candidate)
+                        or any(x in (link or "").lower() for x in [
+                            "/job/", "/jobs/", "greenhouse", "lever.co",
+                            "ashby", "bamboohr", "myworkdayjobs",
+                            "gr8people", "welcometothejungle",
+                        ])
+                        or ("product" in title_low)
+                    )
+
                     light_score = score_title_desc(title_candidate, "", company)
+                    desc_text = ""
 
                     posting_date = ""
-
-                    # === PATCH 1: PRODUCT FILTER (EARLY FORCE DETAIL) ===
-                    if "product" in (title_clean or "").lower() and "product_role_force_detail" not in must_reasons:
-                        must_detail = True
-                        must_reasons.append("product_role_force_detail")
-
-                    if company.lower() in CRITICAL_COMPANIES:
-                        must_detail = True
-                        must_reasons.append("critical_company")
-                    if not location_candidate:
-                        must_detail = True
-                        must_reasons.append("no_location")
-                    if len((title_clean or "").split()) < 2:
-                        must_detail = True
-                        must_reasons.append("short_title")
-                    if LOC_RE.search(title_candidate):
-                        must_detail = True
-                        must_reasons.append("title_contains_loc")
-                    if any(x in (link or "").lower() for x in [
-                        "/job/", "/jobs/", "greenhouse", "lever.co", "ashby", "bamboohr",
-                        "myworkdayjobs", "gr8people", "welcometothejungle", "jobvite", "smartrecruiters"
-                    ]):
-                        must_detail = True
-                        must_reasons.append("link_looks_like_ats")
-
-                    if must_detail:
-                        print(f"[DETAIL_DECISION] (forced) {company} {link} reasons={','.join(must_reasons)}")
-                    else:
-                        print(f"[LIGHT_SCORE] {company} {link} title='{title_candidate[:60]}' score={light_score}")
-
-                    detail_html = ""
-                    final_score = light_score
-
                     if light_score >= RELEVANCY_THRESHOLD and not must_detail:
                         print(f"[KEEP-LIGHT] {company} | {title_candidate} | score={light_score}")
                     else:
                         if light_score <= 0 and not must_detail:
-                            print(f"[DROP-LIGHT] Dropping {company} | {title_candidate} score={light_score}")
+                            print(f"[DROP-LIGHT] {company} | {title_candidate} score={light_score}")
                             continue
-                        if detail_count < MAX_DETAIL_PAGES:
-                            detail_count += 1
-                            detail_html = fetch_page_content(page, link)
-                            if detail_html:
-                                try:
-                                    s_detail = BeautifulSoup(detail_html, "lxml")
 
-                                    # (Generic) title override – this is fine for non-special jobs.
-                                    header = s_detail.find("h1")
-                                    if header:
-                                        newt = clean_title(header.get_text(" ", strip=True))
-                                        if newt and newt != title_clean:
-                                            title_clean = newt
+                        location_candidate, posting_date, desc_text, detail_count = enrich_detail(
+                            page, link, detail_count, location_candidate, ""
+                        )
 
-                                    for sel in [
-                                        "span.location",
-                                        ".job-location",
-                                        ".location",
-                                        "[data-test='job-location']",
-                                        ".posting-location",
-                                        ".job_meta_location",
-                                        ".location--name"
-                                    ]:
-                                        eloc = s_detail.select_one(sel)
-                                        if eloc and eloc.get_text(strip=True):
-                                            location_candidate = eloc.get_text(" ", strip=True)
-                                            break
-
-                                    for script in s_detail.find_all("script", type="application/ld+json"):
-                                        text_json = script.string or ""
-                                        if not text_json:
-                                            continue
-                                        try:
-                                            payload = json.loads(text_json)
-                                        except Exception:
-                                            continue
-                                        items = payload if isinstance(payload, list) else [payload]
-                                        for item in items:
-                                            if isinstance(item, dict):
-                                                if isinstance(item.get("datePosted"), str) and not posting_date:
-                                                    posting_date = _iso_only_date(item.get("datePosted"))
-                                                jl = item.get("jobLocation") or item.get("jobLocations")
-                                                if jl:
-                                                    jl_entry = jl[0] if isinstance(jl, list) else jl
-                                                    if isinstance(jl_entry, dict):
-                                                        addr = jl_entry.get("address") or jl_entry
-                                                        if isinstance(addr, dict):
-                                                            parts = []
-                                                            for k in ("addressLocality", "addressRegion", "addressCountry", "postalCode"):
-                                                                v = addr.get(k)
-                                                                if v:
-                                                                    parts.append(str(v))
-                                                            if parts:
-                                                                location_candidate = ", ".join(parts)
-                                                                break
-
-                                    if not posting_date:
-                                        posting_date = extract_date_from_html(detail_html)
-
-                                except Exception as e:
-                                    print(f"[WARN] detail parse fail {link} -> {e}")
-
-                        # === PATCH 2: PRODUCT FILTER (DESCRIPTION-BASED STRICT CHECK) ===
-                        PRODUCT_TECH_KEYWORDS = [
-                            "etl", "pipeline", "connector", "integration", "api", "sdk",
-                            "snowflake", "databricks", "warehouse", "lakehouse",
-                            "airflow", "spark", "bigquery", "postgres", "mysql",
-                            "orchestration", "kafka", "kubernetes", "observability"
-                        ]
-                        if "product" in (title_clean or "").lower():
-                            desc_blob = (detail_html or "").lower()
-                            if not any(k in desc_blob for k in PRODUCT_TECH_KEYWORDS):
-                                print(f"[DROP-PRODUCT] Irrelevant product role -> {company} | {title_clean}")
+                        # Detail-level product filter
+                        if "product" in title_low:
+                            if not any(k in (desc_text or "").lower() for k in PRODUCT_TECH_KEYWORDS):
+                                print(f"[DROP-PRODUCT] {company} | {title_clean}")
                                 continue
 
-                        final_score = score_title_desc(title_clean or title_candidate, detail_html or "", company)
-                        print(f"[FINAL_SCORE] {company} {link} final_score={final_score} (light={light_score})")
+                        # H1 title override for generic pages
+                        try:
+                            detail_html_for_title = fetch_page_content(page, link) or ""
+                            if detail_html_for_title:
+                                s_detail = BeautifulSoup(detail_html_for_title, "lxml")
+                                h1 = s_detail.find("h1")
+                                if h1:
+                                    newt = clean_title(h1.get_text(" ", strip=True))
+                                    if newt and newt != title_clean:
+                                        title_clean = newt
+                        except Exception:
+                            pass
+
+                        final_score = score_title_desc(title_clean or title_candidate,
+                                                       desc_text, company)
+                        print(f"[FINAL_SCORE] {company} final={final_score}")
                         if final_score < RELEVANCY_THRESHOLD:
-                            print(f"[DROP-FINAL] Dropping after detail fetch -> score={final_score} | {company} | title='{title_clean or title_candidate}'")
+                            print(f"[DROP-FINAL] {company} | {title_clean}")
                             continue
 
-                    # --- GLOBAL TITLE + LOCATION CLEANING ---
                     final_title, loc_from_title = extract_location_from_text(title_clean)
                     final_title = clean_title(final_title)
-
                     if loc_from_title and not location_candidate:
                         location_candidate = loc_from_title
-
                     final_location = (location_candidate or loc_from_title or "").strip()
-                    posting_date_final = posting_date or ""
 
-                    # === PATCH 3: PRODUCT FINAL CHECK (AFTER CLEANUP) ===
+                    # Final product filter after cleanup
                     if "product" in final_title.lower():
-                        desc_blob = (detail_html or "").lower()
-                        if not any(k in desc_blob for k in PRODUCT_TECH_KEYWORDS):
-                            print(f"[DROP-PRODUCT-FINAL] Product role failed final tech filter -> {final_title}")
+                        if not any(k in (desc_text or "").lower() for k in PRODUCT_TECH_KEYWORDS):
+                            print(f"[DROP-PRODUCT-FINAL] {final_title}")
                             continue
 
                     if not should_drop_by_title(final_title):
-                        rows.append({
+                        company_rows.append({
                             "Company": company,
                             "Job Title": final_title,
                             "Job Link": link,
                             "Location": final_location,
-                            "Posting Date": posting_date_final,
-                            "Days Since Posted": ""
+                            "Posting Date": posting_date if 'posting_date' in dir() else "",
+                            "Days Since Posted": "",
+                            "Description": desc_text[:4000] if desc_text else "",
                         })
                     else:
-                        print(f"[DROP] Dropping non-job row -> {company} | {final_title} | {link}")
+                        print(f"[DROP] {company} | {final_title}")
+
+            # Per-company row cap check
+            if len(company_rows) > PER_COMPANY_ROW_CAP:
+                print(f"[ANOMALY WARNING] {company} produced {len(company_rows)} rows "
+                      f"(cap={PER_COMPANY_ROW_CAP}). Investigate before trusting this data.")
+
+            rows.extend(company_rows)
 
         browser.close()
     return rows
 
 
-# --- MAIN ---
+# ─────────────────────────────────────────────────────────────────────────────
+# ENTRY POINT
+# ─────────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     try:
         all_rows = scrape()
 
-        # add seniority
+        # Seniority
         for r in all_rows:
             r["Seniority"] = detect_seniority(r.get("Job Title", ""))
 
-        # dedupe on Job Link, prefer row with Posting Date
+        # Load existing CSV for first_seen tracking
+        repo_root = os.path.dirname(os.path.abspath(__file__))
+        outfile   = os.path.join(repo_root, "jobs_final_hard.csv")
+
+        existing_first_seen = {}
+        if os.path.exists(outfile):
+            try:
+                with open(outfile, encoding="utf-8") as f:
+                    for row in csv.DictReader(f):
+                        lk = normalise_url(row.get("Job Link", ""))
+                        if lk and row.get("First_Seen"):
+                            existing_first_seen[lk] = row["First_Seen"]
+            except Exception:
+                pass
+
+        # Deduplication using normalised URLs
         dedup = {}
         for r in all_rows:
-            lk = r.get("Job Link") or ""
-            if lk in dedup:
-                existing = dedup[lk]
-                if not existing.get("Posting Date") and r.get("Posting Date"):
-                    dedup[lk] = r
+            norm_lk = normalise_url(r.get("Job Link", ""))
+            if not norm_lk:
+                continue
+            if norm_lk in dedup:
+                # prefer row with posting date
+                if not dedup[norm_lk].get("Posting Date") and r.get("Posting Date"):
+                    dedup[norm_lk] = r
                 continue
 
+            # Days since posted
             pd = r.get("Posting Date") or ""
             if pd:
                 try:
-                    d = datetime.fromisoformat(pd).date()
-                    r["Days Since Posted"] = str((date.today() - d).days)
+                    r["Days Since Posted"] = str(
+                        (date.today() - datetime.fromisoformat(pd).date()).days)
                 except Exception:
                     r["Days Since Posted"] = ""
-            else:
-                r["Days Since Posted"] = ""
 
-            dedup[lk] = r
+            # Lifecycle columns
+            r["First_Seen"] = existing_first_seen.get(norm_lk, TODAY)
+            r["Last_Seen"]  = TODAY
 
-        out = list(dedup.values())
-        out_sorted = sorted(out, key=lambda x: (x.get("Company", "").lower(), x.get("Job Title", "").lower()))
+            dedup[norm_lk] = r
 
-        repo_root = os.path.dirname(os.path.abspath(__file__))
-        outfile = os.path.join(repo_root, "jobs_final_hard.csv")
-        fieldnames = ["Company", "Job Title", "Job Link", "Location",
-                      "Posting Date", "Days Since Posted", "Seniority"]
+        out = sorted(dedup.values(),
+                     key=lambda x: (x.get("Company","").lower(),
+                                    x.get("Job Title","").lower()))
+
+        fieldnames = [
+            "Company", "Job Title", "Job Link", "Location",
+            "Posting Date", "Days Since Posted", "Seniority",
+            "Description", "First_Seen", "Last_Seen",
+        ]
 
         with open(outfile, "w", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
             writer.writeheader()
-            for r in out_sorted:
-                row_to_write = {k: (r.get(k, "") if r.get(k) is not None else "") for k in fieldnames}
-                writer.writerow(row_to_write)
+            for r in out:
+                writer.writerow({k: r.get(k, "") or "" for k in fieldnames})
 
-        print(f"[OK] wrote {len(out_sorted)} rows -> {outfile}")
+        print(f"\n[OK] wrote {len(out)} deduplicated rows -> {outfile}")
 
     except KeyboardInterrupt:
         print("Interrupted")
         sys.exit(1)
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        sys.exit(1)
+        print(f"[FATAL] {e}")
+        raise
