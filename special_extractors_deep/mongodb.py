@@ -1,12 +1,11 @@
-# special_extractors_deep/collibra.py — v2.0
-# Uses Greenhouse API with content=true for full metadata
-# Returns consistent 5-tuples matching the pipeline contract
+# special_extractors_deep/mongodb.py — v1.0
+# MongoDB uses Greenhouse — API with content=true
 
 import requests
 from bs4 import BeautifulSoup
 
-def extract_collibra(soup, page, main_url):
-    API_URL = "https://boards-api.greenhouse.io/v1/boards/collibra/jobs?content=true"
+def extract_mongodb(soup, page, main_url):
+    API_URL = "https://boards-api.greenhouse.io/v1/boards/mongodb/jobs?content=true"
     headers = {"User-Agent": "Mozilla/5.0"}
     out = []
 
@@ -15,31 +14,27 @@ def extract_collibra(soup, page, main_url):
         r.raise_for_status()
         data = r.json()
     except Exception as e:
-        print(f"[Collibra extractor error] {e}")
+        print(f"[MongoDB Greenhouse API error] {e}")
         return out
 
     for job in data.get("jobs", []):
         title = (job.get("title") or "").strip()
         link  = (job.get("absolute_url") or "").strip()
-
         if not title or not link:
             continue
 
-        # Location
         loc = ""
         loc_data = job.get("location")
         if isinstance(loc_data, dict):
             loc = loc_data.get("name", "")
 
-        # Posting date
         posting_date = ""
-        for date_field in ("first_published_at", "updated_at"):
-            raw = job.get(date_field, "")
+        for df in ("first_published_at", "updated_at"):
+            raw = job.get(df, "")
             if raw:
                 posting_date = raw.split("T")[0]
                 break
 
-        # Description
         desc_text = ""
         desc_html = job.get("content", "")
         if desc_html:
@@ -50,5 +45,5 @@ def extract_collibra(soup, page, main_url):
 
         out.append((link, title, desc_text, loc, posting_date))
 
-    print(f"[Collibra API] Extracted {len(out)} jobs")
+    print(f"[MongoDB API] Extracted {len(out)} jobs")
     return out

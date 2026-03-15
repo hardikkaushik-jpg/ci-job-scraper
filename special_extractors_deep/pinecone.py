@@ -1,12 +1,14 @@
-# special_extractors_deep/anomalo.py — v2.0
-# Anomalo uses Ashby — hit the public API directly
+# special_extractors_deep/pinecone.py — v1.0
+# Pinecone uses Ashby — API first, DOM fallback
 
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-def extract_anomalo(soup, page, main_url):
-    API_URL = "https://api.ashbyhq.com/posting-api/job-board/anomalo"
+ASHBY_URL = "https://jobs.ashbyhq.com/pinecone"
+
+def extract_pinecone(soup, page, main_url):
+    API_URL = "https://api.ashbyhq.com/posting-api/job-board/pinecone"
     headers = {"User-Agent": "Mozilla/5.0"}
     out = []
 
@@ -15,7 +17,7 @@ def extract_anomalo(soup, page, main_url):
         r.raise_for_status()
         data = r.json()
     except Exception as e:
-        print(f"[Anomalo Ashby API error] {e}")
+        print(f"[Pinecone Ashby API error] {e}")
         return _dom_fallback(page)
 
     for job in data.get("jobs", []):
@@ -42,23 +44,21 @@ def extract_anomalo(soup, page, main_url):
 
         out.append((link, title, desc, str(loc), posting_date))
 
-    print(f"[Anomalo API] Extracted {len(out)} jobs")
+    print(f"[Pinecone Ashby API] Extracted {len(out)} jobs")
     return out
 
 
 def _dom_fallback(page):
     out = []
     seen = set()
-    ASHBY_URL = "https://jobs.ashbyhq.com/anomalo"
     try:
         page.goto(ASHBY_URL, timeout=45000, wait_until="networkidle")
-        page.wait_for_timeout(1000)
-        from bs4 import BeautifulSoup
+        page.wait_for_timeout(1200)
         s = BeautifulSoup(page.content(), "lxml")
         import re
-        for a in s.select("a[href*='anomalo']"):
+        for a in s.select("a[href*='pinecone'], a[href*='/job/']"):
             href = a.get("href", "").strip()
-            if not href or not re.search(r"[0-9a-fA-F\-]{36}", href):
+            if not href or not re.search(r"[0-9a-fA-F\-]{8,}", href):
                 continue
             link = href if href.startswith("http") else urljoin(ASHBY_URL, href)
             if link in seen:
@@ -68,5 +68,5 @@ def _dom_fallback(page):
             if title and len(title.split()) >= 2:
                 out.append((link, title, "", "", ""))
     except Exception as e:
-        print(f"[Anomalo DOM fallback error] {e}")
+        print(f"[Pinecone DOM fallback error] {e}")
     return out

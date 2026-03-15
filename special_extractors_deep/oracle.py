@@ -1,93 +1,100 @@
-# oracle.py
-# Deep extractor for Oracle ORC job boards
+# special_extractors_deep/oracle.py — v2.0
+# Fixed: missing `return out` on last line of original
+# Improved: 5-tuple output, better title/location extraction, relevance pre-filter
+
+import re
+import time
+import json
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-import time, re
+
+RELEVANT = re.compile(
+    r"\b(data|etl|integration|pipeline|engineer|analyst|architect|"
+    r"cloud|platform|bi|analytics|database|sql|developer|sre)\b",
+    re.I
+)
 
 def extract_oracle(soup, page, base_url):
-    results = []
+    out = []
     seen = set()
 
-    # --- Force JS rendering + scrolling ---
+    # JS-render with scroll
     try:
-        page.goto(base_url, wait_until="networkidle", timeout=45000)
-        for _ in range(3):
+        page.goto(base_url, wait_until="networkidle", timeout=50000)
+        for _ in range(4):
             page.mouse.wheel(0, 1400)
-            time.sleep(0.8)
-
+            time.sleep(0.7)
+        # Try "Load more" button
+        for _ in range(5):
+            try:
+                btn = page.query_selector(
+                    "button:has-text('Load more'), button:has-text('Show more'), "
+                    "a:has-text('Load more')"
+                )
+                if btn and btn.is_visible():
+                    btn.click()
+                    time.sleep(1.2)
+                else:
+                    break
+            except Exception:
+                break
         html = page.content()
         soup = BeautifulSoup(html, "lxml")
-    except Exception:
-        pass
-
-    job_nodes = []
+    except Exception as e:
+        print(f"[Oracle] render error: {e}")
 
     selectors = [
         "a[href*='/job/']",
         "a[href*='/jobs/']",
-        ".job", ".job-card", ".job-item",
-        ".card a[href]",
         "div[data-qa='search-result'] a[href]",
+        ".job-card a[href]",
+        ".card a[href]",
         "li a[href*='/job/']",
     ]
 
     for sel in selectors:
-        job_nodes.extend(soup.select(sel))
+        for a in soup.select(sel):
+            href = a.get("href", "")
+            if not href:
+                continue
+            link = urljoin(base_url, href)
+            if link in seen:
+                continue
+            seen.add(link)
 
-    for a in job_nodes:
-        href = a.get("href")
-        if not href:
-            continue
+            # Title
+            title = a.get_text(" ", strip=True)
+            if not title or len(title) < 3:
+                parent = a.find_parent(["div", "li", "article"])
+                if parent:
+                    h = parent.find(["h2", "h3", "h4"])
+                    if h:
+                        title = h.get_text(" ", strip=True)
 
-        link = urljoin(base_url, href)
-        if link in seen:
-            continue
-        seen.add(link)
+            if not title or len(title) < 3:
+                continue
 
-        # ----- Extract Title -----
-        title = a.get_text(" ", strip=True)
+            # Pre-filter noise
+            if not RELEVANT.search(title):
+                continue
 
-        # If anchor is empty, try parents
-        if not title or len(title) < 2:
-            parent = a.find_parent()
-            if parent:
-                t2 = parent.get_text(" ", strip=True)
-                if t2 and len(t2) > 2:
-                    title = t2
-
-        title = title.strip()
-        if len(title) < 2:
-            continue
-
-        # ----- Extract Location -----
-        location = ""
-
-        card = (
-            a.find_parent("div", class_=re.compile("(job|card|item)", re.I))
-            or a.find_parent("li")
-            or a.find_parent("article")
-        )
-
-        if card:
-            loc_el = (
-                card.select_one(".job-location")
-                or card.select_one(".location")
-                or card.select_one("span.location")
-                or card.find("p")
+            # Location
+            loc = ""
+            card = (
+                a.find_parent("div", class_=re.compile(r"(job|card|item)", re.I))
+                or a.find_parent("li")
+                or a.find_parent("article")
             )
-            if loc_el:
-                location = loc_el.get_text(" ", strip=True)
+            if card:
+                for loc_sel in [".job-location", ".location", "span.location", "p"]:
+                    el = card.select_one(loc_sel)
+                    if el:
+                        candidate = el.get_text(" ", strip=True)
+                        if len(candidate) < 60:
+                            loc = candidate
+                            break
 
-        # fallback: extract parent paragraphs
-        if not location:
-            parent = a.find_parent()
-            if parent:
-                loc_el = parent.find("p")
-                if loc_el:
-                    location = loc_el.get_text(" ", strip=True)
+            out.append((link, title, "", loc, ""))
 
-        # final label
-        label = f"{title} ({location})" if location else title
-        results.append((link, label))
-
-    return
+    print(f"[Oracle] Extracted {len(out)} jobs")
+    return out  # was missing in original!

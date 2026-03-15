@@ -1,111 +1,110 @@
-# ibm.py
-# Deep extractor for IBM (BrassRing / IBM Talent Platform)
+# special_extractors_deep/ibm.py — v2.0
+# IBM Phenom People platform
+# Added: relevance pre-filter, 5-tuple output, load-more pagination
 
+import re
+import time
+import json
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-import time, json, re
+
+BASE_URL = "https://www.ibm.com/careers/search"
+
+RELEVANT = re.compile(
+    r"\b(data|etl|integration|pipeline|engineer|analyst|architect|"
+    r"cloud|platform|bi|analytics|database|sql|developer|sre|"
+    r"integration|connector|governance|observ)\b",
+    re.I
+)
 
 def extract_ibm(soup, page, base_url):
-    results = []
+    out = []
     seen = set()
 
-    # --- JS render + scroll ---
+    # JS render with scroll and load-more
     try:
-        page.goto(base_url, wait_until="networkidle", timeout=50000)
-        for _ in range(4):
+        page.goto(base_url, wait_until="networkidle", timeout=55000)
+        page.wait_for_timeout(2000)
+
+        for _ in range(5):
             page.mouse.wheel(0, 1500)
-            time.sleep(0.7)
+            page.wait_for_timeout(600)
+
+        for _ in range(8):
+            try:
+                btn = page.query_selector(
+                    "button:has-text('Load more'), "
+                    "button[data-ph-at-id='load-more-button'], "
+                    "button:has-text('Show more')"
+                )
+                if btn and btn.is_visible():
+                    btn.click()
+                    page.wait_for_timeout(1500)
+                else:
+                    break
+            except Exception:
+                break
+
         html = page.content()
         soup = BeautifulSoup(html, "lxml")
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[IBM] render error: {e}")
 
-    # --- Find job cards ---
     selectors = [
         "a[href*='/job/']",
         "a[href*='/jobs/']",
         "a[href*='jobId=']",
         "div[data-ph-at-id='job-card'] a[href]",
-        ".job", ".job-card", ".card", ".job-list-item"
+        ".job-list-item a[href]",
     ]
 
-    nodes = []
     for sel in selectors:
-        nodes.extend(soup.select(sel))
+        for a in soup.select(sel):
+            href = a.get("href", "")
+            if not href:
+                continue
 
-    for a in nodes:
-        href = a.get("href")
-        if not href:
-            continue
+            # Skip search/filter pages
+            if "search" in href.lower() and "job" not in href.lower():
+                continue
 
-        link = urljoin(base_url, href)
+            link = urljoin(base_url, href)
+            if link in seen:
+                continue
+            seen.add(link)
 
-        # skip search / filter urls
-        if "search" in link.lower() and "job" not in link.lower():
-            continue
+            # Title
+            title = a.get_text(" ", strip=True)
+            if not title or len(title) < 3:
+                parent = a.find_parent(["div", "li"])
+                if parent:
+                    h = parent.find(["h2", "h3", "h4"])
+                    if h:
+                        title = h.get_text(" ", strip=True)
+            if not title or len(title) < 3:
+                continue
 
-        if link in seen:
-            continue
-        seen.add(link)
+            # Relevance filter — IBM posts thousands of unrelated roles
+            if not RELEVANT.search(title):
+                continue
 
-        # --- extract title ---
-        title = a.get_text(" ", strip=True)
-        if not title or len(title) < 2:
-            # fallback: parent heading
-            parent = a.find_parent(["div", "li"])
-            if parent:
-                h = parent.find(["h2", "h3", "h4"])
-                if h:
-                    title = h.get_text(" ", strip=True)
-
-        if not title or len(title) < 2:
-            continue
-
-        # --- extract location ---
-        location = ""
-
-        card = (
-            a.find_parent("div", class_=re.compile("(job|card|result|listing)", re.I))
-            or a.find_parent("li")
-        )
-
-        if card:
-            loc_el = (
-                card.select_one(".job-location")
-                or card.select_one(".location")
-                or card.find("span", class_=re.compile("location", re.I))
-                or card.find("p")
+            # Location
+            loc = ""
+            card = (
+                a.find_parent("div", class_=re.compile(r"(job|card|result|listing)", re.I))
+                or a.find_parent("li")
             )
-            if loc_el:
-                location = loc_el.get_text(" ", strip=True)
+            if card:
+                for loc_sel in [".job-location", ".location",
+                                 "span[class*='location']", "p"]:
+                    el = card.select_one(loc_sel)
+                    if el:
+                        candidate = el.get_text(" ", strip=True)
+                        if len(candidate) < 80:
+                            loc = candidate
+                            break
 
-        # location fallback: parent container paragraphs
-        if not location:
-            parent = a.find_parent()
-            if parent:
-                p = parent.find("p")
-                if p:
-                    location = p.get_text(" ", strip=True)
+            out.append((link, title, "", loc, ""))
 
-        # --- IBM embeds data in JSON in <script> tags ---
-        if not location:
-            for script in soup.find_all("script"):
-                if not script.string:
-                    continue
-                if "jobLocation" in script.string:
-                    try:
-                        data = json.loads(script.string)
-                        if isinstance(data, dict):
-                            jl = data.get("jobLocation")
-                            if jl and isinstance(jl, dict):
-                                loc = jl.get("addressLocality")
-                                country = jl.get("addressCountry")
-                                if loc:
-                                    location = f"{loc}, {country or ''}".strip(", ")
-                    except:
-                        pass
-
-        label = f"{title} ({location})" if location else title
-        results.append((link, label))
-
-    return results
+    print(f"[IBM] Extracted {len(out)} jobs")
+    return out

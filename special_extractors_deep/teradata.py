@@ -1,116 +1,108 @@
-# teradata.py
-# Deep extractor for Teradata (Workday-based)
-# URL: https://careers.teradata.com/jobs
+# special_extractors_deep/teradata.py — v2.0
+# Workday-based. Returns 5-tuples.
+# Removed redundant per-job detail fetch (detail enrichment handled centrally)
 
-import json, re, time
-from urllib.parse import urljoin
+import json
+import re
+import time
+import requests
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+
+DOMAIN  = "https://careers.teradata.com"
+TENANT  = "teradata"
+SITE    = "TeradataCareers"
 
 RELEVANT = re.compile(
-    r"(data|etl|snowflake|pipeline|integration|platform|cloud|engineer|analytics|bi)",
+    r"\b(data|etl|integration|pipeline|engineer|analyst|architect|"
+    r"cloud|platform|bi|analytics|database|sql|developer|sre)\b",
     re.I
 )
 
-def fetch_detail(page, link):
-    """Fetch full job detail page safely."""
-    try:
-        page.goto(link, timeout=45000, wait_until="networkidle")
-        page.wait_for_timeout(1000)
+def extract_teradata(soup, page, base_url):
+    out = []
+    seen = set()
 
-        s = BeautifulSoup(page.content(), "lxml")
-        title = ""
-        loc = ""
-        date = ""
+    # Try Workday cxs API first
+    api_root = f"{DOMAIN}/wday/cxs/{TENANT}/{SITE}/jobs"
+    offset, limit = 0, 20
 
-        h = s.find("h1")
-        if h:
-            title = h.get_text(" ", strip=True)
-
-        # Workday location selectors
-        for sel in [".location", ".job-location", "[data-automation-id='location']"]:
-            el = s.select_one(sel)
-            if el:
-                loc = el.get_text(" ", strip=True)
+    while True:
+        api_url = f"{api_root}?offset={offset}&limit={limit}"
+        try:
+            r = requests.get(api_url, timeout=20,
+                             headers={"Accept": "application/json",
+                                      "User-Agent": "Mozilla/5.0"})
+            r.raise_for_status()
+            data = r.json()
+        except Exception:
+            try:
+                page.goto(api_url, timeout=30000, wait_until="networkidle")
+                raw = page.inner_text("pre") or page.content()
+                data = json.loads(raw)
+            except Exception as e:
+                print(f"[Teradata] API failed at offset {offset}: {e}")
                 break
 
-        # JSON-LD for date + location
-        for sc in s.find_all("script", type="application/ld+json"):
-            try:
-                data = json.loads(sc.string or "{}")
-            except:
-                continue
-
-            if isinstance(data, dict):
-                if "datePosted" in data:
-                    date_raw = data["datePosted"]
-                    if "T" in date_raw:
-                        date = date_raw.split("T")[0]
-
-                jl = data.get("jobLocation")
-                if isinstance(jl, dict) and not loc:
-                    addr = jl.get("address", {})
-                    city = addr.get("addressLocality", "")
-                    region = addr.get("addressRegion", "")
-                    country = addr.get("addressCountry", "")
-                    loc = ", ".join([x for x in [city, region, country] if x])
-
-        return title, loc, date
-
-    except Exception:
-        return "", "", ""
-
-
-def extract_teradata(soup, page, base_url):
-    """Main Teradata extractor – Workday JSON parsing."""
-    out = []
-
-    # Step 1: Find Workday job JSON blob
-    scripts = soup.find_all("script", {"type": "application/json"})
-    json_blob = None
-
-    for sc in scripts:
-        txt = sc.string
-        if txt and '"jobFamilyGroup"' in txt:
-            json_blob = txt.strip()
+        postings = data.get("jobPostings", [])
+        if not postings:
             break
 
-    if not json_blob:
-        return out
+        for job in postings:
+            title = (job.get("title") or "").strip()
+            path  = job.get("externalPath") or job.get("externalUrl") or ""
+            if not title or not path:
+                continue
 
+            # Relevance pre-filter
+            if not RELEVANT.search(title):
+                continue
+
+            link = path if path.startswith("http") else urljoin(base_url, path)
+            if link in seen:
+                continue
+            seen.add(link)
+
+            loc          = (job.get("locationsText") or job.get("location") or "")
+            posting_date = (job.get("postedOn") or "").split("T")[0]
+
+            out.append((link, title, "", str(loc), posting_date))
+
+        total = data.get("total", 0)
+        offset += limit
+        if total and offset >= total:
+            break
+
+    # DOM fallback if API returned nothing
+    if not out:
+        out = _dom_fallback(soup, page, base_url)
+
+    print(f"[Teradata] Extracted {len(out)} jobs")
+    return out
+
+
+def _dom_fallback(soup, page, base_url):
+    out = []
+    seen = set()
     try:
-        data = json.loads(json_blob)
+        page.goto(base_url, wait_until="networkidle", timeout=45000)
+        for _ in range(3):
+            page.mouse.wheel(0, 1400)
+            time.sleep(0.7)
+        soup = BeautifulSoup(page.content(), "lxml")
     except Exception:
-        return out
+        pass
 
-    # Workday stores jobs here:
-    jobs = data.get("jobPostings", []) or data.get("children", [])
-
-    for j in jobs:
-        # Workday structure differs between deployments
-        title = j.get("title") or j.get("displayName") or ""
-        link = j.get("externalPath") or j.get("externalUrl") or j.get("canonicalPositionUrl") or ""
-        loc = j.get("location") or j.get("city") or ""
-        date = j.get("postedOn") or ""
-
-        if not title or not link:
+    for a in soup.select("a[href*='/job/'], a[href*='/jobs/']"):
+        href = a.get("href", "")
+        if not href:
             continue
-
-        full_link = urljoin(base_url, link)
-
-        # relevance filter
-        combined_text = f"{title} {loc}"
-        if not RELEVANT.search(combined_text):
+        link = urljoin(base_url, href)
+        if link in seen:
             continue
-
-        # fetch detail page for clean metadata
-        title2, loc2, date2 = fetch_detail(page, full_link)
-
-        final_title = title2 or title
-        final_loc = loc2 or loc
-        final_date = date2 or date
-
-        label = f"{final_title} ({final_loc})" if final_loc else final_title
-
-        out.append((full_link, label))
+        seen.add(link)
+        title = a.get_text(" ", strip=True)
+        if title and RELEVANT.search(title):
+            out.append((link, title, "", "", ""))
 
     return out

@@ -1,33 +1,31 @@
-# special_extractors_deep/sifflet.py — v2.0
-# Sifflet uses Welcome to the Jungle
-# Playwright render required — WTTJ is React SPA
+# special_extractors_deep/weaviate.py — v1.0
+# Weaviate uses Welcome to the Jungle (WTTJ)
 
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-WTTJ_BASE = "https://www.welcometothejungle.com"
-SIFFLET_URL = "https://www.welcometothejungle.com/en/companies/sifflet/jobs"
+WTTJ_BASE   = "https://www.welcometothejungle.com"
+WEAVIATE_URL = "https://www.welcometothejungle.com/en/companies/weaviate/jobs"
 
-def extract_sifflet(soup, page, main_url):
+def extract_weaviate(soup, page, main_url):
     out = []
     seen = set()
 
     try:
-        page.goto(SIFFLET_URL, timeout=45000, wait_until="networkidle")
+        page.goto(WEAVIATE_URL, timeout=45000, wait_until="networkidle")
         page.wait_for_timeout(1500)
         html = page.content()
     except Exception as e:
-        print(f"[Sifflet] render error: {e}")
+        print(f"[Weaviate] render error: {e}")
         html = ""
 
     s = BeautifulSoup(html or "", "lxml") if html else soup
 
-    # WTTJ job card selectors
     selectors = [
-        "a[href*='/en/companies/sifflet/jobs/']",
-        "a[href*='/jobs/'][href*='sifflet']",
+        "a[href*='/en/companies/weaviate/jobs/']",
         "li[data-testid='job-card'] a",
         ".sc-job-card a[href]",
+        "a[href*='/jobs/'][href*='weaviate']",
     ]
 
     for sel in selectors:
@@ -40,7 +38,7 @@ def extract_sifflet(soup, page, main_url):
                 continue
             seen.add(link)
 
-            # Title — WTTJ usually puts it in an h3 inside the card
+            # Title from h3 inside card, fallback to anchor text
             title = ""
             parent = a.find_parent("li") or a.find_parent("div")
             if parent:
@@ -62,16 +60,16 @@ def extract_sifflet(soup, page, main_url):
                         loc = el.get_text(" ", strip=True)
                         break
 
-            # Contract/date
+            # Date
             posting_date = ""
             if parent:
-                date_el = parent.select_one("time[datetime]")
-                if date_el:
-                    posting_date = (date_el.get("datetime") or "").split("T")[0]
+                time_el = parent.select_one("time[datetime]")
+                if time_el:
+                    posting_date = (time_el.get("datetime") or "").split("T")[0]
 
             out.append((link, title, "", loc, posting_date))
         if out:
             break
 
-    print(f"[Sifflet] Extracted {len(out)} jobs")
+    print(f"[Weaviate WTTJ] Extracted {len(out)} jobs")
     return out
