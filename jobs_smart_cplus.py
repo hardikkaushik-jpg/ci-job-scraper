@@ -61,6 +61,11 @@ COMPANIES = {
     "Amazon":             ["https://www.amazon.jobs/en/"],
     "IBM":                ["https://www.ibm.com/careers/search"],
     "SAP":                ["https://jobs.sap.com/"],
+    # ── Vector DB / AI-native storage ──────────────────────────────────────────
+    "Pinecone":           ["https://jobs.ashbyhq.com/pinecone"],
+    "Weaviate":           ["https://www.welcometothejungle.com/en/companies/weaviate/jobs"],
+    "Qdrant":             ["https://qdrant.tech/careers/"],
+    "Zilliz":             ["https://jobs.lever.co/zilliz"],
 }
 
 PAGE_NAV_TIMEOUT     = 40_000
