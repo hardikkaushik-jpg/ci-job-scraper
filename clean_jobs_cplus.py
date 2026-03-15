@@ -43,6 +43,24 @@ _SKILL_CANON = {
     "kubernetes": "KUBERNETES",
     "docker": "DOCKER",
     "terraform": "TERRAFORM",
+    # Vector / AI
+    "vector": "VECTOR",
+    "embedding": "EMBEDDING",
+    "rag": "RAG",
+    "llm": "LLM",
+    "faiss": "FAISS",
+    "pinecone": "PINECONE",
+    "weaviate": "WEAVIATE",
+    "qdrant": "QDRANT",
+    "milvus": "MILVUS",
+    "chromadb": "CHROMADB",
+    "langchain": "LANGCHAIN",
+    "semantic search": "SEMANTIC_SEARCH",
+    "mlops": "MLOPS",
+    "pytorch": "PYTORCH",
+    "tensorflow": "TENSORFLOW",
+    "hugging face": "HUGGINGFACE",
+    "transformers": "TRANSFORMERS",
 }
 
 _SKILL_TOKEN_RE = re.compile(r'\b([A-Za-z0-9+#\.\-/]{1,40})\b')
@@ -72,7 +90,11 @@ _COMPANY_GROUPS = {
     "Monitoring/Platforms": {
         "datadog", "splunk", "new relic",
     },
-    "Other": set(),  # catch-all, populated at runtime
+    "Vector DB / AI Storage": {
+        "pinecone", "weaviate", "qdrant", "zilliz",
+        "milvus", "chromadb", "chroma",
+    },
+    "Other": set(),
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -86,6 +108,9 @@ _PRODUCT_KEYWORDS = {
     "Streaming / Real-time": ["stream", "kafka", "real-time", "flink"],
     "ML/AI infra":           ["ml", "machine learning", "mlops", "model", "llm", "ai", "rag"],
     "Platform / Infra":      ["sre", "infra", "platform", "kubernetes", "aws", "gcp", "azure"],
+    "Vector / Embedding":    ["vector", "embedding", "similarity search", "faiss", "ann",
+                              "rag", "retrieval", "semantic search", "pinecone", "weaviate",
+                              "qdrant", "milvus", "chroma"],
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -96,6 +121,10 @@ _ACTIAN_RELEVANT_SKILLS = {
     "SNOWFLAKE", "DATABRICKS", "POSTGRES", "STREAMING",
     "KAFKA", "RUST", "GO", "GOVERNANCE", "OBSERVABILITY",
     "LINEAGE", "DATA_QUALITY", "INTEGRATION",
+    # Vector/AI — relevant for VectorAI product
+    "VECTOR", "EMBEDDING", "RAG", "LLM", "FAISS",
+    "PINECONE", "WEAVIATE", "QDRANT", "MILVUS",
+    "SEMANTIC_SEARCH", "MLOPS",
 }
 
 # Calibrated weights — score is NOT multiplied by 10 anymore, kept 0-100 range
@@ -127,6 +156,7 @@ _SENIORITY_VALUE = {
 HIGH_RELEVANCY_PRODUCTS = {
     "ETL/Integration", "Data Governance",
     "Data Observability", "Streaming / Real-time",
+    "Vector / Embedding",
 }
 
 
@@ -235,9 +265,21 @@ def compute_trend_score(title, description, seniority):
 
 def infer_function(title):
     t = (title or "").lower()
+
+    # AI/ML and Vector checked FIRST — before generic Engineering catch-all
+    # so "ML Engineer", "AI Researcher", "Vector Search Engineer" all land here
+    if re.search(
+        r"\b(machine learning|ml engineer|ml infra|mlops|llm|large language|"
+        r"ai engineer|ai researcher|ai scientist|generative|gen ai|rag|"
+        r"vector|embedding|semantic search|similarity|recommendation engine|"
+        r"deep learning|nlp|computer vision|model training|model serving|"
+        r"data scientist|research scientist|applied scientist)\b", t
+    ):
+        return "AI/ML & Vector"
+
     if re.search(r"(engineer|developer|devops|sre|software|architect)", t):
         return "Engineering"
-    if "data" in t or "analyt" in t or "scientist" in t:
+    if "data" in t or "analyt" in t:
         return "Data/Analytics"
     if "product" in t:
         return "Product"
