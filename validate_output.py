@@ -1,4 +1,4 @@
-# validate_output.py — Refactored v5.0
+# validate_output.py — Refactored v6.0
 # Changes:
 #   1. Duplicate rate > 5% → HARD FAIL (sys.exit 1)
 #   2. Garbage title rate > 2% → HARD FAIL
