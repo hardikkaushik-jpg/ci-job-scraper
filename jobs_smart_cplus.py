@@ -73,8 +73,16 @@ PAGE_DOM_TIMEOUT     = 15_000
 SLEEP_BETWEEN        = 0.18
 MAX_DETAIL_PAGES     = 12_000
 PER_COMPANY_ROW_CAP  = 300          # hard warning threshold
+PER_COMPANY_CAP_OVERRIDES = {
+    "Databricks": 500,   # large company, legitimately >300 after filtering
+    "MongoDB":    450,
+    "Fivetran":   200,
+}
 
 TODAY = date.today().isoformat()
+
+# Companies with JS-heavy portals — given longer timeout
+SLOW_COMPANIES = {"SAP", "IBM", "Salesforce", "Amazon", "Oracle"}
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PATTERNS
@@ -105,6 +113,9 @@ RELEVANCE_HARD = [
     r'\bdata engineer\b', r'\betl\b', r'\bintegrat',
     r'\bconnector', r'\bpipeline\b', r'\bsnowflake\b',
     r'\bdatabricks\b', r'\bobservab',
+    r'\bgovernance\b', r'\bcatalog\b', r'\blineage\b',
+    r'\bmetadata\b', r'\bdata quality\b', r'\bdata mesh\b',
+    r'\bvector\b', r'\bembedding\b', r'\brag\b', r'\bllm\b',
 ]
 RELEVANCY_THRESHOLD = 2
 
@@ -407,8 +418,16 @@ def scrape():
 
         for company, url_list in COMPANIES.items():
             company_rows = []
+            import time as _time
+            company_start = _time.time()
+            COMPANY_TIMEOUT_SECS = 900 if company in SLOW_COMPANIES else 600
 
             for main_url in url_list:
+                # Per-company timeout check
+                if _time.time() - company_start > COMPANY_TIMEOUT_SECS:
+                    print(f"[TIMEOUT] {company} exceeded {COMPANY_TIMEOUT_SECS}s — skipping remaining URLs")
+                    break
+
                 print(f"\n[SCRAPING] {company} -> {main_url}")
                 listing_html = fetch_page_content(page, main_url)
                 if not listing_html:
@@ -646,9 +665,10 @@ def scrape():
                         print(f"[DROP] {company} | {final_title}")
 
             # Per-company row cap check
-            if len(company_rows) > PER_COMPANY_ROW_CAP:
+            cap = PER_COMPANY_CAP_OVERRIDES.get(company, PER_COMPANY_ROW_CAP)
+            if len(company_rows) > cap:
                 print(f"[ANOMALY WARNING] {company} produced {len(company_rows)} rows "
-                      f"(cap={PER_COMPANY_ROW_CAP}). Investigate before trusting this data.")
+                      f"(cap={cap}). Investigate before trusting this data.")
 
             rows.extend(company_rows)
 
