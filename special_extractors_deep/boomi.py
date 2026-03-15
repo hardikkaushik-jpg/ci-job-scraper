@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 def extract_boomi(soup, page, main_url):
-    API_URL = "https://boards-api.greenhouse.io/v1/boards/boomi/jobs?content=true"
+    API_URL = "https://boards-api.greenhouse.io/v1/boards/boomilp/jobs?content=true"
     headers = {"User-Agent": "Mozilla/5.0"}
     out = []
 

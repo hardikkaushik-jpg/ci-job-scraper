@@ -3,7 +3,17 @@
 # Fixed: uses first_published_at (actual posting date) not updated_at (edit date)
 
 import requests
+import re
 from bs4 import BeautifulSoup
+
+# Roles to drop immediately — pure sales/legal/HR with no CI signal
+DATABRICKS_DROP = re.compile(
+    r'\b(account executive|business development rep|bdr|sdr|legal counsel|'
+    r'executive assistant|talent sourcer|recruiter|paralegal|'
+    r'deployment strategist|proposal coordinator|field cto|'
+    r'regional vice president|rvp)\b',
+    re.I
+)
 
 def extract_databricks(soup, page, main_url):
     api = "https://boards-api.greenhouse.io/v1/boards/databricks/jobs?content=true"
@@ -22,6 +32,10 @@ def extract_databricks(soup, page, main_url):
         title = (job.get("title") or "").strip()
 
         if not link or not title:
+            continue
+
+        # Drop pure noise roles at extraction time
+        if DATABRICKS_DROP.search(title):
             continue
 
         # Location

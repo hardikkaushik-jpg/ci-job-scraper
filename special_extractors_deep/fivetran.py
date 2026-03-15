@@ -2,7 +2,15 @@
 # Fivetran uses Greenhouse — use the API directly instead of DOM scraping
 
 import requests
+import re
 from bs4 import BeautifulSoup
+
+FIVETRAN_DROP = re.compile(
+    r"\b(account executive|business development|bdr|sdr|"
+    r"recruiter|talent acquisition|legal|paralegal|"
+    r"executive assistant|general application|can't find)\b",
+    re.I
+)
 
 def extract_fivetran(soup, page, main_url):
     API_URL = "https://boards-api.greenhouse.io/v1/boards/fivetran/jobs?content=true"
@@ -21,6 +29,9 @@ def extract_fivetran(soup, page, main_url):
         title = (job.get("title") or "").strip()
         link  = (job.get("absolute_url") or "").strip()
         if not title or not link:
+            continue
+
+        if FIVETRAN_DROP.search(title):
             continue
 
         loc = ""

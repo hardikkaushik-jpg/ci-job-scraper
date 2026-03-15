@@ -1,68 +1,92 @@
-# special_extractors_deep/datadog.py — v2.0
-# Datadog uses Greenhouse — use the API directly
+# special_extractors_deep/datadog.py — v3.0
+# Datadog uses a custom React careers page — no public Greenhouse API
+# Playwright DOM scraping with relevance pre-filter
 
-import requests
+import re
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
+CAREERS_URL = "https://careers.datadoghq.com/all-jobs/"
+
+RELEVANT = re.compile(
+    r"\b(engineer|developer|architect|scientist|analyst|sre|"
+    r"platform|data|observab|monitor|pipeline|integrat|"
+    r"product manager|technical|infrastructure|security|"
+    r"ml|ai|machine learning|vector|embedding)\b",
+    re.I
+)
+
+DROP = re.compile(
+    r"\b(account executive|business development|bdr|sdr|"
+    r"recruiter|talent acquisition|legal|paralegal|"
+    r"executive assistant|office manager)\b",
+    re.I
+)
+
 def extract_datadog(soup, page, base_url):
-    API_URL = "https://boards-api.greenhouse.io/v1/boards/datadoghq/jobs?content=true"
-    headers = {"User-Agent": "Mozilla/5.0"}
-    out = []
-
-    try:
-        r = requests.get(API_URL, headers=headers, timeout=20)
-        r.raise_for_status()
-        data = r.json()
-    except Exception as e:
-        print(f"[Datadog Greenhouse API error] {e}")
-        return _dom_fallback(soup, base_url)
-
-    for job in data.get("jobs", []):
-        title = (job.get("title") or "").strip()
-        link  = (job.get("absolute_url") or "").strip()
-        if not title or not link:
-            continue
-
-        loc = ""
-        loc_data = job.get("location")
-        if isinstance(loc_data, dict):
-            loc = loc_data.get("name", "")
-
-        posting_date = ""
-        for df in ("first_published_at", "updated_at"):
-            raw = job.get(df, "")
-            if raw:
-                posting_date = raw.split("T")[0]
-                break
-
-        desc_text = ""
-        desc_html = job.get("content", "")
-        if desc_html:
-            try:
-                desc_text = BeautifulSoup(desc_html, "lxml").get_text(" ", strip=True)[:4000]
-            except Exception:
-                pass
-
-        out.append((link, title, desc_text, loc, posting_date))
-
-    print(f"[Datadog API] Extracted {len(out)} jobs")
-    return out
-
-
-def _dom_fallback(soup, base_url):
-    """DOM fallback in case API is unavailable."""
     out = []
     seen = set()
-    for a in soup.select("a[href*='/job/']"):
-        href = a.get("href", "").strip()
-        if not href:
-            continue
-        link = urljoin(base_url, href)
-        if link in seen:
-            continue
-        seen.add(link)
-        title = a.get_text(" ", strip=True)
-        if title:
-            out.append((link, title, "", "", ""))
+
+    try:
+        page.goto(CAREERS_URL, timeout=45000, wait_until="networkidle")
+        page.wait_for_timeout(2000)
+        for _ in range(5):
+            page.keyboard.press("End")
+            page.wait_for_timeout(800)
+        for _ in range(10):
+            try:
+                btn = page.query_selector(
+                    "button:has-text('Load more'), button:has-text('Show more')"
+                )
+                if btn and btn.is_visible():
+                    btn.click()
+                    page.wait_for_timeout(1200)
+                else:
+                    break
+            except Exception:
+                break
+        html = page.content()
+    except Exception as e:
+        print(f"[Datadog] render error: {e}")
+        html = ""
+
+    s = BeautifulSoup(html or "", "lxml") if html else soup
+
+    for sel in ["a[href*='/job/']", ".job-listing a[href]", "li.opening a[href]"]:
+        for a in s.select(sel):
+            href = a.get("href", "").strip()
+            if not href:
+                continue
+            link = href if href.startswith("http") else urljoin("https://careers.datadoghq.com", href)
+            if link in seen:
+                continue
+            seen.add(link)
+
+            title = a.get_text(" ", strip=True)
+            if not title:
+                parent = a.find_parent(["li", "div"])
+                if parent:
+                    h = parent.find(["h2", "h3", "h4"])
+                    if h:
+                        title = h.get_text(" ", strip=True)
+            if not title or len(title) < 4:
+                continue
+
+            if DROP.search(title) or not RELEVANT.search(title):
+                continue
+
+            loc = ""
+            parent = a.find_parent(["li", "div"])
+            if parent:
+                for el in parent.select("span, [class*='location']"):
+                    t = el.get_text(" ", strip=True)
+                    if t and re.search(r"\b(remote|usa|york|paris|london|dublin)\b", t, re.I) and len(t) < 60:
+                        loc = t
+                        break
+
+            out.append((link, title, "", loc, ""))
+        if out:
+            break
+
+    print(f"[Datadog] Extracted {len(out)} relevant jobs")
     return out
